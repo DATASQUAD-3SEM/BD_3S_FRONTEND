@@ -13,12 +13,12 @@ try {
 }
 
 const windows = process.platform === 'win32'
-const backendDir = path.resolve(process.env.BACKEND_DIR ?? '../nexus')
+const backendDir = path.resolve(process.env.BACKEND_DIR ?? '../BD_3S_BACKEND')
 const mvnw = path.join(backendDir, windows ? 'mvnw.cmd' : 'mvnw')
 
 if (!existsSync(mvnw)) {
   console.error(`\n[dev:full] Nao achei o backend em: ${backendDir}`)
-  console.error('Clone o repositorio do backend ao lado deste (pasta "nexus"),')
+  console.error('Clone o repositorio do backend ao lado deste (pasta "BD_3S_BACKEND"),')
   console.error('ou crie um arquivo .env com BACKEND_DIR=caminho/do/backend\n')
   process.exit(1)
 }
