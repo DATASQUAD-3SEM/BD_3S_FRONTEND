@@ -20,11 +20,8 @@ export default defineConfig(({ mode }) => {
     },
   }
 
-  // "npm run dev:https" = mode "https" -> certificado autoassinado (celular acessa via https://)
-  const usarHttps = mode === 'https'
-
   return {
-    plugins: [react(), ...(usarHttps ? [basicSsl()] : [])],
+    plugins: [react(), basicSsl()],
     server: {
       host: true, // 0.0.0.0: qualquer aparelho na mesma rede acessa pelo IP do seu PC
       port: 5173,

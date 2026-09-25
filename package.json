@@ -6,7 +6,6 @@
   "engines": { "node": ">=20.19.0" },
   "scripts": {
     "dev": "vite",
-    "dev:https": "vite --mode https",
     "dev:full": "node scripts/dev-full.mjs",
     "ip": "node scripts/mostrar-ip.mjs",
     "tunnel": "npx --yes cloudflared tunnel --url http://localhost:5173",

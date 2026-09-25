@@ -55,6 +55,8 @@ function encerrarTudo(codigo) {
 process.on('SIGINT', () => encerrarTudo(0))
 process.on('SIGTERM', () => encerrarTudo(0))
 
-console.log('[dev:full] Subindo backend (h2) e front. Para parar tudo: Ctrl+C\n')
+console.log('[dev:full] Subindo backend (h2) e front. Para parar tudo: Ctrl+C')
+console.log('[dev:full] Frontend: https://localhost:5173')
+console.log('[dev:full] Para acessar do celular, use o IP que aparece abaixo (comecando com https://)\n')
 iniciar('back ', windows ? `"${mvnw}"` : mvnw, ['spring-boot:run', '-Dspring-boot.run.profiles=h2'], { cwd: backendDir })
-iniciar('front', 'npx', ['vite'], { cwd: process.cwd() })
+iniciar('front', 'npx', ['vite', '--host'], { cwd: process.cwd() })
