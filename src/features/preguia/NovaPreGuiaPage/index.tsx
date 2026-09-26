@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ApiError } from '../../../shared/api/http'
 import { criarPreGuia } from '../api'
-import { formVazio, type NovaPreGuiaForm } from './types'
+import { formVazio, beneficiarioCompleto, type NovaPreGuiaForm } from './types'
 import DadosBeneficiario from './components/DadosBeneficiario'
 import SelecaoOcs from './components/SelecaoOcs'
 import SelecaoProcedimentos from './components/SelecaoProcedimentos'
@@ -18,6 +18,12 @@ export default function NovaPreGuiaPage() {
   const [form, setForm] = useState<NovaPreGuiaForm>(formVazio)
   const [mensagem, setMensagem] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
   const [enviando, setEnviando] = useState(false)
+
+  const podeEnviar =
+    beneficiarioCompleto(form.beneficiario) &&
+    form.arquivo != null &&
+    form.ocsId != null &&
+    form.procedimentoIds.length > 0
 
   async function enviar() {
     setEnviando(true)
@@ -47,7 +53,7 @@ export default function NovaPreGuiaPage() {
       <FeedbackUpload arquivo={form.arquivo} />
       <RevisaoResumo form={form} />
 
-      <button type="button" onClick={() => void enviar()} disabled={enviando}>
+      <button type="button" onClick={() => void enviar()} disabled={enviando || !podeEnviar}>
         {enviando ? 'Enviando...' : 'Enviar pre-guia'}
       </button>
       {mensagem && (
