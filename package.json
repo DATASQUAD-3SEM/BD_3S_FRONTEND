@@ -6,10 +6,10 @@
   "engines": { "node": ">=20.19.0" },
   "scripts": {
     "dev": "vite",
-    "dev:https": "vite --mode https",
     "dev:full": "node scripts/dev-full.mjs",
+    "dev:tunnel": "node scripts/dev-tunnel.mjs",
     "ip": "node scripts/mostrar-ip.mjs",
-    "tunnel": "npx --yes cloudflared tunnel --url http://localhost:5173",
+    "tunnel": "npx --yes cloudflared tunnel --url https://localhost:5173 --no-tls-verify",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
