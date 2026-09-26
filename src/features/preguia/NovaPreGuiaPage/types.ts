@@ -23,3 +23,14 @@ export const formVazio: NovaPreGuiaForm = {
   procedimentoIds: [],
   arquivo: null,
 }
+
+export function beneficiarioCompleto(b: DadosBeneficiarioForm): boolean {
+  return (
+    b.nome.trim() !== '' &&
+    b.idade.trim() !== '' &&
+    b.precCp.trim() !== '' &&
+    b.cpf.trim() !== '' &&
+    b.telefone.trim() !== ''
+  )
+}
+
