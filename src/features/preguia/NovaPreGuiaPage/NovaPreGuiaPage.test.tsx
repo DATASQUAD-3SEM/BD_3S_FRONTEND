@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import NovaPreGuiaPage from '.'
 
-// O jsdom (navegador de mentira dos testes) não tem createObjectURL.
-// O UploadEncaminhamento usa para gerar o preview. Precisa simular.
 beforeEach(() => {
   URL.createObjectURL = vi.fn(() => 'blob:falso')
   URL.revokeObjectURL = vi.fn()
@@ -14,10 +12,13 @@ describe('NovaPreGuiaPage', () => {
     render(<NovaPreGuiaPage />)
 
     // Ainda são EmConstrucao. Quando alguém implementar o seu,
-    // REMOVA o nome dele desta lista
-    for (const nome of ['DadosBeneficiario', 'SelecaoOcs', 'FeedbackUpload', 'RevisaoResumo']) {
+    // REMOVA o nome dele desta lista.
+    for (const nome of ['DadosBeneficiario', 'SelecaoOcs', 'FeedbackUpload']) {
       expect(screen.getByText(nome)).toBeInTheDocument()
     }
+
+    // RevisaoResumo (SCRUM-38) já foi implementado: aparece o título do painel.
+    expect(screen.getByText('Revisão da pré-guia')).toBeInTheDocument()
 
     expect(
       screen.getByText(/Por favor, selecione uma OCS na etapa anterior/i)
@@ -36,7 +37,9 @@ describe('NovaPreGuiaPage', () => {
       target: { files: [foto] },
     })
 
-    expect(screen.getByText('encaminhamento.png')).toBeInTheDocument()
+    // O nome aparece 2x agora: no preview do Upload e no resumo do RevisaoResumo.
+    // Por isso usamos getAllByText e conferimos que existe pelo menos 1.
+    expect(screen.getAllByText('encaminhamento.png').length).toBeGreaterThan(0)
 
     fireEvent.click(screen.getByRole('button', { name: /Remover e enviar outro arquivo/ }))
     expect(screen.getByRole('button', { name: /Escolher Arquivo/ })).toBeInTheDocument()
