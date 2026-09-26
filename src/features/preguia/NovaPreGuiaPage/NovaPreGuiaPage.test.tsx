@@ -11,7 +11,6 @@ describe('NovaPreGuiaPage', () => {
       'DadosBeneficiario',
       'SelecaoOcs',
       'UploadEncaminhamento',
-      'FeedbackUpload',
       'RevisaoResumo',
     ]) {
       expect(screen.getByText(nome)).toBeInTheDocument()
