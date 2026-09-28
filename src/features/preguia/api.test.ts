@@ -5,7 +5,7 @@ import { formVazio } from './NovaPreGuiaPage/types'
 afterEach(() => vi.unstubAllGlobals())
 
 describe('criarPreGuia', () => {
-  it('envia cpf e precCp sem formatacao (so digitos)', async () => {
+  it('envia cpf e precCp sem formatacao (so digitos) e sem procedimentoIds', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -14,7 +14,6 @@ describe('criarPreGuia', () => {
           dataEmissao: '2026-09-27T10:00:00',
           encaminhamentoUrl: 'encaminhamentos/x.pdf',
           ocsId: 1,
-          procedimentoIds: [1],
         }),
         { status: 201, headers: { 'Content-Type': 'application/json' } },
       ),
@@ -31,12 +30,12 @@ describe('criarPreGuia', () => {
         telefone: '(12) 98765-4321',
       },
       ocsId: 1,
-      procedimentoIds: [1],
       arquivo: new File(['x'], 'a.pdf', { type: 'application/pdf' }),
     })
 
     const enviado = fetchMock.mock.calls[0][1].body as FormData
     expect(enviado.get('cpf')).toBe('12345678900')
     expect(enviado.get('precCp')).toBe('45872213300')
+    expect(enviado.get('procedimentoIds')).toBeNull()
   })
 })
