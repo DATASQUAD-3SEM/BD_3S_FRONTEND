@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ApiError } from '../../../shared/api/http'
 import { criarPreGuia } from '../api'
 import { formVazio, beneficiarioCompleto, type NovaPreGuiaForm } from './types'
+import { beneficiarioLogado } from '../sessaoFake'
 import DadosBeneficiario from './components/DadosBeneficiario'
 import SelecaoOcs from './components/SelecaoOcs'
 import SelecaoProcedimentos from './components/SelecaoProcedimentos'
@@ -15,7 +16,10 @@ import RevisaoResumo from './components/RevisaoResumo'
  * em ./components. Assim ninguem edita o mesmo arquivo ao mesmo tempo.
  */
 export default function NovaPreGuiaPage() {
-  const [form, setForm] = useState<NovaPreGuiaForm>(formVazio)
+  const [form, setForm] = useState<NovaPreGuiaForm>({
+    ...formVazio,
+    beneficiario: beneficiarioLogado,
+  })
   const [mensagem, setMensagem] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
   const [enviando, setEnviando] = useState(false)
 
@@ -42,7 +46,7 @@ export default function NovaPreGuiaPage() {
   return (
     <>
       <h1>Nova pre-guia</h1>
-      <DadosBeneficiario value={form.beneficiario} onChange={(beneficiario) => setForm({ ...form, beneficiario })} />
+      <DadosBeneficiario value={form.beneficiario} />
       <SelecaoOcs value={form.ocsId} onChange={(ocsId) => setForm({ ...form, ocsId, procedimentoIds: [] })} />
       <SelecaoProcedimentos
         ocsId={form.ocsId}
