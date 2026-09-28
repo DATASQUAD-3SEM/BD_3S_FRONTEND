@@ -13,9 +13,13 @@ describe('NovaPreGuiaPage', () => {
 
     // Ainda são EmConstrucao. Quando alguém implementar o seu,
     // REMOVA o nome dele desta lista.
-    for (const nome of ['DadosBeneficiario', 'SelecaoOcs', 'FeedbackUpload']) {
+    for (const nome of ['SelecaoOcs', 'FeedbackUpload']) {
       expect(screen.getByText(nome)).toBeInTheDocument()
     }
+
+    // DadosBeneficiario foi implementado: os campos aparecem.
+    expect(screen.getByText('Antonio Carlos Ferreira')).toBeInTheDocument()
+    expect(screen.getByText('123.456.789-00')).toBeInTheDocument()
 
     // RevisaoResumo (SCRUM-38) já foi implementado: aparece o título do painel.
     expect(screen.getByText('Revisão da pré-guia')).toBeInTheDocument()
