@@ -1,0 +1,379 @@
+:root {
+  --verde: #1f4d2b;
+  --verde-escuro: #1a3d2e;
+  --verde-claro: #e8f2ea;
+  --verde-claro-2: #eef5f0;
+  --texto: #1c1c1c;
+  --texto-suave: #6b7d72;
+  --fundo: #f6f7f6;
+  --borda: #d5dad6;
+  --erro: #a61b1b;
+  --erro-fundo: #fdeeee;
+  --ok: #1b6b34;
+  --ok-fundo: #e6f5ea;
+  --fonte-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fonte-serif: 'Georgia', 'Times New Roman', serif;
+
+  font-family: var(--fonte-sans);
+  color: var(--texto);
+  background: var(--fundo);
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1 {
+  font-family: var(--fonte-serif);
+  font-weight: 700;
+  color: var(--verde-escuro);
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+code { background: #ecefec; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; word-break: break-all; }
+
+/* ===== Shell (topbar + sidebar + conteudo) ===== */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  background: var(--verde-escuro);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.app-header {
+  background: var(--verde);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+}
+.app-header nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.app-header a { color: #d6ead9; text-decoration: none; padding: 0.25rem 0; }
+.app-header a.ativo { color: #fff; font-weight: 700; border-bottom: 2px solid #fff; }
+
+.app-main {
+  padding: 2rem 1.5rem;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;   /* <- adicionar */
+}
+
+.app-overlay {
+  display: none;
+}
+
+.app-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 0;
+}
+
+.app-sidebar {
+  background: var(--verde-escuro);
+  padding: 1rem 0.75rem;
+}
+
+.app-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.app-sidebar nav a {
+  display: block;
+  color: #c8dbd0;
+  text-decoration: none;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-sidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.app-sidebar nav a.ativo {
+  color: #fff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border-left-color: #fff;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--verde-escuro);
+  font-weight: 700;
+}
+
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 1rem; }
+.card { display: block; background: #fff; border: 1px solid var(--borda); border-radius: 8px; padding: 1rem; color: inherit; text-decoration: none; }
+.card:hover { border-color: var(--verde); }
+.card p { margin: 0; }
+
+.painel { background: #fff; border: 1px solid var(--borda); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.painel ul { margin: 0; padding-left: 1.25rem; }
+
+.ok { background: var(--ok-fundo); color: var(--ok); padding: 0.75rem; border-radius: 6px; }
+.erro { background: var(--erro-fundo); color: var(--erro); padding: 0.75rem; border-radius: 6px; }
+.erro p, .ok { margin: 0 0 0.5rem; }
+
+.em-construcao { border: 2px dashed var(--borda); background: #fff; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; display: flex; flex-direction: column; color: #555; }
+
+button {
+  background: var(--verde); color: #fff; border: 0; border-radius: 6px;
+  padding: 0.65rem 1.1rem; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+input, select { font-size: 1rem; min-height: 44px; }
+
+/* ===== Card de dados do beneficiario (estilo "readonly rows") ===== */
+.painel-dados {
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.painel-dados .painel-titulo {
+  font-family: var(--fonte-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+  margin: 0 0 1rem;
+}
+
+.dados-lista {
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dados-linha {
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dados-linha[data-par='true'] {
+  background: var(--verde-claro-2);
+}
+
+.dados-rotulo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.dados-valor {
+  font-family: var(--fonte-serif);
+  font-size: 1.1rem;
+  color: var(--verde-escuro);
+}
+
+/* Marca (logo + nome) — evita que o logo fique no tamanho natural */
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+.brand-nome {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+/* O botão "hambúrguer" só aparece no celular */
+.app-menu-toggle {
+  display: none;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0 0.4rem;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+/* ============================================================
+   RESPONSIVIDADE — mobile first breakpoints
+   ============================================================ */
+
+/* Tablet pequeno / celular grande: sidebar encolhe um pouco */
+@media (max-width: 900px) {
+  .app-body {
+    grid-template-columns: 180px 1fr;
+  }
+  .app-main {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* Celular (Android/iPhone retrato): sidebar vira barra horizontal */
+/* ===== Celular: sidebar vira gaveta vertical (drawer) ===== */
+@media (max-width: 720px) {
+  .app-shell {
+    min-height: 100svh;
+  }
+
+  .app-topbar {
+    padding: 0.5rem 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .app-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+  .brand-nome {
+    font-size: 1.1rem;
+  }
+
+  /* Grid vira 1 coluna; a sidebar sai do fluxo e vira gaveta */
+  .app-body {
+    grid-template-columns: 1fr;
+    position: relative;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    max-width: 80vw;
+    z-index: 50;
+    padding: 1rem 0.75rem;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+    /* continua flex-direction: column (herdado) → menu vertical */
+  }
+
+  /* Quando o container ganha .menu-aberto, a gaveta desliza para dentro */
+  .app-body.menu-aberto .app-sidebar {
+    transform: translateX(0);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .app-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 40;
+  }
+  .app-body.menu-aberto .app-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .app-main {
+    padding: 1rem 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.35rem;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.05rem;
+  }
+
+  .painel,
+  .painel-dados {
+    padding: 0.85rem;
+    border-radius: 10px;
+  }
+  .painel-dados .painel-titulo {
+    font-size: 1.1rem;
+  }
+  .dados-linha {
+    padding: 0.6rem 0.85rem;
+  }
+  .dados-valor {
+    font-size: 1rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .app-main > button {
+    width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  .painel img,
+  .painel canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Celular muito pequeno (< 380px, Galaxy antigo) */
+@media (max-width: 380px) {
+  .app-main {
+    padding: 0.75rem 0.5rem;
+  }
+  h1 {
+    font-size: 1.2rem;
+  }
+  .app-sidebar nav a {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.6rem;
+  }
+}
