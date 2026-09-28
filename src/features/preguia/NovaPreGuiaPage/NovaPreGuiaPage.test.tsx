@@ -24,10 +24,6 @@ describe('NovaPreGuiaPage', () => {
     // RevisaoResumo (SCRUM-38) já foi implementado: aparece o título do painel.
     expect(screen.getByText('Revisão da pré-guia')).toBeInTheDocument()
 
-    expect(
-      screen.getByText(/Por favor, selecione uma OCS na etapa anterior/i)
-    ).toBeInTheDocument()
-
     expect(screen.getByText('Encaminhamento médico')).toBeInTheDocument()
 
     expect(screen.getByRole('button', { name: /Enviar pre-guia/i })).toBeInTheDocument()

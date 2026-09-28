@@ -5,7 +5,6 @@ import { formVazio, beneficiarioCompleto, type NovaPreGuiaForm } from './types'
 import { beneficiarioLogado } from '../sessaoFake'
 import DadosBeneficiario from './components/DadosBeneficiario'
 import SelecaoOcs from './components/SelecaoOcs'
-import SelecaoProcedimentos from './components/SelecaoProcedimentos'
 import UploadEncaminhamento from './components/UploadEncaminhamento'
 import FeedbackUpload from './components/FeedbackUpload'
 import RevisaoResumo from './components/RevisaoResumo'
@@ -26,8 +25,7 @@ export default function NovaPreGuiaPage() {
   const podeEnviar =
     beneficiarioCompleto(form.beneficiario) &&
     form.arquivo != null &&
-    form.ocsId != null &&
-    form.procedimentoIds.length > 0
+    form.ocsId != null
 
   async function enviar() {
     setEnviando(true)
@@ -48,11 +46,6 @@ export default function NovaPreGuiaPage() {
       <h1>Nova pre-guia</h1>
       <DadosBeneficiario value={form.beneficiario} />
       <SelecaoOcs value={form.ocsId} onChange={(ocsId) => setForm({ ...form, ocsId, procedimentoIds: [] })} />
-      <SelecaoProcedimentos
-        ocsId={form.ocsId}
-        value={form.procedimentoIds}
-        onChange={(procedimentoIds) => setForm({ ...form, procedimentoIds })}
-      />
       <UploadEncaminhamento value={form.arquivo} onChange={(arquivo) => setForm({ ...form, arquivo })} />
       <FeedbackUpload arquivo={form.arquivo} />
       <RevisaoResumo form={form} />
