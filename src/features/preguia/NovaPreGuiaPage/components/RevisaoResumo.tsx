@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { listarOcs, listarProcedimentosDaOcs } from '../../../ocs/api'
-import type { Ocs, ProcedimentoExame } from '../../../../shared/types/domain'
+import { listarOcs } from '../../../ocs/api'
+import type { Ocs } from '../../../../shared/types/domain'
 import type { NovaPreGuiaForm } from '../types'
 
 interface Props {
@@ -9,41 +9,25 @@ interface Props {
 
 export default function RevisaoResumo({ form }: Props) {
   const [ocsCarregada, setOcsCarregada] = useState<Ocs | null>(null)
-  const [procedimentosDaOcs, setProcedimentosDaOcs] = useState<ProcedimentoExame[]>([])
   const [ocsIdCarregado, setOcsIdCarregado] = useState<number | null>(null)
 
-  // carregando = "selecionei uma OCS que ainda nao terminou de carregar".
-  // Derivado: nao precisa de useState nem de setState sincrono no effect.
   const carregando = form.ocsId !== null && form.ocsId !== ocsIdCarregado
-
-  // Filtra em tempo de render (antes era dentro do .then). Assim o efeito so
-  // depende de form.ocsId e nao precisa refazer fetch quando os procedimentos mudam.
   const ocsExibida = form.ocsId === null ? null : ocsCarregada
-  const procedimentosExibidos =
-    form.ocsId === null
-      ? []
-      : procedimentosDaOcs.filter((p) => form.procedimentoIds.includes(p.id))
 
   useEffect(() => {
-    if (form.ocsId === null) return   // nada para buscar
+    if (form.ocsId === null) return
 
     let ativo = true
-
-    Promise.all([
-      listarOcs().then((lista) => lista.find((o) => o.id === form.ocsId) ?? null),
-      listarProcedimentosDaOcs(form.ocsId),
-    ])
-      .then(([ocsEncontrada, procs]) => {
+    listarOcs()
+      .then((lista) => {
         if (!ativo) return
-        setOcsCarregada(ocsEncontrada)
-        setProcedimentosDaOcs(procs)
-        setOcsIdCarregado(form.ocsId)   // marca "terminei de carregar este id"
+        setOcsCarregada(lista.find((o) => o.id === form.ocsId) ?? null)
+        setOcsIdCarregado(form.ocsId)
       })
       .catch(() => {
         if (!ativo) return
         setOcsCarregada(null)
-        setProcedimentosDaOcs([])
-        setOcsIdCarregado(form.ocsId)   // marca mesmo com erro, para sair do "carregando"
+        setOcsIdCarregado(form.ocsId)
       })
 
     return () => { ativo = false }
@@ -85,27 +69,6 @@ export default function RevisaoResumo({ form }: Props) {
           <p>{ocsExibida.nome}</p>
         ) : (
           <p>OCS #{form.ocsId}</p>
-        )}
-      </section>
-
-      <section>
-        <h3>Procedimentos</h3>
-        {form.procedimentoIds.length === 0 ? (
-          <p>Nenhum procedimento selecionado ainda.</p>
-        ) : carregando ? (
-          <p>Carregando procedimentos...</p>
-        ) : procedimentosExibidos.length > 0 ? (
-          <ul>
-            {procedimentosExibidos.map((p) => (
-              <li key={p.id}>{p.terminologiaProcedimentoEvento}</li>
-            ))}
-          </ul>
-        ) : (
-          <ul>
-            {form.procedimentoIds.map((id) => (
-              <li key={id}>Procedimento #{id}</li>
-            ))}
-          </ul>
         )}
       </section>
 

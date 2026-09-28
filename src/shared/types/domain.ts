@@ -17,20 +17,10 @@ export interface Ocs {
   diasParaVencimento: number | null
 }
 
-export interface ProcedimentoExame {
-  id: number
-  codigoTuss: string
-  terminologiaProcedimentoEvento: string
-  grupo: string | null
-  subgrupo: string | null
-  capitulo: string | null
-}
-
 export interface PreGuia {
   id: number
   status: StatusPreGuia
   dataEmissao: string
   encaminhamentoUrl: string | null
   ocsId: number
-  procedimentoIds: number[]
 }
