@@ -3,6 +3,8 @@ import AppLayout from './shared/components/AppLayout'
 import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
+import NovaPreGuiaMedicoPage from './features/medicos/NovaPreGuiaMedicoPage'
+
 
 /**
  * TABELA DE ROTAS - unico lugar onde as rotas sao declaradas.
@@ -16,6 +18,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
         <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
+        <Route path="/medico/pre-guias/nova" element={<NovaPreGuiaMedicoPage />} />
         <Route path="*" element={<p>Pagina nao encontrada.</p>} />
       </Route>
     </Routes>
