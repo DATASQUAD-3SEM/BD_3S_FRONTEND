@@ -14,6 +14,10 @@ export default function HomePage() {
           <h2>Testar conexao</h2>
           <p>Confere se o front esta falando com o backend.</p>
         </Link>
+        <Link className="card" to="/medico/pre-guias/nova">
+          <h2>Nova pré-guia (médico)</h2>
+          <p>Criar durante a consulta, pela Prec-CP do beneficiário.</p>
+        </Link>
       </div>
     </>
   )
