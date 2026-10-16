@@ -14,6 +14,10 @@ export default function HomePage() {
           <h2>Testar conexao</h2>
           <p>Confere se o front esta falando com o backend.</p>
         </Link>
+        <Link className="card" to="/beneficiarios">
+          <h2>Lista de beneficiarios</h2>
+          <p>Exibe lista de beneficiários (Chefe)</p>
+        </Link>
       </div>
     </>
   )
