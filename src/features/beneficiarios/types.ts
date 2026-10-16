@@ -1,3 +1,5 @@
+import { telefoneValido } from '../../shared/utils/formatar'
+
 /** Linha da tabela (beneficiario + usuario: o CPF e o login). */
 export interface Beneficiario {
   id: number
@@ -5,7 +7,7 @@ export interface Beneficiario {
   cpf: string // so digitos (usuario.login)
   precCp: string // so digitos
   dataNascimento: string // yyyy-mm-dd
-  telefone: string
+  telefone: string // so digitos
   ativo: boolean // usuario.ativo (desativar nunca apaga)
 }
 
@@ -37,7 +39,7 @@ export function paraForm(b: Beneficiario): BeneficiarioForm {
     cpf: b.cpf,
     precCp: b.precCp,
     dataNascimento: b.dataNascimento,
-    telefone: b.telefone,
+    telefone: b.telefone.replace(/\D/g, ''),
     senha: '',
     ativo: b.ativo,
   }
@@ -51,7 +53,7 @@ export function problemasDoForm(f: BeneficiarioForm, modo: 'novo' | 'edicao'): s
   if (f.precCp.length !== 11) p.push('Prec CP com 11 dígitos')
   if (f.dataNascimento === '') p.push('data de nascimento')
   else if (new Date(`${f.dataNascimento}T00:00:00`) > new Date()) p.push('data de nascimento (não pode ser futura)')
-  if (f.telefone.trim() === '') p.push('telefone')
+  if (!telefoneValido(f.telefone)) p.push('telefone no formato (12)99999-9999')
   if (modo === 'novo' && f.senha === '') p.push('senha inicial')
   return p
 }
