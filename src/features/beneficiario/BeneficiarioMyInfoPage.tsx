@@ -1,12 +1,134 @@
+import {
+  useRef,
+  useEffect,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
 import { useBeneficiario } from './BeneficiarioContext.tsx'
-
 import {
   calcularIdade,
   faixaEtaria,
   formatarDataNascimentoComIdade,
 } from './calculosBeneficiario'
 
+function AssinaturaDigital() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [desenhando, setDesenhando] = useState(false)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const rect = canvas.getBoundingClientRect()
+    if (rect.width === 0 || rect.height === 0) return
+
+    const dpr = window.devicePixelRatio || 1
+
+    // Resolução interna = tamanho CSS × DPR
+    canvas.width = Math.round(rect.width * dpr)
+    canvas.height = Math.round(rect.height * dpr)
+
+    // Mapeia coordenadas CSS para o bitmap
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0)
+
+    ctx.strokeStyle = '#22382b'
+    ctx.lineWidth = 3
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+  }, [])
+
+  const obterCoordenadas = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    }
+  }
+
+  const iniciarDesenho = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const ctx = canvasRef.current?.getContext('2d')
+    if (!ctx) return
+
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setDesenhando(true)
+
+    const { x, y } = obterCoordenadas(e)
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+  }
+
+  const desenhar = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (!desenhando) return
+    const ctx = canvasRef.current?.getContext('2d')
+    if (!ctx) return
+
+    const { x, y } = obterCoordenadas(e)
+    ctx.lineTo(x, y)
+    ctx.stroke()
+  }
+
+  const pararDesenho = () => {
+    setDesenhando(false)
+  }
+
+  const limparCanvas = () => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+
+    // Limpa o bitmap inteiro, ignorando a transformação atual
+    ctx.save()
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.restore()
+    ctx.beginPath()
+  }
+
+  return (
+    <>
+      <div
+        className="info-quadro-assinatura"
+        aria-label="Área de desenho da assinatura digital"
+      >
+        <canvas
+          ref={canvasRef}
+          onPointerDown={iniciarDesenho}
+          onPointerMove={desenhar}
+          onPointerUp={pararDesenho}
+          onPointerCancel={pararDesenho}
+          onLostPointerCapture={pararDesenho}
+        />
+      </div>
+
+      <div className="info-assinatura-acoes">
+        <button
+          type="button"
+          className="info-botao-secundario"
+          onClick={limparCanvas}
+        >
+          Limpar
+        </button>
+
+        <button type="button" className="info-botao-secundario">
+          Enviar imagem
+        </button>
+
+        <button type="button">
+          Salvar assinatura
+        </button>
+      </div>
+    </>
+  )
+}
+
 export default function MinhasInformacoesPage() {
+
+  // ---- SOBRE BENEFICIARIO ABAIXO -----
+
   const {
     beneficiario,
     carregando,
@@ -152,44 +274,7 @@ export default function MinhasInformacoesPage() {
           (mouse ou dedo) ou envie uma imagem.
         </p>
 
-        <div
-          className="info-quadro-assinatura"
-          aria-label="Área ilustrativa da assinatura digital"
-        >
-          {/* Desenho decorativo nesta primeira versão visual */}
-          <svg
-            viewBox="0 0 320 100"
-            role="img"
-            aria-label="Exemplo de assinatura"
-          >
-            <path
-              d="M20 67 C40 18, 67 9, 58 62
-                 C50 103, 83 89, 106 48
-                 C128 7, 140 22, 151 62
-                 C166 111, 196 70, 217 38
-                 L280 54"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        <div className="info-assinatura-acoes">
-          <button type="button" className="info-botao-secundario">
-            Limpar
-          </button>
-
-          <button type="button" className="info-botao-secundario">
-            Enviar imagem
-          </button>
-
-          <button type="button">
-            Salvar assinatura
-          </button>
-        </div>
+        <AssinaturaDigital />
       </section>
     </div>
   )
