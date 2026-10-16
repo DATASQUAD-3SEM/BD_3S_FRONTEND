@@ -117,7 +117,7 @@ describe('BeneficiariosPage', () => {
     preencher('CPF (será o login)', '12345678900')
     preencher('Prec CP', '45899900011')
     preencher('Data de nascimento', '1990-05-20')
-    preencher('Telefone', '1290')
+    preencher('Telefone', '12900000000')
     preencher('Senha inicial', 'abc123')
     fireEvent.click(screen.getByRole('button', { name: 'Cadastrar beneficiário' }))
 
@@ -141,7 +141,7 @@ describe('BeneficiariosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }))
 
     expect(await screen.findByText('Alterações em Antonio Carlos Ferreira salvas.')).toBeInTheDocument()
-    expect(atualizarBeneficiario).toHaveBeenCalledWith(1, expect.objectContaining({ telefone: '(12) 90000-1111' }))
+    expect(atualizarBeneficiario).toHaveBeenCalledWith(1, expect.objectContaining({ telefone: '12900001111' }))
     expect(screen.getByRole('heading', { name: 'Novo beneficiário' })).toBeInTheDocument()
     expect(screen.queryByText('Modo de edição')).not.toBeInTheDocument()
   })
@@ -167,7 +167,7 @@ describe('BeneficiariosPage', () => {
       3,
       expect.objectContaining({
         nome: 'João P. Alves', cpf: '11122233355', precCp: '45830040009',
-        dataNascimento: '1991-01-10', telefone: '(12) 97777-0000', senha: 'novaSenha1', ativo: false,
+        dataNascimento: '1991-01-10', telefone: '12977770000', senha: 'novaSenha1', ativo: false,
       }),
     )
   })
