@@ -479,6 +479,13 @@ input, select { font-size: 1rem; min-height: 44px; }
   gap: 1rem;
 }
 
+.info-campo-erro {
+  color: #c62828;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0.35rem 0 0;
+}
+
 /* Alteração de senha */
 
 .info-senha-grid {

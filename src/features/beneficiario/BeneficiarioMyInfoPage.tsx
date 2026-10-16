@@ -11,6 +11,103 @@ import {
   formatarDataNascimentoComIdade,
 } from './calculosBeneficiario'
 
+
+
+
+
+function formatarTelefone(valor: string): string {
+  const digitos = valor.replace(/\D/g, '').slice(0, 11)
+
+  if (digitos.length === 0) return ''
+
+  if (digitos.length <= 2) {
+    return digitos.length === 2
+      ? `(${digitos})`
+      : `(${digitos}`
+  }
+
+  if (digitos.length <= 7) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`
+  }
+
+  return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`
+}
+
+
+
+
+
+function ContatoTelefone({
+                           telefoneInicial,
+                         }: {
+  telefoneInicial: string | null | undefined
+}) {
+  const telefoneOriginal = formatarTelefone(telefoneInicial ?? '')
+
+  const [telefone, setTelefone] = useState(
+    () => telefoneOriginal,
+  )
+
+  function atualizarTelefone(valor: string) {
+    setTelefone(formatarTelefone(valor))
+  }
+
+  const quantidadeDigitos = telefone.replace(/\D/g, '').length
+
+  const telefoneValido =
+    quantidadeDigitos === 11 && telefone.length === 15
+
+  const telefoneAlterado = telefone !== telefoneOriginal
+
+  return (
+    <section className="info-card">
+      <h2>Contato</h2>
+
+      <div className="info-contato-linha">
+        <div className="info-campo">
+          <label htmlFor="telefone">Telefone</label>
+
+          <input
+            id="telefone"
+            type="tel"
+            inputMode="numeric"
+            maxLength={15}
+            value={telefone}
+            onChange={(event) => {
+              atualizarTelefone(event.currentTarget.value)
+            }}
+            placeholder="(00) 00000-0000"
+            aria-invalid={!telefoneValido}
+            aria-describedby={
+              !telefoneValido ? 'telefone-erro' : undefined
+            }
+          />
+
+          {!telefoneValido && (
+            <p
+              id="telefone-erro"
+              className="info-campo-erro"
+              role="alert"
+            >
+              Informe um telefone completo no formato (00) 00000-0000.
+            </p>
+          )}
+        </div>
+
+        <button
+          type="button"
+          disabled={!telefoneValido || !telefoneAlterado}
+        >
+          Salvar telefone
+        </button>
+      </div>
+    </section>
+  )
+}
+
+
+
+
 function AssinaturaDigital() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [desenhando, setDesenhando] = useState(false)
@@ -125,6 +222,10 @@ function AssinaturaDigital() {
   )
 }
 
+
+
+
+
 export default function MinhasInformacoesPage() {
 
   // ---- SOBRE BENEFICIARIO ABAIXO -----
@@ -199,25 +300,10 @@ export default function MinhasInformacoesPage() {
       </section>
 
       {/* Contato */}
-      <section className="info-card">
-        <h2>Contato</h2>
-
-        <div className="info-contato-linha">
-          <div className="info-campo">
-            <label htmlFor="telefone">Telefone</label>
-            <input
-              id="telefone"
-              type="tel"
-              defaultValue={beneficiario.telefone ?? ''}
-              placeholder="(00) 00000-0000"
-            />
-          </div>
-
-          <button type="button">
-            Salvar telefone
-          </button>
-        </div>
-      </section>
+      <ContatoTelefone
+        key={beneficiario.telefone ?? ''}
+        telefoneInicial={beneficiario.telefone}
+      />
 
       {/* Alteração de senha */}
       <section className="info-card">
