@@ -48,7 +48,7 @@ export function problemasDoForm(f: BeneficiarioForm, modo: 'novo' | 'edicao'): s
   const p: string[] = []
   if (f.nome.trim() === '') p.push('nome')
   if (f.cpf.length !== 11) p.push('CPF com 11 dígitos')
-  if (f.precCp.trim() === '') p.push('Prec CP')
+  if (f.precCp.length !== 11) p.push('Prec CP com 11 dígitos')
   if (f.dataNascimento === '') p.push('data de nascimento')
   else if (new Date(`${f.dataNascimento}T00:00:00`) > new Date()) p.push('data de nascimento (não pode ser futura)')
   if (f.telefone.trim() === '') p.push('telefone')
