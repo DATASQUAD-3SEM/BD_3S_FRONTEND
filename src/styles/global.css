@@ -379,8 +379,7 @@ input, select { font-size: 1rem; min-height: 44px; }
 }
 
 
-/* ===== Beneficiarios (Chefe): filtros, tabela, badge, formulario =====
-   Colar NO FINAL do src/styles/global.css (usa as variaveis que ja existem). */
+/* ===== Beneficiarios (Chefe): filtros, tabela, badge, formulario ===== */
 
 .so-leitor-de-tela {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
@@ -422,3 +421,19 @@ button.secundario:hover:not(:disabled) { border-color: var(--verde); }
 @media (max-width: 720px) {
   .form-grade { grid-template-columns: 1fr; }
 }
+/* ----- Modo de edicao (formulario destacado + selo) ----- */
+.painel-edicao { border: 2px solid var(--verde-escuro); }
+.painel-cabecalho {
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  gap: 0.5rem 1rem; margin-bottom: 1rem;
+}
+.painel-dados .painel-cabecalho .painel-titulo { margin: 0; }
+.selo-edicao {
+  display: inline-block; padding: 0.15rem 0.75rem; border-radius: 999px;
+  background: #e3edf9; color: #1f4a7a; font-size: 0.9rem; font-weight: 600;
+}
+.campo .rotulo { font-size: 0.9rem; color: var(--texto-suave); }
+.campo-valor { margin: 0; font-size: 1.05rem; }
+
+
+
