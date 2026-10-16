@@ -86,7 +86,7 @@ export default function MinhasInformacoesPage() {
             <input
               id="telefone"
               type="tel"
-              defaultValue="(12) 98765-4321"
+              defaultValue={beneficiario.telefone ?? ''}
               placeholder="(00) 00000-0000"
             />
           </div>
