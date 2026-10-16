@@ -1,6 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { BeneficiarioProvider } from '../../beneficiario/BeneficiarioContext'
 import NovaPreGuiaPage from '.'
+
+function renderNovaPreGuia() {
+  return render(
+    <BeneficiarioProvider>
+      <NovaPreGuiaPage />
+    </BeneficiarioProvider>,
+  )
+}
 
 beforeEach(() => {
   URL.createObjectURL = vi.fn(() => 'blob:falso')
@@ -20,21 +29,23 @@ afterEach(() => vi.unstubAllGlobals())
 
 describe('NovaPreGuiaPage', () => {
   it('renderiza o container com todos os componentes', async () => {
-    render(<NovaPreGuiaPage />)
+    renderNovaPreGuia()
 
-    expect(screen.getByText('Antonio Carlos Ferreira')).toBeInTheDocument()
+    expect(await screen.findByText('Antonio Carlos'),
+      ).toBeInTheDocument()
     expect(screen.getByText('123.456.789-00')).toBeInTheDocument()
     expect(screen.getByText('Revisão da pré-guia')).toBeInTheDocument()
     expect(screen.getByText('Encaminhamento médico')).toBeInTheDocument()
 
-    expect(screen.getByRole('button', { name: /Enviar pre-guia/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /Enviar pré-guia/i })).toBeDisabled()
     expect(screen.getByText(/Para enviar, falta preencher/i)).toBeInTheDocument()
 
     await screen.findByText(/Nenhuma OCS encontrada/i)
   })
 
   it('o arquivo escolhido passa pelo container e volta como preview', async () => {
-    render(<NovaPreGuiaPage />)
+    renderNovaPreGuia()
+    await screen.findByText('Antonio Carlos')
     await screen.findByText(/Nenhuma OCS encontrada/i)
 
     const foto = new File(['x'], 'encaminhamento.png', { type: 'image/png' })
@@ -50,7 +61,8 @@ describe('NovaPreGuiaPage', () => {
   })
 
   it('arquivo com formato inválido mostra erro', async () => {
-    render(<NovaPreGuiaPage />)
+    renderNovaPreGuia()
+    await screen.findByText('Antonio Carlos')
     await screen.findByText(/Nenhuma OCS encontrada/i)
 
     const txt = new File(['oi'], 'nota.txt', { type: 'text/plain' })

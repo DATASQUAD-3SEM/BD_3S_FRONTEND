@@ -1,4 +1,32 @@
+import { useBeneficiario } from './BeneficiarioContext.tsx'
+
+import {
+  calcularIdade,
+  faixaEtaria,
+  formatarDataNascimentoComIdade,
+} from './calculosBeneficiario'
+
 export default function MinhasInformacoesPage() {
+  const {
+    beneficiario,
+    carregando,
+    erro,
+  } = useBeneficiario()
+
+  if (carregando) {
+    return <p>Carregando beneficiário...</p>
+  }
+
+  if (erro || !beneficiario) {
+    return (
+      <p role="alert">
+        Não foi possível carregar os dados do beneficiário.
+      </p>
+    )
+  }
+
+  const idade = calcularIdade(beneficiario.dataNascimento)
+
   return (
     <div className="minhas-info-page">
       <h1>Minhas informações</h1>
@@ -10,32 +38,36 @@ export default function MinhasInformacoesPage() {
         <div className="info-grid">
           <div className="info-dado">
             <span>Nome</span>
-            <p>Antonio Carlos Ferreira</p>
+            <p>{beneficiario.nome}</p>
           </div>
 
           <div className="info-dado">
             <span>Grupo</span>
-            <p>Exército Brasileiro · FUSEX</p>
+            <p>{beneficiario.grupo ?? '—'}</p>
           </div>
 
           <div className="info-dado">
             <span>CPF</span>
-            <p>123.456.789-00</p>
+            <p>{beneficiario.cpf}</p>
           </div>
 
           <div className="info-dado">
             <span>Prec CP</span>
-            <p>458722133-00</p>
+            <p>{beneficiario.precCp}</p>
           </div>
 
           <div className="info-dado">
             <span>Data de nascimento</span>
-            <p>10/05/1968 (58 anos)</p>
+            <p>
+              {formatarDataNascimentoComIdade(
+                beneficiario.dataNascimento,
+              )}
+            </p>
           </div>
 
           <div className="info-dado">
             <span>Faixa etária</span>
-            <p>51 a 60</p>
+            <p>{faixaEtaria(idade) || '—'}</p>
           </div>
         </div>
 
