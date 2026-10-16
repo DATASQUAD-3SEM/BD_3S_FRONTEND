@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { calcularIdade, faixaEtaria, mascararCpf, mascararPrecCp } from '../../../../shared/utils/formatar'
+import { calcularIdade, faixaEtaria, mascararCpf, mascararPrecCp, mascararTelefone } from '../../../../shared/utils/formatar'
 import { formVazio, paraForm, problemasDoForm, type Beneficiario, type BeneficiarioForm } from '../../types'
 
 interface Props {
@@ -80,7 +80,14 @@ export default function FormBeneficiario({ editando, salvando, onSubmit, onCance
           </div>
           <div className="campo">
             <label htmlFor="benef-tel">Telefone</label>
-            <input id="benef-tel" type="tel" value={form.telefone} onChange={(e) => atualizar({ telefone: e.target.value })} />
+            <input
+              id="benef-tel"
+              type="tel"
+              inputMode="numeric"
+              placeholder="(12)99999-9999"
+              value={mascararTelefone(form.telefone)}
+              onChange={(e) => atualizar({ telefone: e.target.value.replace(/\D/g, '').slice(0, 11) })}
+            />
           </div>
 
           {editando && (
