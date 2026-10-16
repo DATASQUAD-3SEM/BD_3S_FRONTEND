@@ -12,6 +12,12 @@ export function formatarPrecCp(valor: string): string {
   return `${d.slice(0, 9)}-${d.slice(9)}`
 }
 
+export function formatarTelefone(valor: string): string {
+  const d = valor.replace(/\D/g, '')
+  if (d.length !== 11) return valor
+  return `(${d.slice(0, 2)})${d.slice(2, 7)}-${d.slice(7)}`
+}
+
 /** Idade em anos completos a partir de "yyyy-mm-dd". */
 export function calcularIdade(nascimentoIso: string, hoje = new Date()): number {
   const n = new Date(`${nascimentoIso}T00:00:00`)
@@ -49,4 +55,19 @@ export function mascararCpf(valor: string): string {
 export function mascararPrecCp(valor: string): string {
   const d = valor.replace(/\D/g, '').slice(0, 11)
   return d.length > 9 ? `${d.slice(0, 9)}-${d.slice(9)}` : d
+}
+
+/** Mascara enquanto digita: so digitos (max. 11) -> (12)99154-2346 */
+export function mascararTelefone(valor: string): string {
+  const d = valor.replace(/\D/g, '').slice(0, 11)
+  if (d.length === 0) return ''
+  let r = `(${d.slice(0, 2)}`
+  if (d.length > 2) r += `)${d.slice(2, 7)}`
+  if (d.length > 7) r += `-${d.slice(7)}`
+  return r
+}
+
+/** Celular valido: 11 digitos, DDD (sem zero) e o 9 depois do DDD. */
+export function telefoneValido(valor: string): boolean {
+  return /^[1-9][1-9]9\d{8}$/.test(valor.replace(/\D/g, ''))
 }
