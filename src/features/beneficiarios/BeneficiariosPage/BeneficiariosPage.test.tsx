@@ -133,6 +133,7 @@ describe('BeneficiariosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Editar Antonio Carlos Ferreira' }))
 
     expect(screen.getByRole('heading', { name: 'Editando beneficiário' })).toBeInTheDocument()
+    expect(screen.getByText('Modo de edição')).toBeInTheDocument()
     expect((screen.getByLabelText('Nome') as HTMLInputElement).value).toBe('Antonio Carlos Ferreira')
     expect(screen.getAllByRole('row')[1]).toHaveAttribute('data-editando', 'true')
 
@@ -142,6 +143,7 @@ describe('BeneficiariosPage', () => {
     expect(await screen.findByText('Alterações em Antonio Carlos Ferreira salvas.')).toBeInTheDocument()
     expect(atualizarBeneficiario).toHaveBeenCalledWith(1, expect.objectContaining({ telefone: '(12) 90000-1111' }))
     expect(screen.getByRole('heading', { name: 'Novo beneficiário' })).toBeInTheDocument()
+    expect(screen.queryByText('Modo de edição')).not.toBeInTheDocument()
   })
 
   it('o Chefe também edita um beneficiário inativo (todos os dados)', async () => {
@@ -153,11 +155,11 @@ describe('BeneficiariosPage', () => {
     expect((screen.getByLabelText('Situação') as HTMLSelectElement).value).toBe('inativo')
 
     preencher('Nome', 'João P. Alves')
-    preencher('CPF (será o login)', '11122233355')
+    preencher('CPF (login)', '11122233355')
     preencher('Prec CP', '45830040009')
     preencher('Data de nascimento', '1991-01-10')
     preencher('Telefone', '(12) 97777-0000')
-    preencher('Nova senha (opcional)', 'novaSenha1')
+    preencher('Nova senha (deixe em branco para manter)', 'novaSenha1')
     fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }))
 
     expect(await screen.findByText('Alterações em João P. Alves salvas.')).toBeInTheDocument()

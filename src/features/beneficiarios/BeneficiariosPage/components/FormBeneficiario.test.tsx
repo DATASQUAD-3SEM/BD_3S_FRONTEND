@@ -24,12 +24,40 @@ describe('FormBeneficiario — novo', () => {
     expect(screen.getByText(/assinatura digital é cadastrada pelo próprio beneficiário/)).toBeInTheDocument()
   })
 
-  it('CPF aceita só números (até 11)', () => {
+  it('CPF aceita só números, limita a 11 dígitos e mostra a máscara', () => {
     render(<FormBeneficiario editando={null} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
 
     preencher('CPF (será o login)', '123.456.789-00999')
 
-    expect((screen.getByLabelText('CPF (será o login)') as HTMLInputElement).value).toBe('12345678900')
+    expect((screen.getByLabelText('CPF (será o login)') as HTMLInputElement).value).toBe('123.456.789-00')
+  })
+
+  it('Prec CP aceita só números, limita a 11 dígitos e mostra a máscara', () => {
+    render(<FormBeneficiario editando={null} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
+
+    preencher('Prec CP', 'ab458722133-00999')
+
+    expect((screen.getByLabelText('Prec CP') as HTMLInputElement).value).toBe('458722133-00')
+  })
+
+  it('CPF ou Prec CP com menos de 11 dígitos bloqueia o cadastro', () => {
+    render(<FormBeneficiario editando={null} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
+
+    preencher('Nome', 'Nova Pessoa')
+    preencher('CPF (será o login)', '1234567890')
+    preencher('Prec CP', '4587221330')
+    preencher('Data de nascimento', '1990-05-20')
+    preencher('Telefone', '1290')
+    preencher('Senha inicial', 'abc123')
+
+    expect(screen.getByRole('button', { name: 'Cadastrar beneficiário' })).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent(/CPF com 11 dígitos, Prec CP com 11 dígitos/)
+  })
+
+  it('no cadastro novo não aparece o selo "Modo de edição"', () => {
+    render(<FormBeneficiario editando={null} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
+
+    expect(screen.queryByText('Modo de edição')).not.toBeInTheDocument()
   })
 
   it('preenchido, habilita e envia os dados', () => {
@@ -66,12 +94,24 @@ describe('FormBeneficiario — novo', () => {
 })
 
 describe('FormBeneficiario — editando', () => {
-  it('vem preenchido, com faixa etária calculada e situação', () => {
+  it('mostra o selo "Modo de edição" e destaca o painel', () => {
+    const { container } = render(
+      <FormBeneficiario editando={existente} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />,
+    )
+
+    expect(screen.getByText('Modo de edição')).toBeInTheDocument()
+    expect(container.querySelector('section')).toHaveClass('painel-edicao')
+  })
+
+  it('vem preenchido (com máscara), com faixa etária calculada e situação', () => {
     render(<FormBeneficiario editando={existente} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
 
     expect(screen.getByRole('heading', { name: 'Editando beneficiário' })).toBeInTheDocument()
     expect((screen.getByLabelText('Nome') as HTMLInputElement).value).toBe('Antonio Carlos Ferreira')
-    expect((screen.getByLabelText('Faixa etária (calculada)') as HTMLInputElement).value).toBe('41 a 50')
+    expect((screen.getByLabelText('CPF (login)') as HTMLInputElement).value).toBe('123.456.789-00')
+    expect((screen.getByLabelText('Prec CP') as HTMLInputElement).value).toBe('458722133-00')
+    expect(screen.getByText('41 a 50 (45 anos)')).toBeInTheDocument()
+    expect(screen.getByText('Cancelar descarta as mudanças e volta para o formulário de novo cadastro.')).toBeInTheDocument()
     expect((screen.getByLabelText('Situação') as HTMLSelectElement).value).toBe('ativo')
     expect(screen.queryByText(/assinatura digital é cadastrada/)).not.toBeInTheDocument()
   })
@@ -95,6 +135,12 @@ describe('FormBeneficiario — editando', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }))
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ ativo: false }))
+  })
+
+  it('a senha é opcional e o rótulo explica que vazio mantém a atual', () => {
+    render(<FormBeneficiario editando={existente} salvando={false} onSubmit={vi.fn()} onCancelar={vi.fn()} />)
+
+    expect(screen.getByLabelText('Nova senha (deixe em branco para manter)')).toBeInTheDocument()
   })
 
   it('apagar o nome bloqueia o salvar', () => {
