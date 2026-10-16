@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { calcularIdade, faixaEtaria, formatarCpf, formatarPrecCp, mascararCpf, mascararPrecCp } from './formatar'
+import { calcularIdade, faixaEtaria, formatarCpf, formatarPrecCp, formatarTelefone, mascararCpf, mascararPrecCp, mascararTelefone } from './formatar'
+import { telefoneValido } from '../../shared/utils/formatar'
 
 describe('formatar', () => {
   it('formata CPF e Prec CP com 11 dígitos', () => {
@@ -33,5 +34,27 @@ describe('formatar', () => {
     expect(mascararPrecCp('4587')).toBe('4587')
     expect(mascararPrecCp('458722133')).toBe('458722133')
     expect(mascararPrecCp('45872213300999')).toBe('458722133-00')
+  })
+})
+
+describe('telefone', () => {
+  it('mascararTelefone aplica a máscara aos poucos e limita a 11 dígitos', () => {
+    expect(mascararTelefone('')).toBe('')
+    expect(mascararTelefone('12')).toBe('(12')
+    expect(mascararTelefone('129')).toBe('(12)9')
+    expect(mascararTelefone('12991542346')).toBe('(12)99154-2346')
+    expect(mascararTelefone('(12) 99154-2346999')).toBe('(12)99154-2346')
+  })
+
+  it('formatarTelefone formata 11 dígitos e devolve o original nos outros casos', () => {
+    expect(formatarTelefone('12991542346')).toBe('(12)99154-2346')
+    expect(formatarTelefone('1233334444')).toBe('1233334444')
+  })
+
+  it('telefoneValido exige 11 dígitos, DDD válido e o 9 depois do DDD', () => {
+    expect(telefoneValido('(12)99154-2346')).toBe(true)
+    expect(telefoneValido('1233334444')).toBe(false)
+    expect(telefoneValido('12800000000')).toBe(false)
+    expect(telefoneValido('01991542346')).toBe(false)
   })
 })
