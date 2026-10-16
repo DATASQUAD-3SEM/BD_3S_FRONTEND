@@ -34,3 +34,19 @@ export function faixaEtaria(idade: number): string {
   if (idade <= 70) return '61 a 70'
   return 'Acima de 70'
 }
+
+/** Mascara enquanto digita: so digitos (max. 11) -> 123.456.789-00 */
+export function mascararCpf(valor: string): string {
+  const d = valor.replace(/\D/g, '').slice(0, 11)
+  let r = d.slice(0, 3)
+  if (d.length > 3) r += `.${d.slice(3, 6)}`
+  if (d.length > 6) r += `.${d.slice(6, 9)}`
+  if (d.length > 9) r += `-${d.slice(9)}`
+  return r
+}
+
+/** Mascara enquanto digita: so digitos (max. 11) -> 458722133-00 */
+export function mascararPrecCp(valor: string): string {
+  const d = valor.replace(/\D/g, '').slice(0, 11)
+  return d.length > 9 ? `${d.slice(0, 9)}-${d.slice(9)}` : d
+}

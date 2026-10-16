@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calcularIdade, faixaEtaria, formatarCpf, formatarPrecCp } from './formatar'
+import { calcularIdade, faixaEtaria, formatarCpf, formatarPrecCp, mascararCpf, mascararPrecCp } from './formatar'
 
 describe('formatar', () => {
   it('formata CPF e Prec CP com 11 dígitos', () => {
@@ -22,5 +22,16 @@ describe('formatar', () => {
     expect(faixaEtaria(17)).toBe('Menor de 18')
     expect(faixaEtaria(45)).toBe('41 a 50')
     expect(faixaEtaria(71)).toBe('Acima de 70')
+  })
+
+  it('mascara enquanto digita e limita a 11 dígitos', () => {
+    expect(mascararCpf('123')).toBe('123')
+    expect(mascararCpf('1234')).toBe('123.4')
+    expect(mascararCpf('1234567')).toBe('123.456.7')
+    expect(mascararCpf('12345678900999')).toBe('123.456.789-00')
+    expect(mascararCpf('123.456.789-00')).toBe('123.456.789-00')
+    expect(mascararPrecCp('4587')).toBe('4587')
+    expect(mascararPrecCp('458722133')).toBe('458722133')
+    expect(mascararPrecCp('45872213300999')).toBe('458722133-00')
   })
 })
