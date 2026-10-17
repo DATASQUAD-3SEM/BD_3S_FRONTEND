@@ -10,13 +10,46 @@ import type { Beneficiario } from '../../shared/types/domain'
  */
 const USAR_MOCK_BENEFICIARIO = true
 
-const beneficiarioMock: Beneficiario = {
-  nome: 'Antonio Carlos',
-  cpf: '12345678900',
-  precCp: '45872213300',
+/**
+ * "Banco de dados" falso do beneficiario logado.
+ * As funcoes do mock (beneficiarioApi.ts) leem e alteram este estado,
+ * para que o mock se comporte como o backend: o que foi salvo continua salvo
+ * enquanto a pagina estiver aberta.
+ */
+interface EstadoMock {
+  telefone: string | null
+  senha: string
+  assinaturaCadastrada: boolean
+  tentativasSenhaErrada: number
+  /** Momento (em milissegundos) ate quando as trocas de senha ficam bloqueadas. null = sem bloqueio. */
+  bloqueadoAte: number | null
+}
+
+const ESTADO_INICIAL: EstadoMock = {
   telefone: '(12) 98765-4221',
-  dataNascimento: '1978-05-10',
-  grupo: 'Exército Brasileiro · FUSEX',
+  senha: 'senha123',
+  assinaturaCadastrada: false,
+  tentativasSenhaErrada: 0,
+  bloqueadoAte: null,
+}
+
+export const estadoMock: EstadoMock = { ...ESTADO_INICIAL }
+
+/** Volta o mock ao estado inicial. Usado nos testes. */
+export function reiniciarEstadoMock(): void {
+  Object.assign(estadoMock, ESTADO_INICIAL)
+}
+
+function montarBeneficiarioMock(): Beneficiario {
+  return {
+    nome: 'Antonio Carlos',
+    cpf: '12345678900',
+    precCp: '45872213300',
+    telefone: estadoMock.telefone,
+    dataNascimento: '1978-05-10',
+    grupo: 'Exército Brasileiro · FUSEX',
+    assinaturaCadastrada: estadoMock.assinaturaCadastrada,
+  }
 }
 
 async function buscarBeneficiarioNoBackend(): Promise<Beneficiario> {
@@ -25,7 +58,7 @@ async function buscarBeneficiarioNoBackend(): Promise<Beneficiario> {
 
 export async function obterBeneficiarioLogado(): Promise<Beneficiario> {
   if (USAR_MOCK_BENEFICIARIO) {
-    return beneficiarioMock
+    return montarBeneficiarioMock()
   }
 
   return buscarBeneficiarioNoBackend()

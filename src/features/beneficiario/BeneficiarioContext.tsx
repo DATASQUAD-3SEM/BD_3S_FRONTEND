@@ -13,6 +13,7 @@ interface BeneficiarioContexto {
   beneficiario: Beneficiario | null
   carregando: boolean
   erro: string | null
+  atualizarBeneficiario: (parcial: Partial<Beneficiario>) => void
 }
 
 const ContextoBeneficiario =
@@ -27,6 +28,11 @@ export function BeneficiarioProvider({
   const [carregando, setCarregando] = useState(true)
 
   const [erro, setErro] = useState<string | null>(null)
+
+  function atualizarBeneficiario(parcial: Partial<Beneficiario>) {
+    setBeneficiario((atual) =>
+      (atual ? { ...atual, ...parcial } : atual))
+  }
 
   useEffect(() => {
     let ativo = true
@@ -66,6 +72,7 @@ export function BeneficiarioProvider({
         beneficiario,
         carregando,
         erro,
+        atualizarBeneficiario,
       }}
     >
       {children}
