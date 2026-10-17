@@ -1,6 +1,6 @@
 import type { MedicoLogado } from './types'
 
-/** Igual ao sessaoFake.ts: ate existir login, o medico "logado" e este. */
+/** Igual ao sessaoMedicoFake.ts: ate existir login, o medico "logado" e este. */
 export const medicoLogado: MedicoLogado = {
   nome: 'Helena Duarte Quintanilha',
   patente: 'Maj Med',

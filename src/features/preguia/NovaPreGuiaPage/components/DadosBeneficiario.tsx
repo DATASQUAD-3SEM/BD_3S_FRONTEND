@@ -32,7 +32,7 @@ function faixaEtaria(idade: string): string {
 }
 
 /**
- * Sprint 1: dados vem de `sessaoFake.ts` (nao ha login ainda). Somente leitura.
+ * Sprint 1: dados vem de `sessaoMedicoFake.ts` (nao ha login ainda). Somente leitura.
  * Sprint 2: `value` sera preenchido por `GET /beneficiarios/me` apos login.
  * Nao formatamos o value original: apenas a exibicao. `sessaoFake` continua
  * mandando digitos crus para o POST /pre-guias.
