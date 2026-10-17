@@ -32,4 +32,5 @@ export interface Beneficiario {
   telefone: string | null
   dataNascimento?: string | null
   grupo?: string | null
+  assinaturaCadastrada?: boolean
 }

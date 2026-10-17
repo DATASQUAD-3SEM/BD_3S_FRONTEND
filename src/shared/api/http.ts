@@ -79,6 +79,20 @@ export function postForm<T>(caminho: string, formulario: FormData): Promise<T> {
   return request<T>(caminho, { method: 'POST', body: formulario })
 }
 
+/** Alteração parcial de um recurso (ex.: só o telefone). Envia JSON, como o post. */
+export function patch<T>(caminho: string, corpo: unknown): Promise<T> {
+  return request<T>(caminho, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo),
+  })
+}
+
+/** Substituição de um recurso enviando arquivo (multipart). Usado no PUT da assinatura. */
+export function putForm<T>(caminho: string, formulario: FormData): Promise<T> {
+  return request<T>(caminho, { method: 'PUT', body: formulario })
+}
+
 export function del(caminho: string): Promise<void> {
   return request<void>(caminho, { method: 'DELETE' })
 }
