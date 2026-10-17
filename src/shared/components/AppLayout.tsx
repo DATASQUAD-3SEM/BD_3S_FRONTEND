@@ -5,6 +5,7 @@ const links = [
   { to: '/', label: 'Início' },
   { to: '/pre-guias/nova', label: 'Nova pré-guia' },
   { to: '/diagnostico/conexao', label: 'Conexão' },
+  { to: '/beneficiario/minhas-informacoes', label: 'Teste'}
 ]
 
 export default function AppLayout() {

@@ -1,18 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import DadosBeneficiario from './DadosBeneficiario'
-import type { DadosBeneficiarioForm } from '../types'
 
-const preenchido: DadosBeneficiarioForm = {
+import DadosBeneficiario from './DadosBeneficiario'
+
+import type {
+  Beneficiario,
+} from '../../../../shared/types/domain'
+
+const preenchido: Beneficiario = {
   nome: 'Antonio Carlos Ferreira',
-  idade: '58',
   precCp: '45872213300',
-  cpf: '123.456.789-00',
+  cpf: '12345678900',
   telefone: '(12) 98765-4321',
+  dataNascimento: '1968-05-10',
+  grupo: 'Exército Brasileiro · FUSEX',
 }
 
 describe('DadosBeneficiario (somente leitura)', () => {
-  it('renderiza os 5 campos exigidos pelo manual (item 3.1)', () => {
+  it('renderiza os dados pessoais do beneficiário', () => {
     render(<DadosBeneficiario value={preenchido} />)
 
     expect(screen.getByText('Beneficiário')).toBeInTheDocument()
@@ -20,14 +25,17 @@ describe('DadosBeneficiario (somente leitura)', () => {
     expect(screen.getByText('Telefone')).toBeInTheDocument()
     expect(screen.getByText('CPF')).toBeInTheDocument()
     expect(screen.getByText('Prec-CP')).toBeInTheDocument()
+    expect(screen.getByText('Data de nascimento')).toBeInTheDocument()
+    expect(screen.getByText('Grupo')).toBeInTheDocument()
   })
 
-  it('mostra os valores formatados (CPF, Prec-CP, idade com sufixo)', () => {
+  it('mostra valores formatados e derivados', () => {
     render(<DadosBeneficiario value={preenchido} />)
 
     expect(screen.getByText('123.456.789-00')).toBeInTheDocument()
     expect(screen.getByText('458722133-00')).toBeInTheDocument()
     expect(screen.getByText('58 anos')).toBeInTheDocument()
+    expect(screen.getByText('10/05/1968')).toBeInTheDocument()
     expect(screen.getByText('Exército Brasileiro · FUSEX')).toBeInTheDocument()
     expect(screen.getByText('51 a 60')).toBeInTheDocument()
   })
