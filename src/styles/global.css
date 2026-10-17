@@ -465,6 +465,10 @@ input, select { font-size: 1rem; min-height: 44px; }
   font-size: 0.9rem;
 }
 
+.info-campo input[aria-invalid='true'] {
+  border-color: #c62828;
+}
+
 .info-campo input:focus {
   outline: 2px solid #739b80;
   outline-offset: 1px;
@@ -481,6 +485,13 @@ input, select { font-size: 1rem; min-height: 44px; }
 
 .info-campo-erro {
   color: #c62828;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0.35rem 0 0;
+}
+
+.info-mensagem-sucesso {
+  color: #1d6b33;
   font-size: 0.75rem;
   line-height: 1.4;
   margin: 0.35rem 0 0;
@@ -532,6 +543,16 @@ input, select { font-size: 1rem; min-height: 44px; }
   border-radius: 999px;
   background: #f8edc5;
   color: #786400;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.info-status-cadastrada {
+  display: inline-block;
+  border-radius: 999px;
+  background: #d7efdc;
+  color: #1d6b33;
   padding: 0.25rem 0.7rem;
   font-size: 0.7rem;
   font-weight: 600;
