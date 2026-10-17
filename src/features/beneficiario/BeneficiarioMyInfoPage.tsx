@@ -1,20 +1,22 @@
-import {
-  useRef,
-  useEffect,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from 'react'
+import { useState, type FormEvent } from 'react'
 import { useBeneficiario } from './BeneficiarioContext.tsx'
 import {
   calcularIdade,
   faixaEtaria,
   formatarDataNascimentoComIdade,
 } from './calculosBeneficiario'
+import { alterarSenha, salvarAssinatura, salvarTelefone } from './beneficiarioApi'
+import AssinaturaDigital from './components/AssinaturaDigital'
+import { ApiError } from '../../shared/api/http'
 
+const TAMANHO_MINIMO_SENHA = 8
 
+interface Mensagem {
+  tipo: 'sucesso' | 'erro'
+  texto: string
+}
 
-
-
+/** Deixa só os números e aplica a máscara: "(12) 98765-4321". */
 function formatarTelefone(valor: string): string {
   const digitos = valor.replace(/\D/g, '').slice(0, 11)
 
@@ -33,207 +35,292 @@ function formatarTelefone(valor: string): string {
   return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`
 }
 
+interface ContatoTelefoneProps {
+  telefoneSalvo: string | null | undefined
+  /** Recebe só os números e devolve o telefone salvo. Se falhar, lança erro. */
+  onSalvar: (telefone: string) => Promise<string>
+}
 
-
-
-
-function ContatoTelefone({
-                           telefoneInicial,
-                         }: {
-  telefoneInicial: string | null | undefined
-}) {
-  const telefoneOriginal = formatarTelefone(telefoneInicial ?? '')
-
-  const [telefone, setTelefone] = useState(
-    () => telefoneOriginal,
+function ContatoTelefone({ telefoneSalvo, onSalvar }: ContatoTelefoneProps) {
+  // "Último telefone salvo" com máscara. Serve para saber se o campo mudou.
+  const [telefoneSalvoFormatado, setTelefoneSalvoFormatado] = useState(
+    () => formatarTelefone(telefoneSalvo ?? ''),
   )
+  const [telefone, setTelefone] = useState(telefoneSalvoFormatado)
+  const [salvando, setSalvando] = useState(false)
+  const [mensagem, setMensagem] = useState<Mensagem | null>(null)
 
-  function atualizarTelefone(valor: string) {
-    setTelefone(formatarTelefone(valor))
+  const digitos = telefone.replace(/\D/g, '')
+  const telefoneValido = digitos.length === 11
+  const telefoneAlterado = telefone !== telefoneSalvoFormatado
+  const podeSalvar = telefoneValido && telefoneAlterado && !salvando
+
+  async function salvar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    if (!podeSalvar) return
+
+    setSalvando(true)
+    setMensagem(null)
+
+    try {
+      const salvo = formatarTelefone(await onSalvar(digitos))
+      setTelefoneSalvoFormatado(salvo)
+      setTelefone(salvo)
+      setMensagem({ tipo: 'sucesso', texto: 'Telefone salvo com sucesso.' })
+    } catch (erro: unknown) {
+      setMensagem({
+        tipo: 'erro',
+        texto:
+          erro instanceof ApiError
+            ? erro.message
+            : 'Não foi possível salvar o telefone. Tente novamente.',
+      })
+    } finally {
+      setSalvando(false)
+    }
   }
-
-  const quantidadeDigitos = telefone.replace(/\D/g, '').length
-
-  const telefoneValido =
-    quantidadeDigitos === 11 && telefone.length === 15
-
-  const telefoneAlterado = telefone !== telefoneOriginal
 
   return (
     <section className="info-card">
       <h2>Contato</h2>
 
-      <div className="info-contato-linha">
-        <div className="info-campo">
-          <label htmlFor="telefone">Telefone</label>
+      <form onSubmit={salvar} noValidate>
+        <div className="info-contato-linha">
+          <div className="info-campo">
+            <label htmlFor="telefone">Telefone</label>
 
-          <input
-            id="telefone"
-            type="tel"
-            inputMode="numeric"
-            maxLength={15}
-            value={telefone}
-            onChange={(event) => {
-              atualizarTelefone(event.currentTarget.value)
-            }}
-            placeholder="(00) 00000-0000"
-            aria-invalid={!telefoneValido}
-            aria-describedby={
-              !telefoneValido ? 'telefone-erro' : undefined
-            }
-          />
+            <input
+              id="telefone"
+              type="tel"
+              inputMode="numeric"
+              maxLength={15}
+              value={telefone}
+              onChange={(event) => {
+                setTelefone(formatarTelefone(event.currentTarget.value))
+                setMensagem(null)
+              }}
+              placeholder="(00) 00000-0000"
+              aria-invalid={!telefoneValido}
+              aria-describedby={!telefoneValido ? 'telefone-erro' : undefined}
+            />
 
-          {!telefoneValido && (
-            <p
-              id="telefone-erro"
-              className="info-campo-erro"
-              role="alert"
-            >
-              Informe um telefone completo no formato (00) 00000-0000.
-            </p>
-          )}
+            {!telefoneValido && (
+              <p id="telefone-erro" className="info-campo-erro" role="alert">
+                Informe um telefone completo no formato (00) 00000-0000.
+              </p>
+            )}
+          </div>
+
+          <button type="submit" disabled={!podeSalvar}>
+            {salvando ? 'Salvando...' : 'Salvar telefone'}
+          </button>
         </div>
+      </form>
 
-        <button
-          type="button"
-          disabled={!telefoneValido || !telefoneAlterado}
-        >
-          Salvar telefone
-        </button>
-      </div>
+      {mensagem?.tipo === 'sucesso' && (
+        <p className="info-mensagem-sucesso" role="status">
+          {mensagem.texto}
+        </p>
+      )}
+
+      {mensagem?.tipo === 'erro' && (
+        <p className="info-campo-erro" role="alert">
+          {mensagem.texto}
+        </p>
+      )}
     </section>
   )
 }
 
+interface AlterarSenhaProps {
+  onAlterar: (senhaAtual: string, novaSenha: string, confirmacao: string) => Promise<void>
+}
 
+interface ErrosCampos {
+  senhaAtual?: string
+  novaSenha?: string
+  confirmacao?: string
+}
 
+function AlterarSenha({ onAlterar }: AlterarSenhaProps) {
+  const [senhaAtual, setSenhaAtual] = useState('')
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmacao, setConfirmacao] = useState('')
+  const [erros, setErros] = useState<ErrosCampos>({})
+  const [salvando, setSalvando] = useState(false)
+  const [mensagem, setMensagem] = useState<Mensagem | null>(null)
 
-function AssinaturaDigital() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [desenhando, setDesenhando] = useState(false)
+  function validar(): ErrosCampos {
+    const novosErros: ErrosCampos = {}
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    if (!senhaAtual) {
+      novosErros.senhaAtual = 'Informe a senha atual.'
+    }
 
-    const rect = canvas.getBoundingClientRect()
-    if (rect.width === 0 || rect.height === 0) return
+    if (novaSenha.length < TAMANHO_MINIMO_SENHA) {
+      novosErros.novaSenha =
+        `A nova senha precisa ter no mínimo ${TAMANHO_MINIMO_SENHA} caracteres.`
+    } else if (novaSenha === senhaAtual) {
+      novosErros.novaSenha = 'A nova senha precisa ser diferente da senha atual.'
+    }
 
-    const dpr = window.devicePixelRatio || 1
+    if (confirmacao !== novaSenha) {
+      novosErros.confirmacao = 'As senhas não coincidem.'
+    }
 
-    // Resolução interna = tamanho CSS × DPR
-    canvas.width = Math.round(rect.width * dpr)
-    canvas.height = Math.round(rect.height * dpr)
+    return novosErros
+  }
 
-    // Mapeia coordenadas CSS para o bitmap
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0)
+  /** Ao digitar de novo num campo, o erro dele some. */
+  function limparErro(campo: keyof ErrosCampos) {
+    setErros((atual) => ({ ...atual, [campo]: undefined }))
+    setMensagem(null)
+  }
 
-    ctx.strokeStyle = '#22382b'
-    ctx.lineWidth = 3
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-  }, [])
+  async function enviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    setMensagem(null)
 
-  const obterCoordenadas = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+    const novosErros = validar()
+    setErros(novosErros)
+
+    if (Object.keys(novosErros).length > 0) return
+
+    setSalvando(true)
+
+    try {
+      await onAlterar(senhaAtual, novaSenha, confirmacao)
+
+      setSenhaAtual('')
+      setNovaSenha('')
+      setConfirmacao('')
+      setErros({})
+      setMensagem({ tipo: 'sucesso', texto: 'Senha alterada com sucesso.' })
+    } catch (erro: unknown) {
+      // 422 que aponta o campo senhaAtual (contrato T13-BE1): erro embaixo do campo.
+      const erroSenhaAtual =
+        erro instanceof ApiError &&
+        erro.status === 422 &&
+        erro.detalhes.some((detalhe) => detalhe.startsWith('senhaAtual'))
+
+      if (erroSenhaAtual) {
+        setErros({ senhaAtual: 'Senha atual incorreta.' })
+      } else {
+        // Demais erros (ex.: 429 por muitas tentativas) aparecem como mensagem geral.
+        setMensagem({
+          tipo: 'erro',
+          texto:
+            erro instanceof ApiError
+              ? erro.message
+              : 'Não foi possível alterar a senha. Tente novamente.',
+        })
+      }
+    } finally {
+      setSalvando(false)
     }
   }
 
-  const iniciarDesenho = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    const ctx = canvasRef.current?.getContext('2d')
-    if (!ctx) return
-
-    e.currentTarget.setPointerCapture(e.pointerId)
-    setDesenhando(true)
-
-    const { x, y } = obterCoordenadas(e)
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-  }
-
-  const desenhar = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    if (!desenhando) return
-    const ctx = canvasRef.current?.getContext('2d')
-    if (!ctx) return
-
-    const { x, y } = obterCoordenadas(e)
-    ctx.lineTo(x, y)
-    ctx.stroke()
-  }
-
-  const pararDesenho = () => {
-    setDesenhando(false)
-  }
-
-  const limparCanvas = () => {
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
-    if (!canvas || !ctx) return
-
-    // Limpa o bitmap inteiro, ignorando a transformação atual
-    ctx.save()
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.restore()
-    ctx.beginPath()
-  }
-
   return (
-    <>
-      <div
-        className="info-quadro-assinatura"
-        aria-label="Área de desenho da assinatura digital"
-      >
-        <canvas
-          ref={canvasRef}
-          onPointerDown={iniciarDesenho}
-          onPointerMove={desenhar}
-          onPointerUp={pararDesenho}
-          onPointerCancel={pararDesenho}
-          onLostPointerCapture={pararDesenho}
-        />
-      </div>
+    <section className="info-card">
+      <h2>Alterar senha</h2>
 
-      <div className="info-assinatura-acoes">
-        <button
-          type="button"
-          className="info-botao-secundario"
-          onClick={limparCanvas}
-        >
-          Limpar
-        </button>
+      <form onSubmit={enviar} noValidate>
+        <div className="info-senha-grid">
+          <div className="info-campo senha-atual">
+            <label htmlFor="senha-atual">Senha atual</label>
+            <input
+              id="senha-atual"
+              type="password"
+              autoComplete="current-password"
+              value={senhaAtual}
+              onChange={(event) => {
+                setSenhaAtual(event.currentTarget.value)
+                limparErro('senhaAtual')
+              }}
+              aria-invalid={Boolean(erros.senhaAtual)}
+              aria-describedby={erros.senhaAtual ? 'senha-atual-erro' : undefined}
+            />
+            {erros.senhaAtual && (
+              <p id="senha-atual-erro" className="info-campo-erro" role="alert">
+                {erros.senhaAtual}
+              </p>
+            )}
+          </div>
 
-        <button type="button" className="info-botao-secundario">
-          Enviar imagem
-        </button>
+          <div className="info-campo senha-nova">
+            <label htmlFor="senha-nova">Nova senha</label>
+            <input
+              id="senha-nova"
+              type="password"
+              autoComplete="new-password"
+              value={novaSenha}
+              onChange={(event) => {
+                setNovaSenha(event.currentTarget.value)
+                limparErro('novaSenha')
+              }}
+              aria-invalid={Boolean(erros.novaSenha)}
+              aria-describedby={erros.novaSenha ? 'senha-nova-erro' : undefined}
+            />
+            {erros.novaSenha && (
+              <p id="senha-nova-erro" className="info-campo-erro" role="alert">
+                {erros.novaSenha}
+              </p>
+            )}
+          </div>
 
-        <button type="button">
-          Salvar assinatura
+          <div className="info-campo senha-confirmacao">
+            <label htmlFor="confirmar-senha">Confirmar nova senha</label>
+            <input
+              id="confirmar-senha"
+              type="password"
+              autoComplete="new-password"
+              value={confirmacao}
+              onChange={(event) => {
+                setConfirmacao(event.currentTarget.value)
+                limparErro('confirmacao')
+              }}
+              aria-invalid={Boolean(erros.confirmacao)}
+              aria-describedby={erros.confirmacao ? 'confirmar-senha-erro' : undefined}
+            />
+            {erros.confirmacao && (
+              <p id="confirmar-senha-erro" className="info-campo-erro" role="alert">
+                {erros.confirmacao}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <button type="submit" className="info-botao-senha" disabled={salvando}>
+          {salvando ? 'Alterando...' : 'Alterar senha'}
         </button>
-      </div>
-    </>
+      </form>
+
+      {mensagem?.tipo === 'sucesso' && (
+        <p className="info-mensagem-sucesso" role="status">
+          {mensagem.texto}
+        </p>
+      )}
+
+      {mensagem?.tipo === 'erro' && (
+        <p className="info-campo-erro" role="alert">
+          {mensagem.texto}
+        </p>
+      )}
+    </section>
   )
 }
 
-
-
-
-
+/**
+ * Tela "Minhas informações".
+ * Dados pessoais são somente leitura. Telefone, senha e assinatura são salvos
+ * pelas funções de beneficiarioApi.ts.
+ */
 export default function MinhasInformacoesPage() {
-
-  // ---- SOBRE BENEFICIARIO ABAIXO -----
-
   const {
     beneficiario,
     carregando,
     erro,
+    atualizarBeneficiario,
   } = useBeneficiario()
 
   if (carregando) {
@@ -254,7 +341,7 @@ export default function MinhasInformacoesPage() {
     <div className="minhas-info-page">
       <h1>Minhas informações</h1>
 
-      {/* Dados pessoais */}
+      {/* Dados pessoais (somente leitura) */}
       <section className="info-card">
         <h2>Dados pessoais</h2>
 
@@ -301,67 +388,25 @@ export default function MinhasInformacoesPage() {
 
       {/* Contato */}
       <ContatoTelefone
-        key={beneficiario.telefone ?? ''}
-        telefoneInicial={beneficiario.telefone}
+        telefoneSalvo={beneficiario.telefone}
+        onSalvar={async (telefone) => {
+          const salvo = await salvarTelefone(telefone)
+          atualizarBeneficiario({ telefone: salvo })
+          return salvo
+        }}
       />
 
       {/* Alteração de senha */}
-      <section className="info-card">
-        <h2>Alterar senha</h2>
-
-        <div className="info-senha-grid">
-          <div className="info-campo senha-atual">
-            <label htmlFor="senha-atual">Senha atual</label>
-            <input
-              id="senha-atual"
-              type="password"
-              autoComplete="current-password"
-            />
-          </div>
-
-          <div className="info-campo senha-nova">
-            <label htmlFor="senha-nova">Nova senha</label>
-            <input
-              id="senha-nova"
-              type="password"
-              autoComplete="new-password"
-            />
-          </div>
-
-          <div className="info-campo senha-confirmacao">
-            <label htmlFor="confirmar-senha">
-              Confirmar nova senha
-            </label>
-            <input
-              id="confirmar-senha"
-              type="password"
-              autoComplete="new-password"
-            />
-          </div>
-        </div>
-
-        <button type="button" className="info-botao-senha">
-          Alterar senha
-        </button>
-      </section>
+      <AlterarSenha onAlterar={alterarSenha} />
 
       {/* Assinatura digital */}
-      <section className="info-card">
-        <div className="info-assinatura-cabecalho">
-          <h2>Assinatura digital</h2>
-
-          <span className="info-status-pendente">
-            Ainda não cadastrada
-          </span>
-        </div>
-
-        <p className="info-assinatura-descricao">
-          Usada para assinar documentos. Desenhe no quadro
-          (mouse ou dedo) ou envie uma imagem.
-        </p>
-
-        <AssinaturaDigital />
-      </section>
+      <AssinaturaDigital
+        cadastrada={beneficiario.assinaturaCadastrada === true}
+        onSalvar={async (imagem) => {
+          await salvarAssinatura(imagem)
+          atualizarBeneficiario({ assinaturaCadastrada: true })
+        }}
+      />
     </div>
   )
 }
