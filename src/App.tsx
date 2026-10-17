@@ -3,7 +3,7 @@ import AppLayout from './shared/components/AppLayout'
 import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
-import NovaPreGuiaMedicoPage from './features/medicos/NovaPreGuiaMedicoPage'
+import NovaPreGuiaMedicoPage from './features/preguia/NovaPreGuiaMedicoPage'
 
 
 /**
