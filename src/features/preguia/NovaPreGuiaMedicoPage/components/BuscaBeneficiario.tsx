@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { ApiError } from '../../../../shared/api/http'
-import { buscarBeneficiarioPorPrecCp } from '../../../medicos/api'
-import type { BeneficiarioEncontrado } from '../../../medicos/types'
+import { buscarBeneficiarioPorPrecCp } from '../../../medico/api'
+import type { BeneficiarioEncontrado } from '../../../medico/types'
 import DadosBeneficiario from '../../NovaPreGuiaPage/components/DadosBeneficiario'
 
 interface Props {

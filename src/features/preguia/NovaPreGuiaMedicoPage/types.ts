@@ -1,4 +1,4 @@
-import type { BeneficiarioEncontrado, ProcedimentoOpcao } from '../../medicos/types'
+import type { BeneficiarioEncontrado, ProcedimentoOpcao } from '../../medico/types'
 
 export interface NovaPreGuiaMedicoForm {
   beneficiario: BeneficiarioEncontrado | null

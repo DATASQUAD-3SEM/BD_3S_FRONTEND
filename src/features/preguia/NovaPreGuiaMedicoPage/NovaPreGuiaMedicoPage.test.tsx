@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import NovaPreGuiaMedicoPage from '.'
-import { buscarBeneficiarioPorPrecCp, buscarProcedimentos, criarPreGuiaMedico } from '../../medicos/api'
+import { buscarBeneficiarioPorPrecCp, buscarProcedimentos, criarPreGuiaMedico } from '../../medico/api'
 
 vi.mock('../../medicos/api', () => ({
   buscarBeneficiarioPorPrecCp: vi.fn(),

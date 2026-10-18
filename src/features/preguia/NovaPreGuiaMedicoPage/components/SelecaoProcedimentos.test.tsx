@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import SelecaoProcedimentos from './SelecaoProcedimentos'
-import { buscarProcedimentos } from '../../../medicos/api'
-import type { ProcedimentoOpcao } from '../../../medicos/types'
+import { buscarProcedimentos } from '../../../medico/api'
+import type { ProcedimentoOpcao } from '../../../medico/types'
 
 vi.mock('../../../medicos/api', () => ({ buscarProcedimentos: vi.fn() }))
 

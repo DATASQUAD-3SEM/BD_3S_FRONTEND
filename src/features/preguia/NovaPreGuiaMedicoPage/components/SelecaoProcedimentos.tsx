@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ApiError } from '../../../../shared/api/http'
-import { buscarProcedimentos } from '../../../medicos/api'
-import type { ProcedimentoOpcao } from '../../../medicos/types'
+import { buscarProcedimentos } from '../../../medico/api'
+import type { ProcedimentoOpcao } from '../../../medico/types'
 
 interface Props {
   value: ProcedimentoOpcao[]
