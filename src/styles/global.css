@@ -377,3 +377,60 @@ input, select { font-size: 1rem; min-height: 44px; }
     padding: 0.45rem 0.6rem;
   }
 }
+
+
+/* ===== Beneficiarios (Chefe): filtros, tabela, badge, formulario ===== */
+
+.so-leitor-de-tela {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.barra-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+.barra-filtros input { flex: 1 1 260px; padding: 0 0.75rem; border: 1px solid var(--borda); border-radius: 6px; }
+.barra-filtros select { padding: 0 0.75rem; border: 1px solid var(--borda); border-radius: 6px; background: #fff; }
+
+.tabela-rolagem { overflow-x: auto; }
+.tabela { width: 100%; border-collapse: collapse; }
+.tabela th {
+  text-align: left; font-size: 0.85rem; font-weight: 600; color: var(--texto-suave);
+  padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--borda);
+}
+.tabela td { padding: 0.75rem; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+.tabela tr[data-editando='true'] td { background: var(--verde-claro-2); }
+
+.acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.badge { display: inline-block; padding: 0.1rem 0.65rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+.badge-ativo { background: var(--ok-fundo); color: var(--ok); }
+.badge-inativo { background: #fbf0c4; color: #7a5d00; }
+
+button.secundario { background: #fff; color: var(--verde-escuro); border: 1px solid var(--borda); }
+button.secundario:hover:not(:disabled) { border-color: var(--verde); }
+
+.nota { color: var(--texto-suave); font-size: 0.9rem; margin: 0.75rem 0 0; }
+
+.form-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.25rem; margin-bottom: 1rem; }
+.campo { display: flex; flex-direction: column; gap: 0.25rem; }
+.campo label { font-size: 0.9rem; color: var(--texto-suave); }
+.campo input, .campo select {
+  width: 100%; padding: 0 0.75rem; border: 1px solid var(--borda); border-radius: 6px; background: #fff;
+}
+.campo input[readonly] { background: var(--verde-claro-2); }
+
+@media (max-width: 720px) {
+  .form-grade { grid-template-columns: 1fr; }
+}
+/* ----- Modo de edicao (formulario destacado + selo) ----- */
+.painel-edicao { border: 2px solid var(--verde-escuro); }
+.painel-cabecalho {
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  gap: 0.5rem 1rem; margin-bottom: 1rem;
+}
+.painel-dados .painel-cabecalho .painel-titulo { margin: 0; }
+.selo-edicao {
+  display: inline-block; padding: 0.15rem 0.75rem; border-radius: 999px;
+  background: #e3edf9; color: #1f4a7a; font-size: 0.9rem; font-weight: 600;
+}
+.campo .rotulo { font-size: 0.9rem; color: var(--texto-suave); }
+.campo-valor { margin: 0; font-size: 1.05rem; }
