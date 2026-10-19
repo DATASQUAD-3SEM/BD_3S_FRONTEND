@@ -24,3 +24,13 @@ export interface PreGuia {
   encaminhamentoUrl: string | null
   ocsId: number
 }
+
+export interface Beneficiario {
+  nome: string
+  cpf: string
+  precCp: string
+  telefone: string | null
+  dataNascimento?: string | null
+  grupo?: string | null
+  assinaturaCadastrada?: boolean
+}
