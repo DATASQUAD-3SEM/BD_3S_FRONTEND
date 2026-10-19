@@ -1,4 +1,3 @@
-import type { DadosBeneficiarioForm } from '../preguia/NovaPreGuiaPage/types'
 
 export interface MedicoLogado {
   nome: string
@@ -8,10 +7,19 @@ export interface MedicoLogado {
   precCp: string
 }
 
-/** Resultado da busca por Prec-CP: id do beneficiario + dados no mesmo formato do DadosBeneficiario. */
+/** Dados do beneficiario exibidos ao medico (vindos da busca por Prec-CP). */
+export interface DadosBeneficiarioBusca {
+  nome: string
+  idade: string
+  precCp: string
+  cpf: string
+  telefone: string
+}
+
+/** Resultado da busca por Prec-CP: id do beneficiario + dados para exibir. */
 export interface BeneficiarioEncontrado {
   id: number
-  dados: DadosBeneficiarioForm
+  dados: DadosBeneficiarioBusca
 }
 
 export interface ProcedimentoOpcao {
