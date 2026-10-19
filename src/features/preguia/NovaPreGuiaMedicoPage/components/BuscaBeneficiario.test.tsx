@@ -4,7 +4,13 @@ import BuscaBeneficiario from './BuscaBeneficiario'
 import { buscarBeneficiarioPorPrecCp } from '../../../medico/api'
 import type { BeneficiarioEncontrado } from '../../../medico/types'
 
-vi.mock('../../../medicos/api', () => ({ buscarBeneficiarioPorPrecCp: vi.fn() }))
+vi.mock('../../../medico/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../medico/api')>()
+  return {
+    ...actual,
+    buscarBeneficiarioPorPrecCp: vi.fn(),
+  }
+})
 
 const achado: BeneficiarioEncontrado = {
   id: 1,

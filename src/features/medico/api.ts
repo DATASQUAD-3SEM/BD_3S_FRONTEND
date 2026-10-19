@@ -70,6 +70,7 @@ export async function buscarProcedimentos(termo: string): Promise<ProcedimentoOp
 
 /** POST /pre-guias/medico */
 export async function criarPreGuiaMedico(_payload: PreGuiaMedicoPayload): Promise<PreGuiaCriada> {
+  void _payload
   await espera(500)
   return { id: Math.floor(Math.random() * 9000) + 1000, status: 'PENDENTE' }
 }
@@ -101,6 +102,7 @@ export async function listarPreGuiasParaCorrecao(): Promise<PreGuiaParaCorrecao[
 
 /** PUT /pre-guias/{id}/correcao (volta para PENDENTE; so o medico emissor pode) */
 export async function corrigirPreGuia(id: number, _payload: CorrecaoPayload): Promise<PreGuiaCriada> {
+  void _payload
   await espera(400)
   PARA_CORRECAO = PARA_CORRECAO.filter((p) => p.id !== id)
   return { id, status: 'PENDENTE' }

@@ -3,11 +3,15 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import NovaPreGuiaMedicoPage from '.'
 import { buscarBeneficiarioPorPrecCp, buscarProcedimentos, criarPreGuiaMedico } from '../../medico/api'
 
-vi.mock('../../medicos/api', () => ({
-  buscarBeneficiarioPorPrecCp: vi.fn(),
-  buscarProcedimentos: vi.fn(),
-  criarPreGuiaMedico: vi.fn(),
-}))
+vi.mock('../../medico/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../medico/api')>()
+  return {
+    ...actual,
+    buscarBeneficiarioPorPrecCp: vi.fn(),
+    buscarProcedimentos: vi.fn(),
+    criarPreGuiaMedico: vi.fn(),
+  }
+})
 
 const ocs = {
   id: 1, contratoNum: 'C1', nome: 'Clinica Exemplo', tipo: 'OCS',

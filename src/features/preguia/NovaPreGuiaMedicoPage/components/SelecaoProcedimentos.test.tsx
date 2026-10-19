@@ -4,7 +4,13 @@ import SelecaoProcedimentos from './SelecaoProcedimentos'
 import { buscarProcedimentos } from '../../../medico/api'
 import type { ProcedimentoOpcao } from '../../../medico/types'
 
-vi.mock('../../../medicos/api', () => ({ buscarProcedimentos: vi.fn() }))
+vi.mock('../../../medico/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../medico/api')>()
+  return {
+    ...actual,
+    buscarProcedimentos: vi.fn(),
+  }
+})
 
 const hemograma: ProcedimentoOpcao = {
   id: 1, codigoTuss: '40304361', terminologiaProcedimento: 'Hemograma completo', rolAns: 'SIM', subgrupo: 'Hematologia',
