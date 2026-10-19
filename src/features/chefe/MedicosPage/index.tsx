@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from '../apiCadastro'
-import type { FiltroSituacao, Medico, MedicoForm } from './types'
-import FiltroMedicos from './components/FiltroMedicos'
-import TabelaMedicos from './components/TabelaMedicos'
-import FormMedico from './components/FormMedico'
+import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from './medicosApi.ts'
+import type { FiltroSituacao, Medico, MedicoForm } from './types.ts'
+import FiltroMedicos from './components/FiltroMedicos.tsx'
+import TabelaMedicos from './components/TabelaMedicos.tsx'
+import FormMedico from './components/FormMedico.tsx'
 
 type Mensagem = { tipo: 'ok' | 'erro'; texto: string }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import FormMedico from './FormMedico'
-import type { Medico } from '../types'
+import FormMedico from './FormMedico.tsx'
+import type { Medico } from '../types.ts'
 
 const existente: Medico = {
   id: 1, nome: 'Helena Duarte Quintanilha', patente: 'Maj Med', cpf: '12345678901',

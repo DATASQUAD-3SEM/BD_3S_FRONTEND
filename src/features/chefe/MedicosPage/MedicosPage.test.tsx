@@ -1,15 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import MedicosPage from '.'
-import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from '../apiCadastro'
-import type { Medico } from './types'
+import MedicosPage from './index.tsx'
+import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from './medicosApi.ts'
+import type { Medico } from './types.ts'
 
-vi.mock('../apiCadastro', () => ({
-  listarMedicos: vi.fn(),
-  cadastrarMedico: vi.fn(),
-  atualizarMedico: vi.fn(),
-  alterarSituacaoMedico: vi.fn(),
-}))
+vi.mock('../medicosApi.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./medicosApi.ts')>()
+  return {
+    ...actual,
+    listarMedicos: vi.fn(),
+    cadastrarMedico: vi.fn(),
+    atualizarMedico: vi.fn(),
+    alterarSituacaoMedico: vi.fn(),  // ajuste o nome se for outro
+  }
+})
 
 const helena: Medico = {
   id: 1, nome: 'Helena Duarte Quintanilha', patente: 'Maj Med', cpf: '12345678901',

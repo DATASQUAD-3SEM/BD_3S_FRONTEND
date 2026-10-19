@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import TabelaMedicos from './TabelaMedicos'
-import type { Medico } from '../types'
+import TabelaMedicos from './TabelaMedicos.tsx'
+import type { Medico } from '../types.ts'
 
 const ativo: Medico = {
   id: 1, nome: 'Helena Duarte Quintanilha', patente: 'Maj Med', cpf: '12345678901',

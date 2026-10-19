@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import FiltroMedicos from './FiltroMedicos'
+import FiltroMedicos from './FiltroMedicos.tsx'
 
 describe('FiltroMedicos', () => {
   it('digitar na busca avisa o container', () => {

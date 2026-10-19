@@ -4,7 +4,7 @@
  * Erros de negocio (CPF/Prec CP/CRM repetido = 409) devem chegar como ApiError com a mensagem.
  * (Separado do api.ts, que e do fluxo de pre-guia do medico; pode unir depois.)
  */
-import type { Medico, MedicoForm } from './MedicosPage/types'
+import type { Medico, MedicoForm } from './types.ts'
 
 const espera = (ms = 250) => new Promise((r) => setTimeout(r, ms))
 
