@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { mascararCpf, mascararPrecCp } from '../../../../shared/utils/formatar.ts'
-import { formVazio, paraForm, problemasDoForm, type Medico, type MedicoForm } from '../types.ts'
+import { formVazio, paraForm, problemasDoForm, type Medico, type MedicoForm } from '../../typesMedicos.ts'
 
 interface Props {
   /** null = cadastro novo; preenchido = editando esse medico. */

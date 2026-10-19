@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from './medicosApi.ts'
-import type { FiltroSituacao, Medico, MedicoForm } from './types.ts'
+import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from '../medicosApi.ts'
+import type { FiltroSituacao, Medico, MedicoForm } from '../typesMedicos.ts'
 import FiltroMedicos from './components/FiltroMedicos.tsx'
 import TabelaMedicos from './components/TabelaMedicos.tsx'
 import FormMedico from './components/FormMedico.tsx'

@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import MedicosPage from './index.tsx'
-import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from './medicosApi.ts'
-import type { Medico } from './types.ts'
+import { alterarSituacaoMedico, atualizarMedico, cadastrarMedico, listarMedicos } from '../medicosApi.ts'
+import type { Medico } from '../typesMedicos.ts'
 
 vi.mock('../medicosApi.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./medicosApi.ts')>()
+  const actual = await importOriginal<typeof import('../medicosApi.ts')>()
   return {
     ...actual,
     listarMedicos: vi.fn(),

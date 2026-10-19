@@ -1,5 +1,5 @@
 import { formatarCpf, formatarPrecCp } from '../../../../shared/utils/formatar.ts'
-import type { Medico } from '../types.ts'
+import type { Medico } from '../../typesMedicos.ts'
 
 interface Props {
   medicos: Medico[]
