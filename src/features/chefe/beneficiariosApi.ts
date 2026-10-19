@@ -3,7 +3,7 @@
  * Troque cada corpo por get/post/put/patch de shared/api/http, mantendo as assinaturas.
  * Erros de negocio (ex.: CPF repetido = 409) devem chegar como ApiError com a mensagem.
  */
-import type { Beneficiario, BeneficiarioForm } from './types'
+import type { Beneficiario, BeneficiarioForm } from './typesBeneficiarios.ts'
 
 const espera = (ms = 250) => new Promise((r) => setTimeout(r, ms))
 

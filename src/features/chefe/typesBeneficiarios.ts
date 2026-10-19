@@ -1,4 +1,4 @@
-import { telefoneValido } from '../../shared/utils/formatar'
+import { telefoneValido } from '../../shared/utils/formatar.ts'
 
 /** Linha da tabela (beneficiario + usuario: o CPF e o login). */
 export interface Beneficiario {

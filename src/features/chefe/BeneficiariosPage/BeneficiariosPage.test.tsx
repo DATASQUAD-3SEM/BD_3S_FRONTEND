@@ -1,20 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import BeneficiariosPage from '.'
+import BeneficiariosPage from './index.tsx'
 import {
   alterarSituacao,
   atualizarBeneficiario,
   cadastrarBeneficiario,
   listarBeneficiarios,
-} from '../api'
-import type { Beneficiario } from '../types'
+} from '../beneficiariosApi.ts'
+import type { Beneficiario } from '../typesBeneficiarios.ts'
 
-vi.mock('../api', () => ({
-  listarBeneficiarios: vi.fn(),
-  cadastrarBeneficiario: vi.fn(),
-  atualizarBeneficiario: vi.fn(),
-  alterarSituacao: vi.fn(),
-}))
+vi.mock('../beneficiariosApi.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../beneficiariosApi.ts')>()
+  return {
+    ...actual,
+    listarBeneficiarios: vi.fn(),
+    cadastrarBeneficiario: vi.fn(),
+    atualizarBeneficiario: vi.fn(),
+    alterarSituacao: vi.fn(),
+  }
+})
 
 const antonio: Beneficiario = {
   id: 1, nome: 'Antonio Carlos Ferreira', cpf: '12345678900', precCp: '45872213300',

@@ -1,5 +1,5 @@
-import { formatarCpf, formatarPrecCp } from '../../../../shared/utils/formatar'
-import type { Beneficiario } from '../../types'
+import { formatarCpf, formatarPrecCp } from '../../../../shared/utils/formatar.ts'
+import type { Beneficiario } from '../../typesBeneficiarios.ts'
 
 interface Props {
   beneficiarios: Beneficiario[]

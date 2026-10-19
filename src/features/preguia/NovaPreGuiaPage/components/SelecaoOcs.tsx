@@ -8,7 +8,7 @@ interface Props {
   onChange: (ocsId: number | null) => void
 }
 
-/** SCRUM 35 - escolher a OCS (usa listarOcs de features/ocs/api.ts). */
+/** SCRUM 35 - escolher a OCS (usa listarOcs de features/ocs/beneficiariosApi.ts). */
 export default function SelecaoOcs({ value, onChange }: Props) {
   const [ocs, setOcs] = useState<Ocs[]>([])
   const [busca, setBusca] = useState('')

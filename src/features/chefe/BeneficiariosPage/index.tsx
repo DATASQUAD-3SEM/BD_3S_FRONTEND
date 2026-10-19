@@ -4,11 +4,11 @@ import {
   atualizarBeneficiario,
   cadastrarBeneficiario,
   listarBeneficiarios,
-} from '../api'
-import type { Beneficiario, BeneficiarioForm, FiltroSituacao } from '../types'
-import FiltroBeneficiarios from './components/FiltroBeneficiarios'
-import TabelaBeneficiarios from './components/TabelaBeneficiarios'
-import FormBeneficiario from './components/FormBeneficiario'
+} from '../beneficiariosApi.ts'
+import type { Beneficiario, BeneficiarioForm, FiltroSituacao } from '../typesBeneficiarios.ts'
+import FiltroBeneficiarios from './components/FiltroBeneficiarios.tsx'
+import TabelaBeneficiarios from './components/TabelaBeneficiarios.tsx'
+import FormBeneficiario from './components/FormBeneficiario.tsx'
 
 type Mensagem = { tipo: 'ok' | 'erro'; texto: string }
 

@@ -1,4 +1,4 @@
-import type { FiltroSituacao } from '../../types'
+import type { FiltroSituacao } from '../../typesBeneficiarios.ts'
 
 interface Props {
   busca: string

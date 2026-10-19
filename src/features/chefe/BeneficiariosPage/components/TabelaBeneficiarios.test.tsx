@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import TabelaBeneficiarios from './TabelaBeneficiarios'
-import type { Beneficiario } from '../../types'
+import TabelaBeneficiarios from './TabelaBeneficiarios.tsx'
+import type { Beneficiario } from '../../typesBeneficiarios.ts'
 
 const ativo: Beneficiario = {
   id: 1, nome: 'Antonio Carlos Ferreira', cpf: '12345678900', precCp: '45872213300',

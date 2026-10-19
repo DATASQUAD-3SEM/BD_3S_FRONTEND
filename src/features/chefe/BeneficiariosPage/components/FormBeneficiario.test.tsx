@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import FormBeneficiario from './FormBeneficiario'
-import type { Beneficiario } from '../../types'
+import FormBeneficiario from './FormBeneficiario.tsx'
+import type { Beneficiario } from '../../typesBeneficiarios.ts'
 
 const ano = new Date().getFullYear()
 const existente: Beneficiario = {

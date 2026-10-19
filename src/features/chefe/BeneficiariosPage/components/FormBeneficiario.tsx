@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { calcularIdade, faixaEtaria, mascararCpf, mascararPrecCp, mascararTelefone } from '../../../../shared/utils/formatar'
-import { formVazio, paraForm, problemasDoForm, type Beneficiario, type BeneficiarioForm } from '../../types'
+import { calcularIdade, faixaEtaria, mascararCpf, mascararPrecCp, mascararTelefone } from '../../../../shared/utils/formatar.ts'
+import { formVazio, paraForm, problemasDoForm, type Beneficiario, type BeneficiarioForm } from '../../typesBeneficiarios.ts'
 
 interface Props {
   /** null = cadastro novo; preenchido = editando esse beneficiario. */
