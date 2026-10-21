@@ -14,14 +14,38 @@ function renderNovaPreGuia() {
 beforeEach(() => {
   URL.createObjectURL = vi.fn(() => 'blob:falso')
   URL.revokeObjectURL = vi.fn()
+
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(
-      new Response(JSON.stringify([]), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    ),
+    vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/beneficiarios/me') {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              nome: 'Antonio Carlos',
+              cpf: '12345678900',
+              precCp: '45872213300',
+              telefone: '(12) 98765-4321',
+              dataNascimento: '1978-05-10',
+              grupo: 'Exército Brasileiro · FUSEX',
+              assinaturaCadastrada: false,
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          ),
+        )
+      }
+
+      if (url === '/api/ocs') {
+        return Promise.resolve(
+          new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        )
+      }
+
+      return Promise.resolve(new Response('', { status: 404 }))
+    }),
   )
 })
 
