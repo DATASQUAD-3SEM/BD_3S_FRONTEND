@@ -1,11 +1,10 @@
 // Sobe BACKEND + FRONT em UM terminal so (sem precisar de dois IntelliJ).  Uso: npm run dev:full
-// O backend roda com o perfil h2 (banco em memoria, sem instalar MySQL).
+
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 
-// Le o arquivo .env (se existir) para pegar BACKEND_DIR
 try {
   process.loadEnvFile('.env')
 } catch {
@@ -55,8 +54,8 @@ function encerrarTudo(codigo) {
 process.on('SIGINT', () => encerrarTudo(0))
 process.on('SIGTERM', () => encerrarTudo(0))
 
-console.log('[dev:full] Subindo backend (h2) e front. Para parar tudo: Ctrl+C')
+console.log('[dev:full] Subindo backend (perfil dev, MySQL) e front. Para parar tudo: Ctrl+C')
 console.log('[dev:full] Frontend: https://localhost:5173')
 console.log('[dev:full] Para acessar do celular, use o IP que aparece abaixo (comecando com https://)\n')
-iniciar('back ', windows ? `"${mvnw}"` : mvnw, ['spring-boot:run', '-Dspring-boot.run.profiles=h2'], { cwd: backendDir })
+iniciar('back ', windows ? `"${mvnw}"` : mvnw, ['spring-boot:run', '-Dspring-boot.run.profiles=dev'], { cwd: backendDir })
 iniciar('front', 'npx', ['vite', '--host'], { cwd: process.cwd() })
