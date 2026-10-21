@@ -1,5 +1,8 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
 import MinhasPreGuiasPage from './MinhasPreGuiasPage';
-import type { PreGuiaDoBeneficiario } from './types';
 import { preGuiasMock } from './api.mock';
 
 function criarApi(lista: PreGuiaDoBeneficiario[] = preGuiasMock) {
