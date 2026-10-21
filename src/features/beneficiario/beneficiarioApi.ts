@@ -7,7 +7,7 @@ import { estadoMock } from './dadosBeneficiario'
  * true: usa o mock local (nada é enviado ao backend).
  * false: chama o backend de verdade.
  */
-const USAR_MOCK_MINHAS_INFORMACOES = true
+const USAR_MOCK_MINHAS_INFORMACOES = false
 
 /** Pequena pausa no mock, só para o usuário ver a mensagem "salvando". */
 const ATRASO_MOCK_MS = 400
