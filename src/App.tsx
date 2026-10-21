@@ -3,7 +3,7 @@ import AppLayout from './shared/components/AppLayout'
 import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
-import BeneficiariosPage from './features/beneficiarios/BeneficiariosPage'
+import BeneficiariosPage from './features/chefe/BeneficiariosPage'
 
 /**
  * TABELA DE ROTAS - unico lugar onde as rotas sao declaradas.
