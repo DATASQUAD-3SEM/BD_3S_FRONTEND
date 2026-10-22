@@ -6,6 +6,7 @@ import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
 import MinhasPreGuiasPage from './features/MinhasPreGuias/MinhasPreGuiasPage'
 import { BeneficiarioProvider } from './features/beneficiario/BeneficiarioContext'
+import FilaPreGuiasPage from './features/FilaPreGuias/FilaPreGuiasPage'
 
 /**
  * TABELA DE ROTAS - unico lugar onde as rotas sao declaradas.
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/pre-guias" element={<MinhasPreGuiasPage />} />
           <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
+          <Route path="/fila-pre-guias" element={<FilaPreGuiasPage />} />
           <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
           <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
           <Route path="*" element={<p>Pagina nao encontrada.</p>} />

@@ -14,6 +14,10 @@ export default function HomePage() {
            <h2>Minhas pré-guias</h2>
            <p>Acompanhe o status das suas pré-guias.</p>
           </Link>
+          <Link className="card" to="/fila-pre-guias">
+            <h2>Fila de pré-guias</h2>
+            <p>Acompanhe e analise as pré-guias recebidas.</p>
+          </Link>
         <Link className="card" to="/diagnostico/conexao">
           <h2>Testar conexao</h2>
           <p>Confere se o front esta falando com o backend.</p>
