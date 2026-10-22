@@ -58,8 +58,8 @@ export const apiMock: MinhasPreGuiasApi = {
     await espera(300);
     return preGuiasMock;
   },
-  async obterPdf(_id: number, _tipo: 'baixar' | 'visualizar') {
-    await espera(200);
-    return new Blob(['%PDF-1.4 mock'], { type: 'application/pdf' });
-  },
+ async obterPdf() {
+   await espera(200);
+   return new Blob(['%PDF-1.4 mock'], { type: 'application/pdf' });
+ },
 };
