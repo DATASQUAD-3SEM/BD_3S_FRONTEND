@@ -4,7 +4,7 @@ import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
-
+import MinhasPreGuiasPage from './features/MinhasPreGuias/MinhasPreGuiasPage'
 import { BeneficiarioProvider } from './features/beneficiario/BeneficiarioContext'
 
 /**
@@ -18,6 +18,7 @@ export default function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/pre-guias" element={<MinhasPreGuiasPage />} />
           <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
           <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
           <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
