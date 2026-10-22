@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import MinhasPreGuiasPage from './MinhasPreGuiasPage';
 import { preGuiasMock } from './api.mock';
+import type { PreGuiaDoBeneficiario } from './types';
 
 function criarApi(lista: PreGuiaDoBeneficiario[] = preGuiasMock) {
   return {
