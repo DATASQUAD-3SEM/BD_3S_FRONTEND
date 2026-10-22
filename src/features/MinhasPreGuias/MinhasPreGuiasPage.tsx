@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PreGuiaCard from './PreGuiaCard';
 import { minhasPreGuiasApi } from './api';
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 import './minhasPreGuias.css';
-
 
 interface Props {
   api?: MinhasPreGuiasApi;
@@ -20,22 +19,31 @@ export default function MinhasPreGuiasPage({
 }: Props) {
   const [estado, setEstado] = useState<Estado>('carregando');
   const [preGuias, setPreGuias] = useState<PreGuiaDoBeneficiario[]>([]);
-
-  const carregar = useCallback(async () => {
-    setEstado('carregando');
-    try {
-      const lista = await api.listar();
-      const ordenada = [...lista].sort((a, b) => b.dataCriacao.localeCompare(a.dataCriacao));
-      setPreGuias(ordenada);
-      setEstado('pronto');
-    } catch {
-      setEstado('erro');
-    }
-  }, [api]);
+  const [tentativa, setTentativa] = useState(0);
 
   useEffect(() => {
-    carregar();
-  }, [carregar]);
+    let cancelado = false;
+    api
+      .listar()
+      .then((lista) => {
+        if (cancelado) return;
+        const ordenada = [...lista].sort((a, b) => b.dataCriacao.localeCompare(a.dataCriacao));
+        setPreGuias(ordenada);
+        setEstado('pronto');
+      })
+      .catch(() => {
+        if (cancelado) return;
+        setEstado('erro');
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [api, tentativa]);
+
+  const tentarNovamente = () => {
+    setEstado('carregando');
+    setTentativa((n) => n + 1);
+  };
 
   return (
     <section className="minhas-pre-guias">
@@ -52,7 +60,7 @@ export default function MinhasPreGuiasPage({
       {estado === 'erro' && (
         <div role="alert" className="estado-erro">
           <p>Não foi possível carregar suas pré-guias.</p>
-          <button type="button" className="botao botao-primario" onClick={carregar}>
+          <button type="button" className="botao botao-primario" onClick={tentarNovamente}>
             Tentar novamente
           </button>
         </div>
