@@ -8,7 +8,7 @@ import type { Beneficiario } from '../../shared/types/domain'
  * Troque para false quando GET /beneficiarios/me
  * estiver implementado e testado no backend.
  */
-const USAR_MOCK_BENEFICIARIO = true
+const USAR_MOCK_BENEFICIARIO = false
 
 /**
  * "Banco de dados" falso do beneficiario logado.
