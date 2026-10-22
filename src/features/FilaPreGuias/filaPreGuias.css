@@ -1,0 +1,37 @@
+
+
+.fila-pre-guias h1 { margin: 0 0 16px; font-size: 22px; color: #1f3d2b; }
+.fila-pre-guias__painel { background: #fff; border: 1px solid #dfe5e1; border-radius: 10px; padding: 20px; }
+.fila-pre-guias__filtros { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.fila-pre-guias__filtros input, .fila-pre-guias__filtros select {
+  border: 1px solid #b9c4bd; border-radius: 8px; padding: 10px 12px; font-size: 14px; background: #fff;
+}
+.fila-pre-guias__filtros input { flex: 1 1 260px; max-width: 360px; }
+.fila-pre-guias__tabela-wrapper { overflow-x: auto; }
+.fila-pre-guias__tabela { width: 100%; border-collapse: collapse; font-size: 14px; }
+.fila-pre-guias__tabela th { text-align: left; color: #5b6b62; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid #dfe5e1; }
+.fila-pre-guias__tabela td { padding: 12px; border-bottom: 1px solid #eef1ef; vertical-align: middle; }
+.fila-pre-guias__paginacao { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 16px; font-size: 14px; color: #5b6b62; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.badge { padding: 3px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.badge-pendente { background: #fff3c4; color: #7a5b00; }
+.badge-em-analise { background: #d9e8ff; color: #1b4a94; }
+.badge-atencao { background: #ffe0bd; color: #9a4a00; }
+.badge-concluida { background: #d5f0dc; color: #1c6b34; }
+
+.botao { border: 1px solid #b9c4bd; background: #fff; border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
+.botao:disabled { opacity: 0.6; cursor: not-allowed; }
+.botao-primario { background: #1f3d2b; border-color: #1f3d2b; color: #fff; }
+
+.skeleton-linha {
+  height: 52px; border-radius: 8px; margin-bottom: 10px;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f7f5 50%, #e8ede9 75%);
+  background-size: 200% 100%; animation: brilho 1.2s infinite;
+}
+@keyframes brilho { to { background-position: -200% 0; } }
+.estado-vazio, .estado-erro { text-align: center; padding: 28px; color: #5b6b62; }
+
+@media (max-width: 600px) {
+  .fila-pre-guias__filtros input { max-width: none; }
+}
