@@ -34,3 +34,12 @@ export interface Beneficiario {
   grupo?: string | null
   assinaturaCadastrada?: boolean
 }
+
+export interface MedicoPerfil {
+  nome: string
+  patente: string
+  cpf: string
+  precCp: string
+  crm: string
+  assinaturaCadastrada: boolean
+}
