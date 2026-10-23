@@ -97,7 +97,7 @@ export async function alterarSenha(
 
 /**
  * Cadastra ou substitui a assinatura digital (imagem PNG).
- * Contrato T13-BE2: PUT /usuarios/me/assinatura, multipart com a imagem -> 200 { assinaturaCadastrada: true }.
+ * Contrato T13-BE2: PUT /usuarios/me/assinatura, multipart com o campo "arquivo" -> 200 { assinaturaCadastrada: true }.
  */
 export async function salvarAssinatura(imagem: Blob): Promise<void> {
   if (USAR_MOCK_MINHAS_INFORMACOES) {
@@ -107,6 +107,6 @@ export async function salvarAssinatura(imagem: Blob): Promise<void> {
   }
 
   const formulario = new FormData()
-  formulario.append('imagem', imagem, 'assinatura.png')
+  formulario.append('arquivo', imagem, 'assinatura.png')
   await putForm<void>('/usuarios/me/assinatura', formulario)
 }
