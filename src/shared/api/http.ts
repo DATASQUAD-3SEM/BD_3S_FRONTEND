@@ -51,9 +51,14 @@ async function lerErro(res: Response): Promise<ApiError> {
 }
 
 async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
+  const login = localStorage.getItem('X-Usuario-Login') || '11144477735'
+
+  const headers = new Headers(init.headers || {})
+  headers.set('X-Usuario-Login', login)
+
   let res: Response
   try {
-    res = await fetch(`${API_BASE}${caminho}`, init)
+    res = await fetch(`${API_BASE}${caminho}`, { ...init, headers })
   } catch {
     throw new ApiError(0, 'Sem conexao com o servidor. Verifique a rede.', [], true)
   }
