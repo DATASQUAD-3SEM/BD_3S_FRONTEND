@@ -98,6 +98,14 @@ export function putForm<T>(caminho: string, formulario: FormData): Promise<T> {
   return request<T>(caminho, { method: 'PUT', body: formulario })
 }
 
+export function put<T>(caminho: string, corpo: unknown): Promise<T> {
+  return request<T>(caminho, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo),
+  })
+}
+
 export function del(caminho: string): Promise<void> {
   return request<void>(caminho, { method: 'DELETE' })
 }
