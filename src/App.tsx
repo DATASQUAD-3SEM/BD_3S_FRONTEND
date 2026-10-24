@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import AppLayout from './shared/components/AppLayout'
 import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
@@ -11,6 +11,8 @@ import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
 import ChefeLayout from './features/chefeFusex/ChefeLayout'
 import ChefeMinhasInformacoesPage from './features/chefeFusex/ChefeMyInfoPage'
+import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
+import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
 
 
@@ -50,6 +52,11 @@ export default function App() {
             element={<EmConstrucao nome="Médicos" task="Tela do chefe" />}
           />
           <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
+        </Route>
+
+        <Route path="/recepcao" element={<RecepcaoLayout />}>
+          <Route index element={<Navigate to="guias-para-impressao" replace />} />
+          <Route path="guias-para-impressao" element={<GuiasParaImpressaoPage />} />
         </Route>
 
       </Routes>
