@@ -7,12 +7,11 @@ import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPag
 import MinhasPreGuiasPage from './features/MinhasPreGuias/MinhasPreGuiasPage'
 import { BeneficiarioProvider } from './features/beneficiario/BeneficiarioContext'
 import FilaPreGuiasPage from './features/FilaPreGuias/FilaPreGuiasPage'
+import MedicoLayout from './features/medicoFusex/MedicoLayout'
+import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
+import EmConstrucao from './shared/components/EmConstrucao'
 
-/**
- * TABELA DE ROTAS - unico lugar onde as rotas sao declaradas.
- * Nova tela? Crie a pasta da feature e adicione UMA linha aqui (PR pequeno e rapido,
- * para nao dar conflito).
- */
+
 export default function App() {
   return (
     <BeneficiarioProvider>
@@ -25,6 +24,14 @@ export default function App() {
           <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
           <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
           <Route path="*" element={<p>Pagina nao encontrada.</p>} />
+        </Route>
+
+        <Route path="/medico" element={<MedicoLayout />}>
+          <Route
+            path="guias-para-assinar"
+            element={<EmConstrucao nome="Guias para assinar" task="Tela do médico" />}
+          />
+          <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
         </Route>
       </Routes>
     </BeneficiarioProvider>
