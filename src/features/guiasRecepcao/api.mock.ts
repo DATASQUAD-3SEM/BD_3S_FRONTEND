@@ -43,7 +43,7 @@ export const guiasRecepcaoMockApi: GuiasRecepcaoApi = {
     )
   },
 
-  async obterPdf(guiaId: number, _modo): Promise<Blob> {
+  async obterPdf(guiaId: number): Promise<Blob> {
     await espera(250)
     if (!guiasMock.some((g) => g.guiaId === guiaId)) {
       throw new ApiError(404, 'Guia não encontrada')
