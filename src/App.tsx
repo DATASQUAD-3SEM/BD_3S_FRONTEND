@@ -9,6 +9,8 @@ import { BeneficiarioProvider } from './features/beneficiario/BeneficiarioContex
 import FilaPreGuiasPage from './features/FilaPreGuias/FilaPreGuiasPage'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
+import ChefeLayout from './features/chefeFusex/ChefeLayout'
+import ChefeMinhasInformacoesPage from './features/chefeFusex/ChefeMyInfoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
 
 
@@ -33,6 +35,23 @@ export default function App() {
           />
           <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
         </Route>
+
+        <Route path="/chefe" element={<ChefeLayout />}>
+          <Route
+            path="guias-para-assinar"
+            element={<EmConstrucao nome="Guias para assinar" task="Tela do chefe" />}
+          />
+          <Route
+            path="beneficiarios"
+            element={<EmConstrucao nome="Beneficiários" task="Tela do chefe" />}
+          />
+          <Route
+            path="medicos"
+            element={<EmConstrucao nome="Médicos" task="Tela do chefe" />}
+          />
+          <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
+        </Route>
+
       </Routes>
     </BeneficiarioProvider>
   )

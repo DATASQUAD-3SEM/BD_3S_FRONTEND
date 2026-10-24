@@ -43,3 +43,10 @@ export interface MedicoPerfil {
   crm: string
   assinaturaCadastrada: boolean
 }
+
+export interface ChefePerfil {
+  nome: string
+  patente: string
+  login: string
+  assinaturaCadastrada: boolean
+}
