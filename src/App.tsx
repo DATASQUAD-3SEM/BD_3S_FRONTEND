@@ -14,6 +14,8 @@ import ChefeMinhasInformacoesPage from './features/chefeFusex/ChefeMyInfoPage'
 import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
 import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
+import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
+
 
 
 export default function App() {
@@ -31,18 +33,12 @@ export default function App() {
         </Route>
 
         <Route path="/medico" element={<MedicoLayout />}>
-          <Route
-            path="guias-para-assinar"
-            element={<EmConstrucao nome="Guias para assinar" task="Tela do médico" />}
-          />
+          <Route path="guias-para-assinar" element={<GuiasParaAssinarMedico />} />
           <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
         </Route>
 
         <Route path="/chefe" element={<ChefeLayout />}>
-          <Route
-            path="guias-para-assinar"
-            element={<EmConstrucao nome="Guias para assinar" task="Tela do chefe" />}
-          />
+          <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
           <Route
             path="beneficiarios"
             element={<EmConstrucao nome="Beneficiários" task="Tela do chefe" />}
