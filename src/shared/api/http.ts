@@ -50,7 +50,8 @@ async function lerErro(res: Response): Promise<ApiError> {
   }
 }
 
-async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
+/** Faz a chamada com o cabecalho de login e converte erros de rede/HTTP em ApiError. */
+async function enviar(caminho: string, init: RequestInit = {}): Promise<Response> {
   const login = localStorage.getItem('X-Usuario-Login') || '11144477735'
 
   const headers = new Headers(init.headers || {})
@@ -63,12 +64,23 @@ async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
     throw new ApiError(0, 'Sem conexao com o servidor. Verifique a rede.', [], true)
   }
   if (!res.ok) throw await lerErro(res)
+  return res
+}
+
+async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
+  const res = await enviar(caminho, init)
   if (res.status === 204) return undefined as T
   return (await res.json()) as T
 }
 
 export function get<T>(caminho: string): Promise<T> {
   return request<T>(caminho)
+}
+
+/** Download de arquivo binario (ex.: PDF da Guia). Mesmos cabecalhos e erros das demais chamadas. */
+export async function getBlob(caminho: string): Promise<Blob> {
+  const res = await enviar(caminho)
+  return res.blob()
 }
 
 export function post<T>(caminho: string, corpo: unknown): Promise<T> {
