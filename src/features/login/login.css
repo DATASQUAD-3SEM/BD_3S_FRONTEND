@@ -131,19 +131,26 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  background: var(--verde-claro-2);
-  border: 1px solid var(--borda);
+  background: #fff;
+  color: var(--texto);
+  border: 1px solid var(--verde);
   border-radius: 8px;
   padding: 0.85rem 1rem;
   cursor: pointer;
 }
 
+.login-rapido-botao strong {
+  color: var(--verde-escuro);
+}
+
 .login-rapido-botao:hover:not(:disabled) {
-  border-color: var(--verde);
+  background: var(--verde-claro);
+  border-color: var(--verde-escuro);
 }
 
 .login-rapido-botao span {
   color: var(--texto-suave);
+  font-weight: 400;
   font-size: 0.9rem;
 }
 
