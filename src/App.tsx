@@ -18,6 +18,7 @@ import EmConstrucao from './shared/components/EmConstrucao'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
 import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
+import MedicosPage from './features/chefeMedicos/MedicosPage'
 
 export default function App() {
   return (
@@ -46,7 +47,7 @@ export default function App() {
         <Route index element={<Navigate to="guias-para-assinar" replace />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
         <Route path="beneficiarios" element={<BeneficiariosPage />} />
-        <Route path="medicos" element={<EmConstrucao nome="Médicos" task="T8-FE" />} />
+        <Route path="medicos" element={<MedicosPage />} />
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>
 
