@@ -42,5 +42,5 @@ export function mensagemDeErro(erro: unknown, { padrao, conflito = MSG_CONFLITO 
     // o backend manda "campo: mensagem"; mostramos só a mensagem
     return erro.detalhes.map((linha) => linha.replace(/^[^:]+:\s*/, '')).join(' ');
   }
-  return erro.mensagem || padrao;
+  return erro.message || padrao;
 }
