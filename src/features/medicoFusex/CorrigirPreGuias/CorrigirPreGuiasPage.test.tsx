@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CorrigirPreGuiasPage from './CorrigirPreGuiasPage'
@@ -47,12 +47,14 @@ describe('CorrigirPreGuiasPage', () => {
   })
 
   it('mostra erro e tenta de novo ao clicar em "Tentar novamente"', async () => {
-    const listar = vi
-      .fn<() => Promise<never>>()
-      .mockRejectedValueOnce(new Error('falha'))
+    let chamadas = 0
     const api: CorrigirPreGuiasApi = {
-      listarParaCorrigir: () =>
-        listar().catch(() => corrigirPreGuiasMock.listarParaCorrigir()),
+      listarParaCorrigir() {
+        chamadas += 1
+        return chamadas === 1
+          ? Promise.reject(new Error('falha'))
+          : corrigirPreGuiasMock.listarParaCorrigir()
+      },
     }
     renderizar(api)
 
@@ -62,6 +64,7 @@ describe('CorrigirPreGuiasPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }))
 
     expect(await screen.findByText('Pré-guia 0405 · Marta Souza Lima')).toBeInTheDocument()
+    expect(chamadas).toBe(2)
   })
 
   it('navega para a tela de correção ao clicar em "Corrigir"', async () => {
