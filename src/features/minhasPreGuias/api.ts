@@ -1,35 +1,18 @@
 // Cliente HTTP real. Contratos: T1-BE1 (listar) e T1-BE2 (PDF da Guia).
-// O token de autenticação deve ser incluído em `cabecalhos()` quando a autenticação existir.
+// Usa o cliente unico (shared/api/http.ts), que coloca o prefixo /api e o header de login simulado.
+import { get, getBlob } from '../../shared/api/http';
 import type { MinhasPreGuiasApi, ModoPdf, PreGuiaDoBeneficiario } from './types';
 
-const BASE_URL: string = import.meta.env?.VITE_API_URL ?? '';
-
-function cabecalhos(): HeadersInit {
-  return {};
-}
-
-async function verificar(resposta: Response, mensagem: string): Promise<Response> {
-  if (!resposta.ok) {
-    throw new Error(mensagem);
-  }
-  return resposta;
-}
+const BASE = '/beneficiarios/me/pre-guias';
 
 export const minhasPreGuiasApi: MinhasPreGuiasApi = {
   /** GET /beneficiarios/me/pre-guias */
-  async listar(): Promise<PreGuiaDoBeneficiario[]> {
-    const resposta = await fetch(`${BASE_URL}/beneficiarios/me/pre-guias`, { headers: cabecalhos() });
-    await verificar(resposta, 'Não foi possível carregar suas pré-guias.');
-    return resposta.json();
+  listar(): Promise<PreGuiaDoBeneficiario[]> {
+    return get<PreGuiaDoBeneficiario[]>(BASE);
   },
 
   /** GET /beneficiarios/me/pre-guias/{id}/guia/pdf?modo=baixar|visualizar. Retorna um Blob. */
-  async obterPdf(id: number, modo: ModoPdf): Promise<Blob> {
-    const resposta = await fetch(
-      `${BASE_URL}/beneficiarios/me/pre-guias/${id}/guia/pdf?modo=${modo}`,
-      { headers: cabecalhos() },
-    );
-    await verificar(resposta, 'Não foi possível obter o PDF da Guia.');
-    return resposta.blob();
+  obterPdf(id: number, modo: ModoPdf): Promise<Blob> {
+    return getBlob(`${BASE}/${id}/guia/pdf?modo=${modo}`);
   },
 };
