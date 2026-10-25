@@ -7,7 +7,7 @@ import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPag
 import MinhasPreGuiasPage from './features/minhasPreGuias/MinhasPreGuiasPage'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
-import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
+import PreGuiaSetorRota from './features/PreGuiaSetor/PreGuiaSetorRota'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
 import ChefeLayout from './features/chefeFusex/ChefeLayout'
