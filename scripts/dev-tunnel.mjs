@@ -49,7 +49,7 @@ if (subirBackend) {
     console.error('[dev:tunnel] Rode SEM_BACKEND=1 npm run dev:tunnel ou ajuste BACKEND_DIR no .env\n')
     process.exit(1)
   }
-  iniciar('back ', windows ? `"${mvnw}"` : mvnw, ['spring-boot:run', '-Dspring-boot.run.profiles=h2'], { cwd: BACKEND_DIR })
+  iniciar('back ', windows ? `"${mvnw}"` : mvnw, ['spring-boot:run', '-Dspring-boot.run.profiles=dev'], { cwd: BACKEND_DIR })
 }
 
 iniciar('front', 'npx', ['vite', '--host'], { cwd: process.cwd() })
