@@ -1,0 +1,72 @@
+/* Aviso de confirmação na lista (após o reenvio). */
+.correcao-aviso { background: #eef8f1; border: 1px solid #9fd1b0; color: #1c6b34; border-radius: 8px; padding: 10px 14px; margin: 0 0 14px; }
+
+/* T9-FE · Tela de correção da pré-guia (prefixo correcao-). Botões e badges vêm de minhasPreGuias.css. */
+.correcao-pagina { max-width: 1100px; }
+.correcao-pagina h1 { margin: 0; font-size: 22px; color: #1f3d2b; }
+.correcao-topo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.correcao-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.correcao-coluna { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.correcao-card { background: #fff; border: 1px solid #dfe5e1; border-radius: 10px; padding: 16px 20px; min-width: 0; }
+.correcao-card h2 { margin: 0 0 10px; font-size: 16px; color: #1f3d2b; }
+.correcao-card dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; }
+.correcao-card dt { color: #5b6b62; font-size: 14px; }
+.correcao-card dd { margin: 0; overflow-wrap: anywhere; }
+
+.correcao-observacao { background: #fff1e0; border-color: #f0a64a; }
+.correcao-observacao p { margin: 4px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.correcao-observacao h2 { margin-bottom: 0; }
+
+.correcao-meta { color: #5b6b62; font-size: 14px; margin: 8px 0 0; }
+.correcao-erro { color: #b3261e; font-size: 14px; margin: 10px 0 0; }
+
+.correcao-busca {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.correcao-opcoes { list-style: none; padding: 0; margin: 10px 0 0; }
+.correcao-opcoes li { margin-bottom: 8px; }
+.correcao-opcoes label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; font-size: 14px; }
+
+.correcao-dropzone {
+  border: 2px dashed #b9c4bd;
+  border-radius: 10px;
+  padding: 24px 16px;
+  text-align: center;
+  background: #fafcfb;
+  margin-top: 10px;
+}
+.correcao-dropzone--ativa { border-color: #2e7d4f; background: #eef8f1; }
+.correcao-dropzone p { margin: 0; font-size: 14px; color: #5b6b62; }
+.correcao-dropzone__botoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+
+.correcao-selecionado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  background: #eef8f1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.correcao-acoes { background: #fff; border: 1px solid #dfe5e1; border-radius: 10px; padding: 16px 20px; margin-top: 16px; }
+.correcao-acoes__botoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.correcao-confirma { background: #fff1e0; border: 1px solid #f0a64a; border-radius: 8px; padding: 12px 14px; margin-top: 12px; }
+.correcao-confirma p { margin: 0; }
+.correcao-confirma .correcao-acoes__botoes { margin-top: 10px; }
+
+@media (max-width: 800px) {
+  .correcao-grade { grid-template-columns: minmax(0, 1fr); }
+}
