@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { corrigirPreGuiasApi } from './corrigirPreGuiasApi'
 import PreGuiaCorrecaoCard from './components/PreGuiaCorrecaoCard'
 import type { CorrigirPreGuiasApi, PreGuiaParaCorrigir } from './types'
@@ -16,6 +16,8 @@ interface Props {
 
 export default function CorrigirPreGuiasPage({ api = corrigirPreGuiasApi }: Props) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const mensagemSalva = (location.state as { mensagem?: string } | null)?.mensagem
   const [estado, setEstado] = useState<Estado>({ tipo: 'carregando' })
   const [tentativa, setTentativa] = useState(0)
 
@@ -46,6 +48,12 @@ export default function CorrigirPreGuiasPage({ api = corrigirPreGuiasApi }: Prop
         Aparecem aqui somente as pré-guias criadas por você que o setor de Guias devolveu para
         correção.
       </p>
+
+      {mensagemSalva && (
+        <p role="status" className="corrigir-pre-guias__sucesso">
+          {mensagemSalva}
+        </p>
+      )}
 
       {estado.tipo === 'carregando' && (
         <div

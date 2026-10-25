@@ -20,6 +20,7 @@ import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
+import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiaPage'
 
 export default function App() {
   return (
@@ -40,7 +41,7 @@ export default function App() {
         <Route path="inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
         <Route path="nova-pre-guia" element={<NovaPreGuiaMedicoPage />} />
         <Route path="corrigir-pre-guias" element={<CorrigirPreGuiasPage />} />
-        <Route path="corrigir-pre-guias/:id" element={<EmConstrucao nome="Corrigir pré-guia" task="T14-FE2" />} />
+        <Route path="corrigir-pre-guias/:id" element={<CorrigirPreGuiaPage />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarMedico />} />
         <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
       </Route>
