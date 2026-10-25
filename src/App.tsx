@@ -5,7 +5,7 @@ import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
 import MinhasPreGuiasPage from './features/MinhasPreGuias/MinhasPreGuiasPage'
-import FilaPreGuiasPage from './features/FilaPreGuias/FilaPreGuiasPage'
+import FilaPreGuiasRota from './features/FilaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/FilaPreGuias/SetorGuiasLayout'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
@@ -49,7 +49,7 @@ export default function App() {
 
       <Route path="/setor-guias" element={<SetorGuiasLayout />}>
         <Route index element={<Navigate to="fila" replace />} />
-        <Route path="fila" element={<FilaPreGuiasPage />} />
+        <Route path="fila" element={<FilaPreGuiasRota />} />
       </Route>
       {/* rota antiga da fila */}
       <Route path="/fila-pre-guias" element={<Navigate to="/setor-guias/fila" replace />} />
