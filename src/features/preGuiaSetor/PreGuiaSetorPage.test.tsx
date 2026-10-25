@@ -70,7 +70,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await usuario.type(await screen.findByLabelText('Observação (obrigatória)'), 'Falta o documento');
     await usuario.click(screen.getByRole('button', { name: 'Requerer correção' }));
     await usuario.click(screen.getByRole('button', { name: 'Confirmar correção' }));
-    expect(await screen.findByText('Aguardando correção do beneficiário')).toBeInTheDocument();
+    expect(await screen.findByText('Aguardando correção.')).toBeInTheDocument();
   });
 
   it('Concluir fica desabilitado até anexar o PDF com o número', async () => {
