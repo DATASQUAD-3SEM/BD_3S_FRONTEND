@@ -13,6 +13,8 @@ import OcsCard from './OcsCard'
  */
 
 interface Props {
+  /** Id da pre-guia, lido da rota: a resposta do T14-BE2 nao traz o id. */
+  preGuiaId: number
   detalhe: DetalheCorrecao
   api: CorrecaoApi
   onCancelar: () => void
@@ -27,7 +29,7 @@ function mesmosCodigos(a: ProcedimentoResumo[], b: ProcedimentoResumo[]): boolea
   return a.every((p) => codigos.has(p.codigoTuss))
 }
 
-export default function FormularioCorrecao({ detalhe, api, onCancelar, onSalvo }: Props) {
+export default function FormularioCorrecao({ preGuiaId, detalhe, api, onCancelar, onSalvo }: Props) {
   const [ocs, setOcs] = useState<OcsResumo>(detalhe.ocsAtual)
   const [exames, setExames] = useState<ProcedimentoResumo[]>(detalhe.procedimentos)
   const [enviando, setEnviando] = useState(false)
@@ -59,7 +61,7 @@ export default function FormularioCorrecao({ detalhe, api, onCancelar, onSalvo }
     setEnviando(true)
     setErro(null)
     try {
-      await api.salvarCorrecao(detalhe.id, {
+      await api.salvarCorrecao(preGuiaId, {
         ocsId: ocsMudou ? ocs.id : undefined,
         procedimentos: exames.map((e) => e.codigoTuss),
       })

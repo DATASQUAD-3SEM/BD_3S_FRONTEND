@@ -95,6 +95,7 @@ export default function CorrigirPreGuiaPage({ api = correcaoApi }: Props) {
 
   return (
     <FormularioCorrecao
+      preGuiaId={preGuiaId}
       detalhe={estado.detalhe}
       api={api}
       onCancelar={() => navigate(ROTA_LISTA)}
