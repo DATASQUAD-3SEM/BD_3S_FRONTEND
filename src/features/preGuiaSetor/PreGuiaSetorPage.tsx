@@ -242,7 +242,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
 
         {situacao === 'guia-enviada' && <p className="pgs__aviso">Guia já enviada para assinatura</p>}
         {situacao === 'aguardando-correcao' && (
-          <p className="pgs__aviso">Aguardando correção do beneficiário</p>
+          <p className="pgs__aviso">Aguardando correção.</p>
         )}
 
         {(situacao === 'ativa' || situacao === 'indisponivel') && (
