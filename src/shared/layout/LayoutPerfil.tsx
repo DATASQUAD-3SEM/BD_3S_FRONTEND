@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
-import { MENUS, ROTULO_PERFIL, type Perfil } from './perfis'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { encerrarSessao } from '../auth/sessao'
+import { INICIO_PERFIL, MENUS, ROTULO_PERFIL, type Perfil } from './perfis'
 
 interface Props {
   perfil: Perfil
@@ -14,9 +15,16 @@ interface Props {
 /**
  * T0-FE: barra superior verde com "Nexus" e o usuário, e menu lateral só com os itens do perfil.
  * No mobile o menu vira gaveta. As telas entregam só o conteúdo da área principal (Outlet).
+ * O botão "Sair" encerra a sessão e volta para a tela de login.
  */
 export default function LayoutPerfil({ perfil, nomeUsuario, itemAtivo, children }: Props) {
   const [menuAberto, setMenuAberto] = useState(false)
+  const navigate = useNavigate()
+
+  function sair() {
+    encerrarSessao()
+    navigate('/login', { replace: true })
+  }
 
   // Beneficiário e médico mostram "{nome} · {perfil}"; chefe e setores, só o nome do perfil
   const usaNome = perfil === 'BENEFICIARIO' || perfil === 'MEDICO'
@@ -35,11 +43,16 @@ export default function LayoutPerfil({ perfil, nomeUsuario, itemAtivo, children 
           <span aria-hidden="true">{menuAberto ? '✕' : '☰'}</span>
         </button>
 
-        <Link className="brand" to="/" aria-label="Nexus: trocar de perfil">
+        <Link className="brand" to={INICIO_PERFIL[perfil]} aria-label="Nexus: página inicial">
           <span className="brand-nome">Nexus</span>
         </Link>
 
-        <span className="app-usuario">{usuario}</span>
+        <div className="app-topbar-direita">
+          <span className="app-usuario">{usuario}</span>
+          <button type="button" className="app-sair" onClick={sair}>
+            Sair
+          </button>
+        </div>
       </header>
 
       <div className={`app-body${menuAberto ? ' menu-aberto' : ''}`}>
