@@ -21,7 +21,6 @@ const EXAMES: ProcedimentoResumo[] = [
 ]
 
 const DETALHE: DetalheCorrecao = {
-  id: 405,
   numero: '0405',
   status: 'ATENCAO',
   beneficiario: {

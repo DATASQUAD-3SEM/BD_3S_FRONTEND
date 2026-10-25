@@ -19,8 +19,8 @@ export interface ProcedimentoResumo {
   nome: string
 }
 
+/** Resposta do GET /medicos/me/pre-guias/{id}/correcao (T14-BE2). O id da pre-guia vem da rota, nao da resposta. */
 export interface DetalheCorrecao {
-  id: number
   numero: string
   status: string
   beneficiario: BeneficiarioCorrecao
