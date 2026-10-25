@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { ApiError } from '../../shared/api/http'
 import { errosDoBackend, validarDadosConta, type DadosConta } from './validacaoDadosConta'
 
+/**
+ * Testes das validacoes do cartao Dados da conta do Chefe.
+ */
+
 const VALIDOS: DadosConta = { nome: 'Chefe do FUSEX', patente: 'Coronel', login: 'chefe.fusex', novaSenha: '' }
 
 describe('validarDadosConta', () => {

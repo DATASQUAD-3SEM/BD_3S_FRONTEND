@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import UploadEncaminhamento from './UploadEncaminhamento'
 
+/**
+ * Testes do envio do arquivo de encaminhamento.
+ */
+
 // O "jsdom" (o navegador de mentira dos testes) nao tem createObjectURL. Simulamos.
 beforeEach(() => {
   URL.createObjectURL = vi.fn(() => 'blob:falso')

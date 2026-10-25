@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { CHAVE_LOGIN, CHAVE_PERFIL, LOGIN_PADRAO, entrarComo, garantirPerfilSimulado } from './perfis'
 
+/**
+ * Testes do login simulado por perfil (T0-FE).
+ */
+
 describe('login simulado por perfil (T0-FE)', () => {
   beforeEach(() => localStorage.clear())
 

@@ -3,6 +3,10 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { BeneficiarioProvider } from '../../beneficiario/BeneficiarioContext'
 import NovaPreGuiaPage from '.'
 
+/**
+ * Testes da Nova pre-guia do beneficiario (Sprint 1).
+ */
+
 function renderNovaPreGuia() {
   return render(
     <BeneficiarioProvider>

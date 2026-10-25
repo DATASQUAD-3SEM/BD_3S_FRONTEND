@@ -5,6 +5,10 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import HomePage from './HomePage'
 import { CHAVE_LOGIN } from '../../shared/layout/perfis'
 
+/**
+ * Testes da pagina inicial de escolha de perfil (login simulado).
+ */
+
 describe('HomePage: escolha do perfil', () => {
   beforeEach(() => localStorage.clear())
 

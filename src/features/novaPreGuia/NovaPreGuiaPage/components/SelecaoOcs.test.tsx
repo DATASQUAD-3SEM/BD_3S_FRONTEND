@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import SelecaoOcs from './SelecaoOcs'
 
+/**
+ * Testes da escolha de OCS da Nova pre-guia do beneficiario.
+ */
+
 function respostaJson(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), {
     status,

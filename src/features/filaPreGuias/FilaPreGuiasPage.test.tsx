@@ -6,6 +6,10 @@ import FilaPreGuiasPage from './FilaPreGuiasPage';
 import type { PaginaFila } from './types';
 import { filaMock } from './api.mock';
 
+/**
+ * Testes da Fila de pre-guias do Setor de Guias (T3-FE): busca, filtro, paginacao e estados.
+ */
+
 const linhaDe = (texto: string): HTMLTableRowElement => {
   const el = screen.getByText(texto).closest('tr');
   if (!el) throw new Error(`Linha não encontrada para "${texto}"`);

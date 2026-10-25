@@ -7,6 +7,10 @@ import { correcaoMock, ocsMock } from './correcaoApi.mock';
 import { ApiError } from '../../../shared/api/http';
 import type { CorrecaoApi } from './types';
 
+/**
+ * Testes da tela Visualizar e corrigir pre-guia (T9-FE): carregamento, redirecionamentos e reenvio.
+ */
+
 function criarApi(): CorrecaoApi {
   return {
     obterCorrecao: vi.fn().mockResolvedValue(correcaoMock),

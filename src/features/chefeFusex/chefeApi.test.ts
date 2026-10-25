@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { salvarAssinatura, salvarDadosChefe } from './chefeApi'
 
+/**
+ * Testes das chamadas a API da conta do Chefe.
+ */
+
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',

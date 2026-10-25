@@ -5,6 +5,10 @@ import GuiasParaImpressaoPage from './GuiasParaImpressaoPage'
 import { imprimirIframe, imprimirUrlEmSegundoPlano } from './imprimirPdf'
 import type { GuiaRecepcao, GuiasRecepcaoApi } from './types'
 
+/**
+ * Testes da tela Guias para impressao da Recepcao (T6-FE): busca, janela de visualizacao e impressao.
+ */
+
 vi.mock('./imprimirPdf', () => ({
   imprimirUrlEmSegundoPlano: vi.fn(),
   imprimirIframe: vi.fn(),

@@ -6,6 +6,10 @@ import MedicosPage from './MedicosPage'
 import { ApiError } from '../../shared/api/http'
 import type { ListaMedicos, MedicoDetalhe, MedicosApi } from './tipos'
 
+/**
+ * Testes da tela Medicos do Chefe (T8-FE): lista, filtros, cadastro, edicao e duplicidades.
+ */
+
 const lista: ListaMedicos = {
   total: 2,
   pagina: 0,

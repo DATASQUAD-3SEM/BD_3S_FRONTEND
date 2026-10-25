@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { guiasRecepcaoApi } from './api'
 
+/**
+ * Testes da montagem das chamadas a API da recepcao.
+ */
+
 afterEach(() => {
   vi.unstubAllGlobals()
 })

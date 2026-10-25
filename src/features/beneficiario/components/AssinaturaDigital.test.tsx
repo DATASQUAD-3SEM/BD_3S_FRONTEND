@@ -2,6 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import AssinaturaDigital from './AssinaturaDigital'
 
+/**
+ * Testes do cartao de assinatura digital: badge de situacao, quadro de desenho e envio de imagem.
+ */
+
 describe('AssinaturaDigital', () => {
   it('mostra o badge amarelo quando ainda não há assinatura', () => {
     render(<AssinaturaDigital cadastrada={false} onSalvar={vi.fn()} />)

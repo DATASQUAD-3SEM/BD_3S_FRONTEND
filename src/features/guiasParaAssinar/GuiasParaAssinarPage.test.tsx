@@ -6,6 +6,10 @@ import { ApiError } from '../../shared/api/http'
 import GuiasParaAssinarPage, { type GuiasParaAssinarPageProps } from './GuiasParaAssinarPage'
 import type { AssinaturaRegistrada, GuiaParaAssinar, GuiasParaAssinarApi } from './types'
 
+/**
+ * Testes da tela Guias para assinar (T5-FE) para medico e chefe, incluindo os textos padronizados de pendencia.
+ */
+
 const GUIAS: GuiaParaAssinar[] = [
   { guiaId: 1, numero: '202610701', beneficiarioNome: 'Marta Souza Lima', pendencias: ['MEDICO', 'CHEFE'] },
   { guiaId: 2, numero: '202610699', beneficiarioNome: 'João Pereira Alves', pendencias: ['MEDICO'] },

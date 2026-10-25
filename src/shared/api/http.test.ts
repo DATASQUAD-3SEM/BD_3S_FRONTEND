@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, get, postForm } from './http'
 
+/**
+ * Testes do cliente HTTP unico: prefixo /api, header de login simulado e conversao de erros.
+ */
+
 function respostaJson(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } })
 }

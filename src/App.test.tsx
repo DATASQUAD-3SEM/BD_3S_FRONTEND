@@ -5,6 +5,10 @@ import '@testing-library/jest-dom/vitest'
 import { MemoryRouter } from 'react-router-dom'
 import App from './App'
 
+/**
+ * Testes das rotas do beneficiario no App: a navegacao de Minhas pre-guias para a tela de correcao (T9-FE).
+ */
+
 // As rotas usam os clientes reais por padrão; nos testes eles são trocados pelos mocks.
 vi.mock('./features/minhasPreGuias/api', async () => {
   const mock = await import('./features/minhasPreGuias/api.mock')

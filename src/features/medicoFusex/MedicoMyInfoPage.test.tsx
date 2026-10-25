@@ -4,6 +4,10 @@ import { MedicoProvider } from './MedicoContext'
 import MedicoMyInfoPage from './MedicoMyInfoPage'
 import { reiniciarEstadoMockMedico } from './dadosMedico'
 
+/**
+ * Testes da tela Minhas informacoes do medico (T11-FE).
+ */
+
 const ESPERA = { timeout: 3000 }
 
 const MEDICO_INICIAL = {
