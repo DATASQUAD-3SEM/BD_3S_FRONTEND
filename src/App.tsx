@@ -17,6 +17,7 @@ import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoP
 import EmConstrucao from './shared/components/EmConstrucao'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
 import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
+import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 
 export default function App() {
   return (
@@ -35,7 +36,7 @@ export default function App() {
       <Route path="/medico" element={<MedicoLayout />}>
         <Route index element={<Navigate to="inicio" replace />} />
         <Route path="inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
-        <Route path="nova-pre-guia" element={<EmConstrucao nome="Nova pré-guia" task="T2-FE" />} />
+        <Route path="nova-pre-guia" element={<NovaPreGuiaMedicoPage />} />
         <Route path="corrigir-pre-guias" element={<EmConstrucao nome="Corrigir pré-guias" task="T14-FE1" />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarMedico />} />
         <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
