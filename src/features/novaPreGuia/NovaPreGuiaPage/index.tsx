@@ -1,15 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
-import { ApiError } from '../../../shared/api/http'
-
+import { mensagemDeErro } from '../../../shared/api/erros'
 import { useBeneficiario } from '../../beneficiario/BeneficiarioContext'
-
 import { criarPreGuia } from '../api'
-
-import {
-  formVazio,
-  type NovaPreGuiaForm,
-} from './types'
+import { formVazio, type NovaPreGuiaForm } from './types'
 
 import DadosBeneficiario from './components/DadosBeneficiario'
 import SelecaoOcs from './components/SelecaoOcs'
@@ -18,84 +13,41 @@ import FeedbackUpload from './components/FeedbackUpload'
 import RevisaoResumo from './components/RevisaoResumo'
 
 /**
- * A página guarda apenas o estado do formulário.
- * Os dados pessoais vêm do BeneficiarioContext.
+ * Nova pre-guia do beneficiario: escolha da OCS, envio do encaminhamento medico (foto ou PDF) e envio ao
+ * setor de Guias. Os dados pessoais vem do BeneficiarioContext e nao sao enviados: o backend usa o usuario logado.
+ * Em sucesso, o formulario e limpo e a pre-guia passa a aparecer em Minhas pre-guias como Pendente.
  */
 export default function NovaPreGuiaPage() {
-  const [form, setForm] =
-    useState<NovaPreGuiaForm>(formVazio)
-
-  const [mensagem, setMensagem] = useState<{
-    tipo: 'ok' | 'erro'
-    texto: string
-  } | null>(null)
-
+  const [form, setForm] = useState<NovaPreGuiaForm>(formVazio)
+  const [mensagem, setMensagem] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
   const [enviando, setEnviando] = useState(false)
+  // Muda a cada envio com sucesso para recriar o campo de upload vazio
+  const [versaoFormulario, setVersaoFormulario] = useState(0)
 
-  const {
-    beneficiario,
-    carregando: carregandoBeneficiario,
-    erro: erroBeneficiario,
-  } = useBeneficiario()
-
-  // Para enviar a pré-guia, precisamos de CPF e Prec-CP.
-  const identificacaoCompleta = Boolean(
-    beneficiario?.cpf.trim() &&
-    beneficiario.precCp.trim(),
-  )
+  const { beneficiario, carregando: carregandoBeneficiario, erro: erroBeneficiario } = useBeneficiario()
 
   const faltas: string[] = []
-
-  if (
-    carregandoBeneficiario ||
-    erroBeneficiario ||
-    !identificacaoCompleta
-  ) {
-    faltas.push('dados do beneficiário')
-  }
-
-  if (form.ocsId === null) {
-    faltas.push('OCS')
-  }
-
-  if (form.arquivo === null) {
-    faltas.push('arquivo de encaminhamento')
-  }
+  if (carregandoBeneficiario || erroBeneficiario || !beneficiario) faltas.push('dados do beneficiário')
+  if (form.ocs === null) faltas.push('OCS')
+  if (form.arquivo === null) faltas.push('arquivo de encaminhamento')
 
   const podeEnviar = faltas.length === 0
 
   async function enviar() {
-    if (!beneficiario || !identificacaoCompleta) {
-      setMensagem({
-        tipo: 'erro',
-        texto: 'Os dados do beneficiário ainda não foram carregados.',
-      })
-      return
-    }
-
+    if (enviando) return
     setEnviando(true)
     setMensagem(null)
 
     try {
-      const preGuia = await criarPreGuia(
-        form,
-        beneficiario,
-      )
-
+      const preGuia = await criarPreGuia(form)
+      setForm(formVazio)
+      setVersaoFormulario((v) => v + 1)
       setMensagem({
         tipo: 'ok',
-        texto: `Pré-guia ${preGuia.id} enviada!`,
+        texto: `Pré-guia ${preGuia.numero} enviada ao setor de Guias. Acompanhe o status em Minhas pré-guias.`,
       })
     } catch (e) {
-      const texto =
-        e instanceof ApiError
-          ? e.message
-          : 'Erro inesperado'
-
-      setMensagem({
-        tipo: 'erro',
-        texto,
-      })
+      setMensagem({ tipo: 'erro', texto: mensagemDeErro(e, 'Não foi possível enviar a pré-guia. Tente novamente.') })
     } finally {
       setEnviando(false)
     }
@@ -105,65 +57,47 @@ export default function NovaPreGuiaPage() {
     <>
       <h1>Nova pré-guia</h1>
 
-      {carregandoBeneficiario && (
-        <p>Carregando dados do beneficiário...</p>
-      )}
+      {carregandoBeneficiario && <p>Carregando dados do beneficiário...</p>}
 
       {erroBeneficiario && (
         <p className="erro" role="alert">
-          Não foi possível carregar os dados do beneficiário:
-          {' '}
-          {erroBeneficiario}
+          Não foi possível carregar os dados do beneficiário: {erroBeneficiario}
         </p>
       )}
 
-      {beneficiario && (
-        <DadosBeneficiario value={beneficiario} />
-      )}
+      {beneficiario && <DadosBeneficiario value={beneficiario} />}
 
-      <SelecaoOcs
-        value={form.ocsId}
-        onChange={(ocsId) =>
-          setForm({ ...form, ocsId })
-        }
-      />
+      <SelecaoOcs value={form.ocs} onChange={(ocs) => setForm({ ...form, ocs })} />
 
       <UploadEncaminhamento
+        key={versaoFormulario}
         value={form.arquivo}
-        onChange={(arquivo) =>
-          setForm({ ...form, arquivo })
-        }
+        onChange={(arquivo) => setForm({ ...form, arquivo })}
       />
 
       <FeedbackUpload arquivo={form.arquivo} />
 
-      <RevisaoResumo
-        form={form}
-        beneficiario={beneficiario}
-      />
+      <RevisaoResumo form={form} beneficiario={beneficiario} />
 
-      <button
-        type="button"
-        onClick={() => void enviar()}
-        disabled={enviando || !podeEnviar}
-      >
+      <button type="button" onClick={() => void enviar()} disabled={enviando || !podeEnviar}>
         {enviando ? 'Enviando...' : 'Enviar pré-guia'}
       </button>
 
-      {!podeEnviar && (
+      {!podeEnviar && !mensagem && (
         <p className="erro" role="status">
-          <strong>Para enviar, falta preencher:</strong>
-          {' '}
-          {faltas.join(', ')}.
+          <strong>Para enviar, falta preencher:</strong> {faltas.join(', ')}.
         </p>
       )}
 
       {mensagem && (
-        <p
-          className={mensagem.tipo}
-          role={mensagem.tipo === 'erro' ? 'alert' : 'status'}
-        >
+        <p className={mensagem.tipo} role={mensagem.tipo === 'erro' ? 'alert' : 'status'}>
           {mensagem.texto}
+          {mensagem.tipo === 'ok' && (
+            <>
+              {' '}
+              <Link to="/pre-guias">Ver Minhas pré-guias</Link>
+            </>
+          )}
         </p>
       )}
     </>
