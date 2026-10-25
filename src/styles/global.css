@@ -658,3 +658,28 @@ input, select { font-size: 1rem; min-height: 44px; }
     flex: 1 1 auto;
   }
 }
+
+/* ===== T0-FE: layout por perfil ===== */
+.app-topbar .brand { color: inherit; text-decoration: none; }
+
+.app-usuario {
+  color: #d6ead9;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Cartões da escolha de perfil no Início geral */
+.card-botao { text-align: left; font: inherit; cursor: pointer; width: 100%; }
+
+/* Perfis com telas largas (tabelas, duas colunas): menu de 240px e área principal sem limite */
+@media (min-width: 721px) {
+  .app-shell[data-perfil]:not([data-perfil='BENEFICIARIO']) .app-body { grid-template-columns: 240px 1fr; }
+  .app-shell[data-perfil]:not([data-perfil='BENEFICIARIO']) .app-main { max-width: none; padding: 2rem 2.5rem; }
+}
+
+@media (max-width: 720px) {
+  .app-usuario { font-size: 0.8rem; }
+}
