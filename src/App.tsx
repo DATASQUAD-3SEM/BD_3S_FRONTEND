@@ -16,6 +16,7 @@ import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
 import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
+import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
 
 export default function App() {
   return (
@@ -43,7 +44,7 @@ export default function App() {
       <Route path="/chefe" element={<ChefeLayout />}>
         <Route index element={<Navigate to="guias-para-assinar" replace />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
-        <Route path="beneficiarios" element={<EmConstrucao nome="Beneficiários" task="T7-FE" />} />
+        <Route path="beneficiarios" element={<BeneficiariosPage />} />
         <Route path="medicos" element={<EmConstrucao nome="Médicos" task="T8-FE" />} />
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>
