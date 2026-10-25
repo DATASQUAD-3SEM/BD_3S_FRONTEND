@@ -29,7 +29,7 @@ function itensDoMenu() {
 describe('LayoutPerfil (T0-FE)', () => {
   it('mostra só os itens do perfil logado, na ordem de cada perfil', () => {
     const esperado: Record<Perfil, string[]> = {
-      BENEFICIARIO: ['Início', 'Minhas pré-guias', 'Minhas informações'],
+      BENEFICIARIO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas informações'],
       MEDICO: ['Início', 'Nova pré-guia', 'Corrigir pré-guias', 'Guias para assinar', 'Minhas informações'],
       CHEFE_FUSEX: ['Guias para assinar', 'Beneficiários', 'Médicos', 'Minhas informações'],
       SETOR_GUIAS: ['Fila de pré-guias'],
@@ -77,9 +77,9 @@ describe('LayoutPerfil (T0-FE)', () => {
     expect(screen.getByRole('link', { name: 'Nova pré-guia' })).not.toHaveClass('ativo')
   })
 
-  it('o menu do beneficiário não tem "Nova pré-guia" e "Minhas pré-guias" não fica ativo em /pre-guias/nova', () => {
+  it('"Nova pré-guia" do beneficiário fica ativo em /pre-guias/nova e "Minhas pré-guias" não', () => {
     renderizar('BENEFICIARIO', '/pre-guias/nova')
-    expect(screen.queryByRole('link', { name: 'Nova pré-guia' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Nova pré-guia' })).toHaveClass('ativo')
     expect(screen.getByRole('link', { name: 'Minhas pré-guias' })).not.toHaveClass('ativo')
   })
 
