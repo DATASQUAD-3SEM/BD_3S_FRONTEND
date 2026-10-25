@@ -2,6 +2,11 @@ import { ApiError } from '../../shared/api/http'
 import { calcularIdade } from '../beneficiario/calculosBeneficiario'
 import { somenteDigitos, cpfValido } from '../../shared/utils/formatadores'
 
+/**
+ * Validacoes do formulario de beneficiario feitas antes do envio e leitura dos erros 422/409
+ * devolvidos pelo backend, para exibir cada mensagem no campo correspondente.
+ */
+
 export type CampoBeneficiario =
   | 'nome'
   | 'cpf'

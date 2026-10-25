@@ -6,6 +6,11 @@ import VisualizarGuiaModal from './VisualizarGuiaModal'
 import type { GuiaRecepcao, GuiasRecepcaoApi } from './types'
 import './guiasRecepcao.css'
 
+/**
+ * Tela 6 - Guias para impressao da Recepcao (T6-FE): busca por nome, Prec CP ou numero da Guia
+ * e acoes de visualizar e imprimir. So aparecem Guias concluidas, com as duas assinaturas.
+ */
+
 const MINIMO_CARACTERES = 3
 
 type Estado = 'inicial' | 'carregando' | 'pronto' | 'vazio' | 'erro'

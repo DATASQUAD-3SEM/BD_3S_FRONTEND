@@ -9,6 +9,11 @@ import {
 import type { Beneficiario } from '../../shared/types/domain'
 import { obterBeneficiarioLogado } from './dadosBeneficiario'
 
+/**
+ * Contexto React com os dados do beneficiario logado, carregados uma vez e compartilhados pelo layout
+ * e pelas telas do perfil. Use o hook useBeneficiario() para ler ou recarregar esses dados.
+ */
+
 interface BeneficiarioContexto {
   beneficiario: Beneficiario | null
   carregando: boolean

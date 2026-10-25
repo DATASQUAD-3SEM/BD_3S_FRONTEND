@@ -7,6 +7,12 @@ import {
 } from 'react'
 import { ApiError } from '../../../shared/api/http'
 
+/**
+ * Cartao de assinatura digital, reutilizado nas telas Minhas informacoes dos tres perfis.
+ * Permite desenhar no quadro (mouse ou toque) ou enviar uma imagem PNG/JPG; o botao de salvar
+ * so habilita quando ha algo desenhado ou enviado, e um quadro em branco nunca e enviado.
+ */
+
 const TIPOS_IMAGEM_ACEITOS = ['image/png', 'image/jpeg']
 
 interface AssinaturaDigitalProps {

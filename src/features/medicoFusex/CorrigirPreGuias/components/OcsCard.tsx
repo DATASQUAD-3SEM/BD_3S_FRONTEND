@@ -3,6 +3,10 @@ import type { CorrecaoApi, OcsResumo } from '../correcaoTipos'
 import { mensagemDeErro } from '../../../../shared/api/erros'
 import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
+/**
+ * Cartao "OCS" da correcao do medico (T14-FE2): a OCS atual ja vem selecionada e pode ser trocada pela busca.
+ */
+
 interface Props {
   selecionada: OcsResumo
   api: CorrecaoApi

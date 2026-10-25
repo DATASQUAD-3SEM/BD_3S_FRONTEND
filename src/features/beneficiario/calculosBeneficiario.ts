@@ -1,3 +1,8 @@
+/**
+ * Calculos derivados da data de nascimento (idade e faixa etaria) e formatacao da data para exibicao.
+ * Idade e faixa nunca sao gravadas: sao sempre calculadas a partir da data de nascimento.
+ */
+
 interface PartesData {
   ano: number
   mes: number

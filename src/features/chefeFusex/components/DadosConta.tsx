@@ -7,6 +7,11 @@ import {
   type ErrosDadosConta,
 } from '../validacaoDadosConta'
 
+/**
+ * Cartao "Dados da conta" do Chefe: nome, patente, login e nova senha opcional, com erros por campo
+ * e aviso de login ja existente (409).
+ */
+
 interface DadosContaProps {
   nomeInicial: string
   patenteInicial: string

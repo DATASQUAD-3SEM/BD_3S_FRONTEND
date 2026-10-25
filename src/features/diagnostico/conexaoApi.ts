@@ -1,5 +1,9 @@
 import { ApiError, get } from '../../shared/api/http'
 
+/**
+ * Verifica se o backend esta acessivel pelo endpoint de saude (/actuator/health).
+ */
+
 export type ResultadoConexao =
   | { estado: 'ok'; ms: number }
   | { estado: 'desligado'; mensagem: string }

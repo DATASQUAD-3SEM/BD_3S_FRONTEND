@@ -4,6 +4,10 @@ import {
   calcularIdade,
 } from '../../../beneficiario/calculosBeneficiario'
 
+/**
+ * Bloco somente leitura com os dados do beneficiario logado na Nova pre-guia (Sprint 1).
+ */
+
 interface Props {
   value: Beneficiario
 }

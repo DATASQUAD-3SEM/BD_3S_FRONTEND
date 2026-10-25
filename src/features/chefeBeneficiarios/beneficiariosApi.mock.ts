@@ -8,6 +8,11 @@ import type {
   SituacaoFiltro,
 } from './tipos'
 
+/**
+ * Implementacao em memoria do contrato T7-BE1 a T7-BE4, usada nos testes e no desenvolvimento sem backend.
+ * Reproduz as regras principais do servidor, como CPF e Prec CP duplicados (409).
+ */
+
 interface Registro {
   id: number
   nome: string

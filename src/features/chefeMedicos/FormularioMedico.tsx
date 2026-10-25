@@ -8,6 +8,11 @@ import {
 } from './validacaoMedico'
 import { mascaraCpf, mascaraPrecCp, somenteDigitos } from '../../shared/utils/formatadores'
 
+/**
+ * Formulario "Novo medico" e "Editando medico" (T8-FE), no mesmo padrao do formulario de beneficiarios.
+ * O erro 409 indica se o valor duplicado foi o CPF, o Prec CP ou o CRM.
+ */
+
 const VAZIO: ValoresFormulario = {
   nome: '',
   patente: '',

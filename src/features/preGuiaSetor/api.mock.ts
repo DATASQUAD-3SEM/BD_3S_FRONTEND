@@ -1,6 +1,10 @@
 import { ApiError } from '../../shared/api/http';
 import type { DetalhePreGuia, GuiaRascunhoDetalhe, PreGuiaSetorApi } from './types';
 
+/**
+ * Implementacao em memoria do contrato T4-BE1 a T4-BE6 (detalhe, abertura, correcao, anexo e conclusao da Guia).
+ */
+
 interface OpcoesMock {
   /** Atraso simulado em ms. Nos testes use 0. */
   atrasoMs?: number;

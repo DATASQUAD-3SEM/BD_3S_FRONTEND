@@ -6,6 +6,11 @@ import { rotuloTipo } from '../formatadores'
 import type { OcsBusca, OcsBuscaResposta } from '../types'
 import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
+/**
+ * Secao "OCS" da Nova pre-guia do medico: busca por nome, contrato ou tipo com debounce de 300 ms.
+ * Com uma OCS escolhida, mostra a faixa "OCS selecionada" e o botao "Trocar".
+ */
+
 interface Props {
   selecionada: OcsBusca | null
   onSelecionar: (ocs: OcsBusca) => void

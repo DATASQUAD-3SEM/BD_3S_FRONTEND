@@ -1,6 +1,10 @@
 import { ApiError } from '../../shared/api/http'
 import type { GuiaRecepcao, GuiasRecepcaoApi } from './types'
 
+/**
+ * Implementacao em memoria do contrato T6-BE1 e T6-BE2 (busca e PDF das Guias concluidas).
+ */
+
 export const guiasMock: GuiaRecepcao[] = [
   {
     guiaId: 2,

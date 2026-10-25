@@ -1,6 +1,11 @@
 import { ApiError } from '../../shared/api/http';
 import type { DetalhePreGuia } from './types';
 
+/**
+ * Regras de exibicao do detalhe da pre-guia: quando as colunas de decisao ficam ativas, quando o
+ * botao Concluir habilita e como ler os erros 404 e 409 da API.
+ */
+
 export const LIMITE_OBSERVACAO = 500;
 
 const MSG_CONFLITO = 'Esta pré-guia já foi alterada. Atualizamos a tela para mostrar a situação atual.';

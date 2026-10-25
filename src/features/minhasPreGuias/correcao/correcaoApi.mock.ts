@@ -1,6 +1,10 @@
 import { ApiError } from '../../../shared/api/http';
 import type { CorrecaoApi, CorrecaoPreGuia, OcsBusca } from './types';
 
+/**
+ * Implementacao em memoria do contrato T9-BE1 a T9-BE4 (correcao e reenvio pelo beneficiario).
+ */
+
 const espera = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const normalizar = (texto: string) =>

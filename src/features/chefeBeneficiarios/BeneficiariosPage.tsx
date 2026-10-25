@@ -5,6 +5,11 @@ import ListaBeneficiarios, { TAMANHO_PAGINA, type EstadoLista } from './ListaBen
 import type { BeneficiarioDetalhe, BeneficiarioItem, BeneficiariosApi, SituacaoFiltro } from './tipos'
 import './beneficiarios.css'
 
+/**
+ * Tela 7 - Beneficiarios do Chefe (T7-FE): lista com busca, filtro de situacao e paginacao,
+ * e o formulario de cadastro/edicao logo abaixo da tabela.
+ */
+
 const ATRASO_BUSCA_MS = 300
 
 interface Aviso {

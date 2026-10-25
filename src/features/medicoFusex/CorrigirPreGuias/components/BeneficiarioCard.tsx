@@ -1,6 +1,10 @@
 import type { BeneficiarioCorrecao } from '../correcaoTipos'
 import { formatarPrecCp } from '../../../../shared/utils/formatadores'
 
+/**
+ * Cartao "Beneficiario" da correcao do medico (T14-FE2), somente leitura: o beneficiario nao pode ser trocado.
+ */
+
 interface Props {
   beneficiario: BeneficiarioCorrecao
 }

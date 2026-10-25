@@ -5,6 +5,11 @@ import { formatarDiaMes, ORIGEM } from './formatadores';
 import type { FilaPreGuiasApi, PaginaFila, StatusPreGuia } from './types';
 import './filaPreGuias.css';
 
+/**
+ * Tela 3 - Fila de pre-guias do Setor de Guias (T3-FE): busca com debounce, filtro de status, paginacao
+ * e o botao "Abrir" de cada pre-guia. A tela apenas lista; ela nunca altera o status.
+ */
+
 const TAMANHO_PAGINA = 10;
 const ATRASO_BUSCA_MS = 300;
 

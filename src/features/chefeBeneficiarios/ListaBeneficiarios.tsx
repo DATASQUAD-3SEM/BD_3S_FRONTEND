@@ -1,6 +1,10 @@
 import type { BeneficiarioItem, SituacaoFiltro } from './tipos'
 import { mascaraCpf, mascaraPrecCp } from '../../shared/utils/formatadores'
 
+/**
+ * Tabela de beneficiarios do Chefe, com as acoes Editar, Desativar e Reativar (ambas com confirmacao).
+ */
+
 export const TAMANHO_PAGINA = 10
 
 export type EstadoLista = 'carregando' | 'pronto' | 'erro'

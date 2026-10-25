@@ -9,6 +9,11 @@ import {
 } from './validacaoBeneficiario'
 import { mascaraCpf, mascaraPrecCp, mascaraTelefone, somenteDigitos } from '../../shared/utils/formatadores'
 
+/**
+ * Formulario "Novo beneficiario" e "Editando beneficiario" (T7-FE). No modo de edicao, os campos chegam
+ * preenchidos e a nova senha e opcional; cancelar com alteracoes pede confirmacao.
+ */
+
 const VAZIO: ValoresFormulario = {
   nome: '',
   cpf: '',

@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { imprimirIframe } from './imprimirPdf'
 import type { GuiaRecepcao, GuiasRecepcaoApi } from './types'
 
+/**
+ * Janela "Guia de encaminhamento" aberta sobre a lista da recepcao, com o PDF e os botoes Imprimir,
+ * Baixar PDF e Fechar. A tecla Esc fecha a janela e o foco volta para o botao que a abriu.
+ */
+
 interface Props {
   guia: GuiaRecepcao
   api: GuiasRecepcaoApi

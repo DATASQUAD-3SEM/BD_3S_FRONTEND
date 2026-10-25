@@ -6,6 +6,11 @@ import { statusDoErro } from '../../../shared/api/erros'
 import FormularioCorrecao from './components/FormularioCorrecao'
 import './corrigirPreGuiaDetalhe.css'
 
+/**
+ * Tela 14 - Corrigir pre-guia {numero} (T14-FE2). So abre para pre-guia do proprio medico em Atencao:
+ * status diferente de Atencao (ou 409) redireciona para a lista Corrigir pre-guias, e 404 mostra a mensagem de nao encontrada.
+ */
+
 const ROTA_LISTA = '/medico/corrigir-pre-guias'
 
 type Estado =

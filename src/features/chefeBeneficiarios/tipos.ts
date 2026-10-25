@@ -1,3 +1,7 @@
+/**
+ * Tipos do contrato de beneficiarios do Chefe (T7-BE1 a T7-BE4).
+ */
+
 export type SituacaoFiltro = 'ativos' | 'inativos' | 'todos'
 
 export interface BeneficiarioItem {

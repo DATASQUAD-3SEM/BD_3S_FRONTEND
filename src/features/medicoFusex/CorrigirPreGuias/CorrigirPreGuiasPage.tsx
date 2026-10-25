@@ -5,6 +5,11 @@ import PreGuiaCorrecaoCard from './components/PreGuiaCorrecaoCard'
 import type { CorrigirPreGuiasApi, PreGuiaParaCorrigir } from './types'
 import './corrigirPreGuias.css'
 
+/**
+ * Tela 14 - Corrigir pre-guias (T14-FE1): lista as pre-guias criadas pelo medico logado que o Setor de Guias
+ * devolveu em Atencao. Sem pendencias, mostra a mensagem de lista vazia.
+ */
+
 type Estado =
   | { tipo: 'carregando' }
   | { tipo: 'erro' }

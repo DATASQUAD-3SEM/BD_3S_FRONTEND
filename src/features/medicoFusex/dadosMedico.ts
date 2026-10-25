@@ -1,6 +1,10 @@
 import type { MedicoPerfil } from '../../shared/types/domain'
 
 
+/**
+ * Dados simulados do medico usados quando o modo mock de medicoApi.ts esta ativo e nos testes.
+ */
+
 interface EstadoMockMedico {
   senha: string
   assinaturaCadastrada: boolean

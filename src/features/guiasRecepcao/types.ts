@@ -1,3 +1,7 @@
+/**
+ * Tipos do contrato de Guias da recepcao (T6-BE1 e T6-BE2).
+ */
+
 export interface GuiaRecepcao {
   guiaId: number
   numero: string

@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { ApiError } from '../../../shared/api/http'
 
+/**
+ * Cartao "Alterar senha" (T13-BE1), usado nas telas Minhas informacoes do beneficiario e do medico.
+ * Exige nova senha com no minimo 8 caracteres e confirmacao igual; senha atual incorreta aparece no proprio campo.
+ */
+
 const TAMANHO_MINIMO_SENHA = 8
 
 interface Mensagem {

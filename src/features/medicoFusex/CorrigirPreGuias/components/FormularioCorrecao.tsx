@@ -6,6 +6,12 @@ import BeneficiarioCard from './BeneficiarioCard'
 import ExamesCard from './ExamesCard'
 import OcsCard from './OcsCard'
 
+/**
+ * Formulario da correcao do medico (T14-FE2): reune os cartoes de OCS e exames e envia a correcao.
+ * Bloqueia duplo clique durante o envio, pede confirmacao ao cancelar com alteracoes e trata o 409
+ * (pre-guia ja alterada por outra pessoa).
+ */
+
 interface Props {
   detalhe: DetalheCorrecao
   api: CorrecaoApi

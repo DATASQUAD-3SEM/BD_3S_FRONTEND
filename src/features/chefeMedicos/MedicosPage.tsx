@@ -5,6 +5,10 @@ import ListaMedicos, { TAMANHO_PAGINA, type EstadoLista } from './ListaMedicos'
 import type { MedicoDetalhe, MedicoItem, MedicosApi, SituacaoFiltro } from './tipos'
 import './medicos.css'
 
+/**
+ * Tela 8 - Medicos do Chefe (T8-FE): lista com busca, filtro de situacao e paginacao, e o formulario abaixo.
+ */
+
 const ATRASO_BUSCA_MS = 300
 
 interface Aviso {
