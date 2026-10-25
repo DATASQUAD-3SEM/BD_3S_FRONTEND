@@ -1,18 +1,22 @@
 # Arquitetura do front
 
 ## Organizacao por FEATURE
-Cada pasta em `src/features/` e um assunto (preguia, ocs, ...). Quem e dono da feature mexe nos proprios arquivos.
+Cada pasta em `src/features/` e um assunto (novaPreGuia, minhasPreGuias, filaPreGuias, ...). Quem e dono da feature mexe nos proprios arquivos.
 
 ## O que e COMPARTILHADO (ja pronto - nao recrie)
 
 | Arquivo | Serve para |
 |---|---|
 | `shared/api/http.ts` | `get`, `post`, `postForm`, `del`, `ApiError`. Toda chamada ao backend passa aqui |
-| `shared/types/domain.ts` | Tipos `Ocs`, `ProcedimentoExame`, `PreGuia`, `StatusPreGuia` |
+| `shared/types/domain.ts` | Tipos `Ocs`, `PreGuia`, `StatusPreGuia`, `OrigemPreGuia` e perfis logados |
+| `shared/api/erros.ts` | `statusDoErro` e `mensagemDeErro` para tratar erros das chamadas |
+| `shared/components/StatusBadge.tsx` | Badge de status da pre-guia (Pendente, Em analise, Atencao, Concluida) |
+| `shared/hooks/useDebounce.ts` | Atraso de 300 ms nas buscas digitadas |
+| `shared/utils/formatadores.ts` | Formatacao e mascaras de CPF, Prec CP, telefone e data; validacao de CPF |
 | `shared/components/AppLayout.tsx` | Cabecalho + menu |
 | `shared/components/EmConstrucao.tsx` | Marcador temporario |
 | `App.tsx` | Tabela de rotas |
-| `features/preguia/NovaPreGuiaPage/types.ts` | Estado do formulario da pre-guia |
+| `features/novaPreGuia/NovaPreGuiaPage/types.ts` | Estado do formulario da pre-guia |
 
 ## Regras de ouro
 1. **Chamada ao backend so em arquivos `api.ts`** da feature, usando `shared/api/http.ts`. Nunca `fetch` dentro de componente.
