@@ -65,12 +65,10 @@ describe('CorrigirPreGuiaPage', () => {
   })
 
   it('envia só os exames quando a OCS não muda e bloqueia o duplo clique', async () => {
-    const salvar = vi.fn(
-      async (_id: number, _dados: { ocsId?: number; procedimentos: string[] }) => ({
-        status: 'PENDENTE',
-        dataReenvio: '2026-10-25T10:00:00',
-      }),
-    )
+    const salvar = vi.fn(async () => ({
+      status: 'PENDENTE',
+      dataReenvio: '2026-10-25T10:00:00',
+    }))
     renderizar(apiCom({ salvarCorrecao: salvar }))
 
     const botoes = await screen.findAllByRole('button', { name: 'Remover' })
@@ -82,7 +80,7 @@ describe('CorrigirPreGuiaPage', () => {
 
     expect(await screen.findByText('Lista de correção')).toBeInTheDocument()
     expect(salvar).toHaveBeenCalledTimes(1)
-    expect(salvar.mock.calls[0]).toEqual([405, { procedimentos: ['40304361'] }])
+    expect(salvar).toHaveBeenCalledWith(405, { procedimentos: ['40304361'] })
   })
 
   it('mostra o aviso de pré-guia já alterada quando a API responde 409', async () => {
