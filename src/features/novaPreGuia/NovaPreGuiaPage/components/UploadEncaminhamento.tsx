@@ -325,7 +325,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
       <h3 style={{
         marginTop: 0,
         marginBottom: '20px',
-        color: '#1a2e22',
+        color: 'var(--verde-escuro)',
         fontSize: '20px',
         fontFamily: 'serif',
         fontWeight: 'bold'
@@ -368,30 +368,15 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
             <button
               type="button"
               onClick={tirarFoto}
-              style={{
-                flex: 1,
-                padding: '12px',
-                backgroundColor: '#1a4331',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
+              className="botao botao-primario"
+              style={{ flex: 1 }}
             >
               📸 Capturar Foto
             </button>
             <button
               type="button"
               onClick={fecharCamera}
-              style={{
-                padding: '12px 20px',
-                backgroundColor: '#991b1b',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer'
-              }}
+              className="botao"
             >
               Cancelar
             </button>
@@ -404,8 +389,8 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           style={{
-            border: isDragging ? '2px dashed #1a4331' : '2px dashed #e2e8f0',
-            backgroundColor: isDragging ? '#f0fdf4' : '#fafafa',
+            border: isDragging ? '2px dashed var(--verde-escuro)' : '2px dashed #9fbfaa',
+            backgroundColor: isDragging ? 'var(--verde-claro)' : 'var(--verde-claro-2)',
             padding: '40px 20px',
             borderRadius: '12px',
             textAlign: 'center',
@@ -413,7 +398,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
             cursor: 'pointer'
           }}
         >
-          <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '14px' }}>
+          <p style={{ margin: '0 0 16px 0', color: 'var(--texto-suave)', fontSize: '14px' }}>
             Arrastre e solte sua imagem ou PDF aqui, ou use os botões abaixo:
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -421,16 +406,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
             <button
               type="button"
               onClick={handleCliqueCamera}
-              style={{
-                padding: '10px 14px',
-                backgroundColor: '#1a4331',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '13px'
-              }}
+              className="botao botao-primario"
             >
               📷 Usar Câmera
             </button>
@@ -438,16 +414,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
             <button
               type="button"
               onClick={() => inputArquivoRef.current?.click()}
-              style={{
-                padding: '10px 14px',
-                backgroundColor: '#f1f5f9',
-                color: '#334155',
-                border: '1px solid #cbd5e1',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '13px'
-              }}
+              className="botao"
             >
               📁 Escolher Arquivo
             </button>
@@ -460,7 +427,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
             onClick={() => { setModalAberto(true); setZoomLevel(1); }}
             title="Clique para abrir e visualizar"
             style={{
-              border: '1px dashed #d1d5db',
+              border: '1px dashed #9fbfaa',
               borderRadius: '12px',
               padding: '16px',
               maxHeight: '260px',
@@ -500,23 +467,15 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
           </div>
 
           {/* Nome do arquivo: tambem serve de plano B se o preview do PDF nao carregar */}
-          <p style={{ margin: '12px 0 0 0', color: '#64748b', fontSize: '13px', wordBreak: 'break-all' }}>
+          <p style={{ margin: '12px 0 0 0', color: 'var(--texto-suave)', fontSize: '13px', wordBreak: 'break-all' }}>
             {value?.name}
           </p>
 
           <button
             type="button"
             onClick={limpar}
-            style={{
-              marginTop: '16px',
-              color: '#c25e00',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              padding: 0
-            }}
+            className="botao"
+            style={{ marginTop: '16px' }}
           >
             Remover e enviar outro arquivo
           </button>
@@ -562,17 +521,8 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.min(z + 0.3, 3))}
                   aria-label="Aumentar zoom"
-                  style={{
-                    cursor: 'pointer',
-                    border: '1px solid #cbd5e1',
-                    background: '#f1f5f9',
-                    color: '#334155',
-                    borderRadius: '6px',
-                    padding: '6px 12px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    minWidth: '90px',
-                  }}
+                  className="botao"
+                  style={{ minWidth: '90px' }}
                 >
                   Aumentar
                 </button>
@@ -580,17 +530,8 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
                   type="button"
                   onClick={() => setZoomLevel((z) => Math.max(z - 0.3, 0.5))}
                   aria-label="Reduzir zoom"
-                  style={{
-                    cursor: 'pointer',
-                    border: '1px solid #cbd5e1',
-                    background: '#f1f5f9',
-                    color: '#334155',
-                    borderRadius: '6px',
-                    padding: '6px 12px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    minWidth: '90px',
-                  }}
+                  className="botao"
+                  style={{ minWidth: '90px' }}
                 >
                   Reduzir
                 </button>
@@ -601,16 +542,7 @@ export default function UploadEncaminhamento({ value, onChange }: UploadEncaminh
               type="button"
               onClick={() => setModalAberto(false)}
               aria-label="Fechar visualização"
-              style={{
-                cursor: 'pointer',
-                border: 'none',
-                background: '#991b1b',
-                color: '#fff',
-                borderRadius: '6px',
-                padding: '6px 14px',
-                fontSize: '14px',
-                fontWeight: 600,
-              }}
+              className="botao botao-primario"
             >
               ✕ Fechar
             </button>
