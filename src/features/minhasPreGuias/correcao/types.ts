@@ -17,12 +17,6 @@ export interface OcsBusca {
   tipo: string;
 }
 
-/** Resposta de GET /ocs?busca= (mesmo formato usado pela Nova pré-guia do médico). */
-export interface OcsBuscaResposta {
-  resultados: OcsBusca[];
-  total: number;
-}
-
 export interface DadosReenvio {
   /** Omitido quando a OCS não muda. */
   ocsId?: number;
@@ -40,7 +34,7 @@ export interface CorrecaoApi {
   obterCorrecao(id: number): Promise<CorrecaoPreGuia>;
   /** GET /beneficiarios/me/pre-guias/{id}/encaminhamento/arquivo (T9-BE2) */
   buscarEncaminhamento(id: number): Promise<Blob>;
-  /** GET /ocs?busca= (sem termo devolve a lista inicial) */
+  /** GET /beneficiarios/me/ocs?busca= (T9-BE3; sem termo devolve a lista inicial) */
   buscarOcs(busca: string): Promise<OcsBusca[]>;
   /** POST /beneficiarios/me/pre-guias/{id}/reenvio (T9-BE4) */
   reenviar(id: number, dados: DadosReenvio): Promise<RespostaReenvio>;
