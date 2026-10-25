@@ -4,7 +4,7 @@
   --verde-claro: #e8f2ea;
   --verde-claro-2: #eef5f0;
   --texto: #1c1c1c;
-  --texto-suave: #6b7d72;
+  --texto-suave: #4f6156; /* escurecido para contraste AA sobre branco e verde claro */
   --fundo: #f6f7f6;
   --borda: #d5dad6;
   --erro: #a61b1b;
@@ -150,6 +150,36 @@ button {
   padding: 0.65rem 1.1rem; font-size: 1rem; cursor: pointer; min-height: 44px;
 }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
+button:focus-visible { outline: 3px solid #7fb08c; outline-offset: 2px; }
+
+/*
+ * Botoes padrao das telas (todas usam a paleta verde). Toda classe de botao que trocar o fundo
+ * DEVE definir tambem a cor do texto: a regra "button" acima deixa o texto branco.
+ * - .botao: secundario (fundo branco, texto e borda verde-escuro)
+ * - .botao-primario: acao principal (fundo verde-escuro, texto branco)
+ * - .botao-atencao: acao principal em cartoes de Atencao (mesmo verde, para manter a paleta)
+ */
+.botao {
+  background: #fff;
+  color: var(--verde-escuro);
+  border: 1px solid var(--verde);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+  cursor: pointer;
+}
+.botao:hover:not(:disabled) { background: var(--verde-claro); }
+.botao:disabled { opacity: 0.6; cursor: not-allowed; }
+.botao-primario,
+.botao-atencao {
+  background: var(--verde-escuro);
+  border-color: var(--verde-escuro);
+  color: #fff;
+}
+.botao-primario:hover:not(:disabled),
+.botao-atencao:hover:not(:disabled) { background: var(--verde); }
 input, select { font-size: 1rem; min-height: 44px; }
 
 /* ===== Card de dados do beneficiario (estilo "readonly rows") ===== */
