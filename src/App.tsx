@@ -4,9 +4,10 @@ import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
-import MinhasPreGuiasPage from './features/MinhasPreGuias/MinhasPreGuiasPage'
-import FilaPreGuiasRota from './features/FilaPreGuias/FilaPreGuiasRota'
-import SetorGuiasLayout from './features/FilaPreGuias/SetorGuiasLayout'
+import MinhasPreGuiasPage from './features/minhasPreGuias/MinhasPreGuiasPage'
+import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
+import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
+import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
 import ChefeLayout from './features/chefeFusex/ChefeLayout'
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/setor-guias" element={<SetorGuiasLayout />}>
         <Route index element={<Navigate to="fila" replace />} />
         <Route path="fila" element={<FilaPreGuiasRota />} />
+        <Route path="pre-guias/:id" element={<PreGuiaSetorRota />} />
       </Route>
       {/* rota antiga da fila */}
       <Route path="/fila-pre-guias" element={<Navigate to="/setor-guias/fila" replace />} />
