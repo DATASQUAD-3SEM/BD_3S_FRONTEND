@@ -683,3 +683,22 @@ input, select { font-size: 1rem; min-height: 44px; }
 @media (max-width: 720px) {
   .app-usuario { font-size: 0.8rem; }
 }
+
+/* Barra superior: nome do usuario e botao Sair */
+.app-topbar-direita {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.app-sair {
+  font: inherit;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 0.2rem 0.75rem;
+  cursor: pointer;
+}
+.app-sair:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

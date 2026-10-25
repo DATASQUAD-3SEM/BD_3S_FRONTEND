@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { salvarAssinatura, salvarDadosChefe } from './chefeApi'
+import { encerrarSessao, lerSessao, salvarSessao } from '../../shared/auth/sessao'
 
 /**
  * Testes das chamadas a API da conta do Chefe.
@@ -52,7 +53,7 @@ describe('salvarAssinatura', () => {
   })
 })
 
-describe('login simulado acompanha a troca de login do chefe', () => {
+describe('sessão acompanha a troca de login do chefe', () => {
   function stubRespostaPerfil(login: string) {
     vi.stubGlobal(
       'fetch',
@@ -65,19 +66,20 @@ describe('login simulado acompanha a troca de login do chefe', () => {
     )
   }
 
-  afterEach(() => localStorage.removeItem('X-Usuario-Login'))
+  afterEach(() => encerrarSessao())
 
   it('troca o login guardado quando ele era o login anterior do chefe', async () => {
-    localStorage.setItem('X-Usuario-Login', 'chefe.fusex')
+    salvarSessao({ login: 'chefe.fusex', perfil: 'CHEFE_FUSEX', nome: 'Maria Souza' })
     stubRespostaPerfil('chefe.novo')
 
     await salvarDadosChefe({ nome: 'Chefe', patente: 'Coronel', login: 'chefe.novo', novaSenha: '' }, 'chefe.fusex')
 
     expect(localStorage.getItem('X-Usuario-Login')).toBe('chefe.novo')
+    expect(lerSessao()?.login).toBe('chefe.novo')
   })
 
   it('não mexe no login guardado quando ele pertence a outra conta', async () => {
-    localStorage.setItem('X-Usuario-Login', '52998224725')
+    salvarSessao({ login: '52998224725', perfil: 'BENEFICIARIO', nome: 'Antonio' })
     stubRespostaPerfil('chefe.novo')
 
     await salvarDadosChefe({ nome: 'Chefe', patente: 'Coronel', login: 'chefe.novo', novaSenha: '' }, 'chefe.fusex')

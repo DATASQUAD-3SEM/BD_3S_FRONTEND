@@ -1,9 +1,7 @@
 /**
- * T0-FE: perfis, menus e login simulado.
+ * T0-FE: perfis, rotulos, pagina inicial e menu lateral de cada perfil.
  *
- * Ainda nao ha tela de login: o backend identifica o usuario pelo header X-Usuario-Login
- * (ver shared/api/http.ts). Cada area de perfil garante que o login simulado seja de uma
- * conta daquele perfil (as contas do seed), para as telas nao receberem 403.
+ * O login fica em shared/auth (tela /login e RotaProtegida): cada area so abre para o perfil dono dela.
  */
 export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'RECEPCAO'
 
@@ -65,36 +63,4 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
   ],
   SETOR_GUIAS: [{ to: '/setor-guias/fila', label: 'Fila de pré-guias' }],
   RECEPCAO: [{ to: '/recepcao/guias-para-impressao', label: 'Guias para impressão' }],
-}
-
-function lerStorage(chave: string): string | null {
-  try {
-    return localStorage.getItem(chave)
-  } catch {
-    return null
-  }
-}
-
-/**
- * Garante que o login simulado pertence ao perfil da area aberta.
- * Se o perfil guardado ja e este, nao mexe: assim o chefe que trocou o proprio login (T12) continua logado.
- */
-export function garantirPerfilSimulado(perfil: Perfil): void {
-  try {
-    if (lerStorage(CHAVE_PERFIL) === perfil && lerStorage(CHAVE_LOGIN)) return
-    localStorage.setItem(CHAVE_PERFIL, perfil)
-    localStorage.setItem(CHAVE_LOGIN, LOGIN_PADRAO[perfil])
-  } catch {
-    // sem localStorage (ex.: modo privado): o http.ts usa o login padrao
-  }
-}
-
-/** Entrar como outro perfil a partir do Início geral. */
-export function entrarComo(perfil: Perfil): void {
-  try {
-    localStorage.setItem(CHAVE_PERFIL, perfil)
-    localStorage.setItem(CHAVE_LOGIN, LOGIN_PADRAO[perfil])
-  } catch {
-    // ignora: sem localStorage o http.ts usa o login padrao
-  }
 }

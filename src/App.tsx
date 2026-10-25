@@ -1,6 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import AppLayout from './shared/components/AppLayout'
-import HomePage from './features/home/HomePage'
+import LoginPage from './features/login/LoginPage'
+import RotaProtegida from './shared/auth/RotaProtegida'
+import { lerSessao } from './shared/auth/sessao'
+import { INICIO_PERFIL } from './shared/layout/perfis'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/novaPreGuia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
@@ -26,24 +29,34 @@ import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/Corrigi
 /**
  * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
  * e as telas sao rotas filhas desse layout. Ao criar uma tela nova, adicione aqui apenas a rota correspondente.
+ *
+ * Cada area fica dentro de uma RotaProtegida: sem login, a pessoa vai para /login; com outro perfil,
+ * volta para o inicio do proprio perfil.
  */
+
+/** Raiz do site: quem ja entrou vai para a propria area; quem nao entrou, para o login. */
+function Raiz() {
+  const sessao = lerSessao()
+  return <Navigate to={sessao ? INICIO_PERFIL[sessao.perfil] : '/login'} replace />
+}
 
 export default function App() {
   return (
     <Routes>
-      {/* Início geral: escolha do perfil (login simulado), sem layout */}
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<Raiz />} />
+      <Route path="/login" element={<LoginPage />} />
+      {/* Teste de conexao com o backend: aberto, sem login */}
+      <Route path="/diagnostico/conexao" element={<main className="app-main"><ConexaoPage /></main>} />
 
-      <Route element={<AppLayout />}>
+      <Route element={<RotaProtegida perfil="BENEFICIARIO"><AppLayout /></RotaProtegida>}>
         <Route path="/beneficiario/inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
         <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
         <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
         <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
-        <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
       </Route>
 
-      <Route path="/medico" element={<MedicoLayout />}>
+      <Route path="/medico" element={<RotaProtegida perfil="MEDICO"><MedicoLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="inicio" replace />} />
         <Route path="inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
         <Route path="nova-pre-guia" element={<NovaPreGuiaMedicoPage />} />
@@ -53,7 +66,7 @@ export default function App() {
         <Route path="minhas-informacoes" element={<MedicoMinhasInformacoesPage />} />
       </Route>
 
-      <Route path="/chefe" element={<ChefeLayout />}>
+      <Route path="/chefe" element={<RotaProtegida perfil="CHEFE_FUSEX"><ChefeLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-assinar" replace />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
         <Route path="beneficiarios" element={<BeneficiariosPage />} />
@@ -61,7 +74,7 @@ export default function App() {
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>
 
-      <Route path="/setor-guias" element={<SetorGuiasLayout />}>
+      <Route path="/setor-guias" element={<RotaProtegida perfil="SETOR_GUIAS"><SetorGuiasLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="fila" replace />} />
         <Route path="fila" element={<FilaPreGuiasRota />} />
         <Route path="pre-guias/:id" element={<PreGuiaSetorRota />} />
@@ -69,7 +82,7 @@ export default function App() {
       {/* rota antiga da fila */}
       <Route path="/fila-pre-guias" element={<Navigate to="/setor-guias/fila" replace />} />
 
-      <Route path="/recepcao" element={<RecepcaoLayout />}>
+      <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-impressao" replace />} />
         <Route path="guias-para-impressao" element={<GuiasParaImpressaoPage />} />
       </Route>

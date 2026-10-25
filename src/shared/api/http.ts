@@ -52,10 +52,16 @@ async function lerErro(res: Response): Promise<ApiError> {
 
 /** Faz a chamada com o cabecalho de login e converte erros de rede/HTTP em ApiError. */
 async function enviar(caminho: string, init: RequestInit = {}): Promise<Response> {
-  const login = localStorage.getItem('X-Usuario-Login') || '11144477735'
+  // O login e gravado pela tela de login (shared/auth/sessao.ts). Sem login, o header nao vai e o backend responde 401.
+  let login: string | null
+  try {
+    login = localStorage.getItem('X-Usuario-Login')
+  } catch {
+    login = null
+  }
 
   const headers = new Headers(init.headers || {})
-  headers.set('X-Usuario-Login', login)
+  if (login) headers.set('X-Usuario-Login', login)
 
   let res: Response
   try {

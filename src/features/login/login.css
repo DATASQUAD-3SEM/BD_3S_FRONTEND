@@ -1,0 +1,159 @@
+/* Tela de login, conforme o prototipo (login.png e login_erro.png). */
+.login-pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo);
+}
+
+.login-topbar {
+  background: var(--verde-escuro);
+  color: #fff;
+  padding: 1rem 1.5rem;
+}
+
+.login-marca {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.login-conteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 1rem;
+}
+
+.login-cartao {
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-cartao h1 {
+  font-size: 2.25rem;
+}
+
+.login-legenda {
+  color: var(--texto-suave);
+  margin: 0 0 1.5rem;
+}
+
+.login-cartao label {
+  color: var(--texto-suave);
+  margin-bottom: 0.35rem;
+}
+
+.login-input {
+  font: inherit;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.login-input:focus {
+  outline: 2px solid var(--verde);
+  outline-offset: 1px;
+}
+
+.login-linha-senha {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.login-mostrar {
+  font: inherit;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 0.15rem 0.85rem;
+  margin-bottom: 0.35rem;
+  cursor: pointer;
+  color: var(--verde-escuro);
+}
+
+.login-erro {
+  display: flex;
+  flex-direction: column;
+  background: #fdf0e8;
+  border: 1px solid #f2c9a8;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.login-entrar {
+  font: inherit;
+  font-weight: 700;
+  background: var(--verde-escuro);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.95rem;
+  cursor: pointer;
+}
+
+.login-entrar:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.login-rodape {
+  text-align: center;
+  color: var(--texto-suave);
+  margin: 1.25rem 0 0;
+}
+
+.login-rapido h2 {
+  font-family: var(--fonte-serif);
+  color: var(--verde-escuro);
+  font-size: 1.35rem;
+}
+
+.login-rapido-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.login-rapido-botao {
+  font: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--verde-claro-2);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+}
+
+.login-rapido-botao:hover:not(:disabled) {
+  border-color: var(--verde);
+}
+
+.login-rapido-botao span {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.login-diagnostico {
+  margin-top: 1rem;
+  color: var(--verde);
+}
+
+@media (max-width: 640px) {
+  .login-cartao {
+    padding: 1.5rem;
+  }
+}

@@ -1,5 +1,6 @@
 import { ApiError, get, put, putForm } from '../../shared/api/http'
 import type { ChefePerfil } from '../../shared/types/domain'
+import { atualizarLoginDaSessao } from '../../shared/auth/sessao'
 import type { DadosConta } from './validacaoDadosConta'
 import { LOGIN_EM_USO_MOCK, estadoMockChefe, montarChefeMock } from './dadosChefe'
 
@@ -13,20 +14,10 @@ const USAR_MOCK_CHEFE = false
 
 const ATRASO_MOCK_MS = 400
 
-const CHAVE_LOGIN_SIMULADO = 'X-Usuario-Login'
-
 function esperar(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-
-function acompanharTrocaDeLogin(loginAnterior: string | undefined, loginNovo: string): void {
-  if (!loginAnterior) return
-
-  if (localStorage.getItem(CHAVE_LOGIN_SIMULADO) === loginAnterior) {
-    localStorage.setItem(CHAVE_LOGIN_SIMULADO, loginNovo)
-  }
-}
 
 
 export async function obterChefeLogado(): Promise<ChefePerfil> {
@@ -71,7 +62,8 @@ export async function salvarDadosChefe(
 
   const perfil = await put<ChefePerfil>('/chefe/me', corpo)
 
-  acompanharTrocaDeLogin(loginAnterior, perfil.login)
+  // Se o chefe trocou o proprio login, a sessao passa a usar o login novo nas proximas chamadas
+  atualizarLoginDaSessao(loginAnterior, perfil.login)
 
   return perfil
 }
