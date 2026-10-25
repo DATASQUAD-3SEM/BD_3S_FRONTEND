@@ -4,7 +4,8 @@ import HomePage from './features/home/HomePage'
 import ConexaoPage from './features/diagnostico/ConexaoPage'
 import NovaPreGuiaPage from './features/preguia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
-import MinhasPreGuiasPage from './features/minhasPreGuias/MinhasPreGuiasPage'
+import MinhasPreGuiasRota from './features/minhasPreGuias/MinhasPreGuiasRota'
+import CorrecaoPreGuiaRota from './features/minhasPreGuias/correcao/CorrecaoPreGuiaRota'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
@@ -30,7 +31,8 @@ export default function App() {
 
       <Route element={<AppLayout />}>
         <Route path="/beneficiario/inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
-        <Route path="/pre-guias" element={<MinhasPreGuiasPage />} />
+        <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
+        <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
         <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
         <Route path="/diagnostico/conexao" element={<ConexaoPage />} />
