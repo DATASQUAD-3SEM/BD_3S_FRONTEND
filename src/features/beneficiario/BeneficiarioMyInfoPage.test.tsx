@@ -4,6 +4,10 @@ import { BeneficiarioProvider } from './BeneficiarioContext'
 import MinhasInformacoesPage from './BeneficiarioMyInfoPage'
 import { reiniciarEstadoMock } from './dadosBeneficiario'
 
+/**
+ * Testes da tela Minhas informacoes do beneficiario (T10-FE) usando os dados simulados.
+ */
+
 const ESPERA = { timeout: 3000 }
 
 const BENEFICIARIO_INICIAL = {

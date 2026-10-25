@@ -2,6 +2,10 @@ import { ApiError } from '../../shared/api/http'
 import { somenteDigitos } from '../../shared/utils/formatadores'
 import type { MedicoDetalhe, MedicosApi, SituacaoFiltro } from './tipos'
 
+/**
+ * Implementacao em memoria do contrato T8-BE1 a T8-BE4, usada nos testes e no desenvolvimento sem backend.
+ */
+
 const registros: MedicoDetalhe[] = [
   { id: 1, nome: 'Cap Méd Ribeiro', patente: 'Capitão', cpf: '22233344455', precCp: '45890010003', crm: '000000-SP', ativo: true },
   { id: 2, nome: 'Maj Méd Teixeira', patente: 'Major', cpf: '55566677788', precCp: '45890020004', crm: '111111-SP', ativo: true },

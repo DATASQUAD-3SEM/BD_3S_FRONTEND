@@ -9,6 +9,10 @@ import type {
   ProcedimentoBusca,
 } from './types'
 
+/**
+ * Chamadas a API da Tela 2 - Nova pre-guia do medico (T2-BE1 a T2-BE4).
+ */
+
 function somenteDigitos(valor: string): string {
   return valor.replace(/\D/g, '')
 }

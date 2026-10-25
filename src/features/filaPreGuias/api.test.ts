@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { filaPreGuiasApi } from './api';
 
+/**
+ * Testes da montagem das chamadas a API da fila de pre-guias.
+ */
+
 function respostaJson(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });
 }

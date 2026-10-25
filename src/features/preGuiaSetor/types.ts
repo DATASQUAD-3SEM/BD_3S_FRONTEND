@@ -1,5 +1,9 @@
 import type { OrigemPreGuia, StatusPreGuia } from '../filaPreGuias/types';
 
+/**
+ * Tipos do contrato do detalhe da pre-guia do Setor de Guias (T4-BE1 a T4-BE6).
+ */
+
 export interface BeneficiarioDetalhe {
   nome: string;
   precCp: string;

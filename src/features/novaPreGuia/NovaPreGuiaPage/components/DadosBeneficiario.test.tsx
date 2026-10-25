@@ -7,6 +7,10 @@ import type {
   Beneficiario,
 } from '../../../../shared/types/domain'
 
+/**
+ * Testes do bloco somente leitura com os dados do beneficiario.
+ */
+
 const preenchido: Beneficiario = {
   nome: 'Antonio Carlos Ferreira',
   precCp: '45872213300',

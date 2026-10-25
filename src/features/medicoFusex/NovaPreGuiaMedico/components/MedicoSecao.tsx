@@ -1,5 +1,9 @@
 import type { MedicoSolicitante } from '../types'
 
+/**
+ * Secao "Medico solicitante": nome e CRM preenchidos automaticamente com o perfil do medico logado.
+ */
+
 interface Props {
   medico: MedicoSolicitante | null
   carregando: boolean

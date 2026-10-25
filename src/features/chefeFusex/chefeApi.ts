@@ -4,6 +4,11 @@ import type { DadosConta } from './validacaoDadosConta'
 import { LOGIN_EM_USO_MOCK, estadoMockChefe, montarChefeMock } from './dadosChefe'
 
 
+/**
+ * Chamadas a API da tela Minhas informacoes do Chefe (T12-BE1, T12-BE2 e T13-BE2).
+ * Com USAR_MOCK_CHEFE = true, as respostas vem de dadosChefe.ts, sem depender do backend.
+ */
+
 const USAR_MOCK_CHEFE = false
 
 const ATRASO_MOCK_MS = 400

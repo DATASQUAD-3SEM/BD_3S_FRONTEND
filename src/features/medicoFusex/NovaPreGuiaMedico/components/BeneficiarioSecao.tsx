@@ -2,6 +2,11 @@ import { formatarCpf } from '../../../../shared/utils/formatadores'
 import { formatarTelefone, mascaraPrecCp } from '../../../../shared/utils/formatadores'
 import type { BeneficiarioBusca } from '../types'
 
+/**
+ * Secao "Beneficiario" da Nova pre-guia do medico: busca pelo Prec CP com mascara e exibe os dados
+ * encontrados em um cartao somente leitura.
+ */
+
 export type StatusBusca = 'ocioso' | 'buscando' | 'encontrado' | 'naoEncontrado' | 'erro'
 
 interface Props {

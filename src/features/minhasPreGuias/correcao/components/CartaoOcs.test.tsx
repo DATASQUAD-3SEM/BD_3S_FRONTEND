@@ -5,6 +5,10 @@ import '@testing-library/jest-dom/vitest';
 import CartaoOcs from './CartaoOcs';
 import { ocsMock } from '../correcaoApi.mock';
 
+/**
+ * Testes do cartao de OCS da correcao do beneficiario (T9-FE).
+ */
+
 describe('CartaoOcs (T9-FE · correção)', () => {
   it('marca a OCS atual com "(atual)" e busca só depois de 300 ms sem digitar', async () => {
     const buscar = vi.fn().mockResolvedValue(ocsMock);

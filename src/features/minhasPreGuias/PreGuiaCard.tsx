@@ -3,6 +3,12 @@ import StatusBadge from '../../shared/components/StatusBadge';
 import { formatarData } from '../../shared/utils/formatadores';
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 
+/**
+ * Cartao de uma pre-guia em Minhas pre-guias. Em Atencao criada pelo beneficiario, mostra "Visualizar e corrigir";
+ * em Atencao criada pelo medico, mostra a caixa "O que aconteceu?" e o botao desabilitado (regra 11).
+ * Em Concluida, oferece baixar, visualizar e imprimir a Guia.
+ */
+
 function baixarArquivo(blob: Blob, nome: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

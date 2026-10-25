@@ -5,6 +5,10 @@ import { describe, expect, it } from 'vitest'
 import LayoutPerfil from './LayoutPerfil'
 import { MENUS, type Perfil } from './perfis'
 
+/**
+ * Testes do layout base (T0-FE): itens de menu por perfil, item ativo e barra superior.
+ */
+
 function renderizar(perfil: Perfil, rota: string, nomeUsuario?: string) {
   return render(
     <MemoryRouter initialEntries={[rota]}>

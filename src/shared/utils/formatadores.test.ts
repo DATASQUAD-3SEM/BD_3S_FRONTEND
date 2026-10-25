@@ -10,6 +10,10 @@ import {
   mascaraTelefone,
 } from './formatadores'
 
+/**
+ * Testes dos formatadores e mascaras compartilhados (CPF, Prec CP, telefone e data).
+ */
+
 describe('formatarCpf', () => {
   it('aplica a máscara em 11 dígitos', () => {
     expect(formatarCpf('11144477735')).toBe('111.444.777-35')

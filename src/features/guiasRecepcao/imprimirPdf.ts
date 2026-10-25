@@ -1,3 +1,7 @@
+/**
+ * Funcoes auxiliares para disparar a impressao de um PDF sem sair da tela atual.
+ */
+
 const ATRASO_LIMPEZA_MS = 60_000
 
 export function imprimirIframe(iframe: HTMLIFrameElement | null): void {

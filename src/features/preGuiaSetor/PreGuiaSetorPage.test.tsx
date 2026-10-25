@@ -6,6 +6,10 @@ import PreGuiaSetorPage from './PreGuiaSetorPage';
 import { criarMockPreGuiaSetor } from './api.mock';
 import { ApiError } from '../../shared/api/http';
 
+/**
+ * Testes do detalhe da pre-guia do Setor de Guias (T4-FE): abertura, decisao, anexo e conclusao da Guia.
+ */
+
 beforeAll(() => {
   // O jsdom não implementa URLs de objeto (blob)
   URL.createObjectURL = vi.fn(() => 'blob:teste');

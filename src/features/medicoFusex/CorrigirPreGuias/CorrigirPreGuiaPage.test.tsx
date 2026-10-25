@@ -5,6 +5,10 @@ import CorrigirPreGuiaPage from './CorrigirPreGuiaPage'
 import { correcaoMock } from './correcaoApi.mock'
 import type { CorrecaoApi } from './correcaoTipos'
 
+/**
+ * Testes da tela Corrigir pre-guia {numero} (T14-FE2): carregamento, redirecionamentos, 404, 409 e salvamento.
+ */
+
 function apiCom(parcial: Partial<CorrecaoApi>): CorrecaoApi {
   return { ...correcaoMock, ...parcial }
 }

@@ -6,6 +6,10 @@ import type {
   PapelAssinatura,
 } from './types'
 
+/**
+ * Implementacao em memoria do contrato T5-BE1 a T5-BE3 para o perfil informado (medico ou chefe).
+ */
+
 const ATRASO_MS = 300
 const PDF_MOCK = '%PDF-1.4\n% Guia de encaminhamento (mock)\n%%EOF'
 const espera = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

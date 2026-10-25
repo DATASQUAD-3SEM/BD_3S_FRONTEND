@@ -9,6 +9,10 @@ import type {
 
 import type { NovaPreGuiaForm } from '../types'
 
+/**
+ * Resumo para revisao antes do envio da Nova pre-guia do beneficiario (Sprint 1).
+ */
+
 interface Props {
   form: NovaPreGuiaForm
   beneficiario: Beneficiario | null

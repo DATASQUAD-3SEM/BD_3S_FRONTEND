@@ -1,3 +1,7 @@
+/**
+ * Tipos do contrato de medicos do Chefe (T8-BE1 a T8-BE4).
+ */
+
 export type SituacaoFiltro = 'ativos' | 'inativos' | 'todos'
 
 /** Linha da tabela do chefe (GET /chefe/medicos, T8-BE1). CPF e Prec CP vêm sem máscara. */

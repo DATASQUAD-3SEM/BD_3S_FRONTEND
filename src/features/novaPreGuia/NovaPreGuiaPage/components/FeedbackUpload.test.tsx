@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import FeedbackUpload from './FeedbackUpload'
 
+/**
+ * Testes da mensagem de retorno sobre o arquivo escolhido.
+ */
+
 function arquivo(nome: string, tamanhoBytes: number, tipo = ''): File {
   return new File([new Uint8Array(tamanhoBytes)], nome, { type: tipo })
 }

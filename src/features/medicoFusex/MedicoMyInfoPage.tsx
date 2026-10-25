@@ -5,6 +5,11 @@ import AlterarSenha from './components/AlterarSenha'
 import AssinaturaDigital from '../beneficiario/components/AssinaturaDigital'
 
 
+/**
+ * Tela 11 - Minhas informacoes do medico (T11-FE): dados profissionais somente leitura,
+ * troca de senha e assinatura digital. O medico nao tem telefone no modelo logico.
+ */
+
 export default function MedicoMyInfoPage() {
   const { medico, carregando, erro, atualizarMedico } = useMedico()
 

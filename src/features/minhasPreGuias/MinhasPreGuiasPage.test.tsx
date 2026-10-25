@@ -6,6 +6,10 @@ import MinhasPreGuiasPage from './MinhasPreGuiasPage';
 import { preGuiasMock } from './api.mock';
 import type { PreGuiaDoBeneficiario } from './types';
 
+/**
+ * Testes da tela Minhas pre-guias (T1-FE): cartoes por status, Atencao por origem e acoes da Guia.
+ */
+
 function criarApi(lista: PreGuiaDoBeneficiario[] = preGuiasMock) {
   return {
     listar: vi.fn().mockResolvedValue(lista),

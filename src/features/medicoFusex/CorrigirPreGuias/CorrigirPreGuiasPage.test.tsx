@@ -5,6 +5,10 @@ import CorrigirPreGuiasPage from './CorrigirPreGuiasPage'
 import { corrigirPreGuiasMock } from './corrigirPreGuiasApi.mock'
 import type { CorrigirPreGuiasApi } from './types'
 
+/**
+ * Testes da lista Corrigir pre-guias (T14-FE1): cartoes, lista vazia e erro com nova tentativa.
+ */
+
 function renderizar(api: CorrigirPreGuiasApi) {
   return render(
     <MemoryRouter initialEntries={['/medico/corrigir-pre-guias']}>

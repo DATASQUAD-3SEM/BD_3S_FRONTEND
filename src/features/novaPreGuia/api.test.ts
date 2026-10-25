@@ -7,6 +7,10 @@ import type {
   Beneficiario,
 } from '../../shared/types/domain'
 
+/**
+ * Testes da chamada de criacao da pre-guia pelo beneficiario.
+ */
+
 afterEach(() => vi.unstubAllGlobals())
 
 const beneficiarioTeste: Beneficiario = {

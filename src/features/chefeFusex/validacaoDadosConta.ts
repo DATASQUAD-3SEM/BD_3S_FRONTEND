@@ -1,5 +1,9 @@
 import { ApiError } from '../../shared/api/http'
 
+/**
+ * Validacoes do cartao Dados da conta do Chefe e leitura dos erros 422/409 do backend por campo.
+ */
+
 export interface DadosConta {
   nome: string
   patente: string

@@ -1,3 +1,7 @@
+/**
+ * Tipos do contrato da Nova pre-guia do medico (T2-BE1 a T2-BE4).
+ */
+
 export interface BeneficiarioBusca {
   id: number
   nome: string

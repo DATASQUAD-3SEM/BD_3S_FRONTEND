@@ -5,6 +5,12 @@ import { guiasParaAssinarApi } from './api'
 import type { GuiaParaAssinar, GuiasParaAssinarApi, PapelAssinatura } from './types'
 import './guiasParaAssinar.css'
 
+/**
+ * Tela 5 - Guias para assinar (T5-FE), compartilhada por medico e chefe: lista de Guias com o texto
+ * padronizado do que falta assinar, previa do PDF e botao de assinatura. Sem assinatura cadastrada,
+ * o botao fica desabilitado com link para Minhas informacoes.
+ */
+
 export interface GuiasParaAssinarPageProps {
   perfil: PapelAssinatura
   assinaturaCadastrada: boolean | null

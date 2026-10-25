@@ -4,6 +4,10 @@ import { ChefeProvider } from './ChefeContext'
 import ChefeMyInfoPage from './ChefeMyInfoPage'
 import { reiniciarEstadoMockChefe } from './dadosChefe'
 
+/**
+ * Testes da tela Minhas informacoes do Chefe (T12-FE).
+ */
+
 const ESPERA = { timeout: 3000 }
 
 const CHEFE_INICIAL = {

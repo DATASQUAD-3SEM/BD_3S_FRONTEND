@@ -9,6 +9,10 @@ import {
 import type { MedicoPerfil } from '../../shared/types/domain'
 import { obterMedicoLogado } from './medicoApi'
 
+/**
+ * Contexto React com os dados do medico logado, compartilhados pelo layout e pelas telas do perfil.
+ */
+
 interface MedicoContexto {
   medico: MedicoPerfil | null
   carregando: boolean

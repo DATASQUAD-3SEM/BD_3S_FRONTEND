@@ -1,5 +1,9 @@
 import type { MedicoCriador, ProcedimentoDetalhe } from './types';
 
+/**
+ * Textos exibidos no detalhe da pre-guia do Setor de Guias.
+ */
+
 export function formatarExame(procedimento: ProcedimentoDetalhe): string {
   return `${procedimento.codigoTuss} · ${procedimento.nome}`;
 }

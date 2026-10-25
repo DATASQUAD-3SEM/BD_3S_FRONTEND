@@ -2,6 +2,10 @@ import { ApiError, get, post, putForm } from '../../shared/api/http'
 import type { MedicoPerfil } from '../../shared/types/domain'
 import { estadoMockMedico, montarMedicoMock } from './dadosMedico'
 
+/**
+ * Chamadas a API da tela Minhas informacoes do medico (T11-BE1, T13-BE1 e T13-BE2).
+ */
+
 const USAR_MOCK_MEDICO = false
 
 const ATRASO_MOCK_MS = 400

@@ -1,5 +1,9 @@
 import type { CorrigirPreGuiasApi, PreGuiaParaCorrigir } from './types'
 
+/**
+ * Implementacao em memoria do contrato T14-BE1 (lista de pre-guias para corrigir).
+ */
+
 const LISTA: PreGuiaParaCorrigir[] = [
   {
     id: 405,

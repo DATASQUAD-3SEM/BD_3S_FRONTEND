@@ -23,6 +23,11 @@ import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
 import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiaPage'
 
+/**
+ * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
+ * e as telas sao rotas filhas desse layout. Ao criar uma tela nova, adicione aqui apenas a rota correspondente.
+ */
+
 export default function App() {
   return (
     <Routes>

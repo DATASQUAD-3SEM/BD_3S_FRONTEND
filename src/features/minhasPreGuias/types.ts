@@ -1,5 +1,9 @@
 import type { OrigemPreGuia, StatusPreGuia } from '../../shared/types/domain';
 
+/**
+ * Tipos do contrato de Minhas pre-guias (T1-BE1 e T1-BE2).
+ */
+
 export type { OrigemPreGuia, StatusPreGuia };
 
 export type ModoPdf = 'baixar' | 'visualizar';

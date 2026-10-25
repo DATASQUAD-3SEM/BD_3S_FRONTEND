@@ -2,6 +2,10 @@
 
 import type { ConsultaFila, FilaPreGuiasApi, ItemFila, PaginaFila, StatusPreGuia, OrigemPreGuia } from './types';
 
+/**
+ * Implementacao em memoria do contrato T3-BE1 (fila de pre-guias), com busca, filtro e paginacao.
+ */
+
 type ItemMock = ItemFila & { precCp: string };
 
 export const filaMock: ItemMock[] = [

@@ -9,6 +9,10 @@ import {
 import type { ChefePerfil } from '../../shared/types/domain'
 import { obterChefeLogado } from './chefeApi'
 
+/**
+ * Contexto React com os dados do Chefe logado, compartilhados pelo layout e pelas telas do perfil.
+ */
+
 interface ChefeContexto {
   chefe: ChefePerfil | null
   carregando: boolean

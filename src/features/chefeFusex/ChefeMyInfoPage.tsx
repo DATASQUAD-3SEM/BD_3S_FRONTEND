@@ -4,6 +4,10 @@ import DadosConta from './components/DadosConta'
 import AssinaturaDigital from '../beneficiario/components/AssinaturaDigital'
 
 
+/**
+ * Tela 12 - Minhas informacoes do Chefe (T12-FE): dados da conta editaveis e assinatura digital.
+ */
+
 export default function ChefeMyInfoPage() {
   const { chefe, carregando, erro, atualizarChefe } = useChefe()
 

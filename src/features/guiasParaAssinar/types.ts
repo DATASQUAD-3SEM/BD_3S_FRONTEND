@@ -1,3 +1,7 @@
+/**
+ * Tipos do contrato de Guias para assinar (T5-BE1 a T5-BE3).
+ */
+
 export type PapelAssinatura = 'MEDICO' | 'CHEFE'
 
 export interface GuiaParaAssinar {

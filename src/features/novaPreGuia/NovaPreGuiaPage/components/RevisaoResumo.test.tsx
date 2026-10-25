@@ -8,6 +8,10 @@ import type {
   Beneficiario,
 } from '../../../../shared/types/domain'
 
+/**
+ * Testes do resumo de revisao da Nova pre-guia do beneficiario.
+ */
+
 function respostaJson(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), {
     status,

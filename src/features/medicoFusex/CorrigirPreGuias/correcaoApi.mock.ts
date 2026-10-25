@@ -5,6 +5,10 @@ import type {
   ProcedimentoResumo,
 } from './correcaoTipos'
 
+/**
+ * Implementacao em memoria do contrato T14-BE2 a T14-BE5 (detalhe, buscas e salvamento da correcao).
+ */
+
 const OCS: OcsResumo[] = [
   { id: 1, nome: 'Laboratório Exemplo', contrato: 'EXEMPLO-001', tipo: 'LABORATÓRIO' },
   { id: 2, nome: 'Clínica Modelo', contrato: 'MODELO-002', tipo: 'CLÍNICA' },

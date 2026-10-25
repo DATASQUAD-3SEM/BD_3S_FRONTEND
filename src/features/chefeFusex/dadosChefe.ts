@@ -1,5 +1,9 @@
 import type { ChefePerfil } from '../../shared/types/domain'
 
+/**
+ * Dados simulados do Chefe usados quando o modo mock de chefeApi.ts esta ativo e nos testes.
+ */
+
 interface EstadoMockChefe {
   nome: string
   patente: string

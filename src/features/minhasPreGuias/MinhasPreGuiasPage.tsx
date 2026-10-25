@@ -4,6 +4,11 @@ import { minhasPreGuiasApi } from './api';
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 import './minhasPreGuias.css';
 
+/**
+ * Tela 1 - Minhas pre-guias do beneficiario (T1-FE): um cartao por pre-guia, da mais recente para a mais antiga,
+ * com os estados de carregando, lista vazia e erro.
+ */
+
 interface Props {
   api?: MinhasPreGuiasApi;
   onVisualizarECorrigir?: (id: number) => void;

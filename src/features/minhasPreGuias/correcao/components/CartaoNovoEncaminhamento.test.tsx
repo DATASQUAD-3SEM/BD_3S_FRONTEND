@@ -4,6 +4,10 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import CartaoNovoEncaminhamento, { validarEncaminhamento } from './CartaoNovoEncaminhamento';
 
+/**
+ * Testes da validacao do novo encaminhamento (tipo e tamanho do arquivo).
+ */
+
 const MB = 1024 * 1024;
 
 function arquivoComTamanho(nome: string, tamanho: number): File {

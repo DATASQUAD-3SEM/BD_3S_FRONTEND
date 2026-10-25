@@ -3,6 +3,11 @@ import type { CorrecaoApi, ProcedimentoResumo } from '../correcaoTipos'
 import { mensagemDeErro } from '../../../../shared/api/erros'
 import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
+/**
+ * Cartao "Exames e procedimentos" da correcao do medico (T14-FE2): busca no catalogo com debounce
+ * e tabela de exames. Remover o ultimo exame e bloqueado, pois a pre-guia exige ao menos um.
+ */
+
 interface Props {
   exames: ProcedimentoResumo[]
   api: CorrecaoApi

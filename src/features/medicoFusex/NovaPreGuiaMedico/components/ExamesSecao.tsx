@@ -5,6 +5,11 @@ import { mensagemDeErro } from '../../../../shared/api/erros'
 import type { ProcedimentoBusca } from '../types'
 import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
+/**
+ * Secao "Exames e procedimentos" da Nova pre-guia do medico: busca no catalogo inteiro (sem filtro por OCS),
+ * minimo de 2 caracteres e debounce de 300 ms. Um exame nao pode ser incluido duas vezes.
+ */
+
 const MINIMO_CARACTERES = 2
 
 interface Props {

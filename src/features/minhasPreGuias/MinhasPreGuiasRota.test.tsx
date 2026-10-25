@@ -5,6 +5,10 @@ import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Routes, Route, useParams } from 'react-router-dom';
 import MinhasPreGuiasRota from './MinhasPreGuiasRota';
 
+/**
+ * Testes da ligacao entre Minhas pre-guias e a tela de correcao (T9-FE).
+ */
+
 // A rota usa o cliente real por padrão; nos testes ele é trocado pelo mock da lista.
 vi.mock('./api', async () => {
   const mock = await import('./api.mock');

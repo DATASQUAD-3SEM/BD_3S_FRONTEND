@@ -9,6 +9,10 @@ import type {
   NovaPreGuiaForm,
 } from './NovaPreGuiaPage/types'
 
+/**
+ * Chamada a API da Nova pre-guia do beneficiario (Sprint 1): envio multipart com OCS e encaminhamento.
+ */
+
 function somenteDigitos(texto: string): string {
   return texto.replace(/\D/g, '')
 }

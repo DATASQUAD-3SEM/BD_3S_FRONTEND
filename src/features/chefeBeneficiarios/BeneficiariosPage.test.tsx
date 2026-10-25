@@ -5,6 +5,10 @@ import '@testing-library/jest-dom/vitest'
 import BeneficiariosPage from './BeneficiariosPage'
 import type { BeneficiarioDetalhe, BeneficiariosApi, ListaBeneficiarios } from './tipos'
 
+/**
+ * Testes da tela Beneficiarios do Chefe (T7-FE): lista, filtros, cadastro, edicao e erros por campo.
+ */
+
 const lista: ListaBeneficiarios = {
   total: 2,
   pagina: 0,

@@ -1,5 +1,10 @@
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 
+/**
+ * Implementacao em memoria do contrato T1-BE1 e T1-BE2, com um cartao de cada status
+ * (incluindo Atencao criada pelo beneficiario e Atencao criada pelo medico).
+ */
+
 const espera = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Dados fixos usados nos testes — cobrem todos os status e as duas origens.

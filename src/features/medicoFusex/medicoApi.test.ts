@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { alterarSenha, salvarAssinatura } from './medicoApi'
 
+/**
+ * Testes das chamadas a API da tela Minhas informacoes do medico.
+ */
+
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',

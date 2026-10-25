@@ -1,6 +1,10 @@
 import type { PreGuiaParaCorrigir } from '../types'
 import { formatarData, formatarPrecCp } from '../../../../shared/utils/formatadores'
 
+/**
+ * Cartao de uma pre-guia na lista Corrigir pre-guias (T14-FE1), com a observacao do setor e o botao "Corrigir".
+ */
+
 interface Props {
   preGuia: PreGuiaParaCorrigir
   onCorrigir: (id: number) => void
