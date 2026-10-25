@@ -1,45 +1,20 @@
 import { postForm } from '../../shared/api/http'
-
-import type {
-  Beneficiario,
-  PreGuia,
-} from '../../shared/types/domain'
-
-import type {
-  NovaPreGuiaForm,
-} from './NovaPreGuiaPage/types'
+import type { NovaPreGuiaForm, PreGuiaCriada } from './NovaPreGuiaPage/types'
 
 /**
- * Chamada a API da Nova pre-guia do beneficiario (Sprint 1): envio multipart com OCS e encaminhamento.
+ * Chamada a API da Nova pre-guia do beneficiario: POST /pre-guias (multipart com ocsId e arquivo).
+ * O beneficiario nao e enviado: o backend usa sempre o usuario logado.
  */
-
-function somenteDigitos(texto: string): string {
-  return texto.replace(/\D/g, '')
-}
-
-export function criarPreGuia(
-  form: NovaPreGuiaForm,
-  beneficiario: Beneficiario,
-): Promise<PreGuia> {
+export function criarPreGuia(form: NovaPreGuiaForm): Promise<PreGuiaCriada> {
   const dados = new FormData()
 
-  dados.append(
-    'cpf',
-    somenteDigitos(beneficiario.cpf),
-  )
-
-  dados.append(
-    'precCp',
-    somenteDigitos(beneficiario.precCp),
-  )
-
-  if (form.ocsId !== null) {
-    dados.append('ocsId', String(form.ocsId))
+  if (form.ocs) {
+    dados.append('ocsId', String(form.ocs.id))
   }
 
   if (form.arquivo) {
     dados.append('arquivo', form.arquivo)
   }
 
-  return postForm<PreGuia>('/pre-guias', dados)
+  return postForm<PreGuiaCriada>('/pre-guias', dados)
 }
