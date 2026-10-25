@@ -1,5 +1,6 @@
-export type StatusPreGuia = 'PENDENTE' | 'EM_ANALISE' | 'ATENCAO' | 'CONCLUIDA';
-export type OrigemPreGuia = 'BENEFICIARIO' | 'MEDICO';
+import type { OrigemPreGuia, StatusPreGuia } from '../../shared/types/domain';
+
+export type { OrigemPreGuia, StatusPreGuia };
 
 export interface ItemFila {
   id: number;

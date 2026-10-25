@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
 import { buscarProcedimentosMedico } from '../api'
-import { mensagemDeErro } from '../erros'
+import { mensagemDeErro } from '../../../../shared/api/erros'
 import type { ProcedimentoBusca } from '../types'
-import { useValorComDebounce } from '../useValorComDebounce'
+import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
 const MINIMO_CARACTERES = 2
 
@@ -21,7 +21,7 @@ interface ResultadoBusca {
 
 export default function ExamesSecao({ exames, onAdicionar, onRemover }: Props) {
   const [busca, setBusca] = useState('')
-  const termo = useValorComDebounce(busca.trim(), 300)
+  const termo = useDebounce(busca.trim(), 300)
   const [resultado, setResultado] = useState<ResultadoBusca | null>(null)
 
   const consultaAtiva = termo.length >= MINIMO_CARACTERES

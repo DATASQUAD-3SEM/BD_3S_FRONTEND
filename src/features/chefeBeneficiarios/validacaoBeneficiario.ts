@@ -1,5 +1,6 @@
 import { ApiError } from '../../shared/api/http'
 import { calcularIdade } from '../beneficiario/calculosBeneficiario'
+import { somenteDigitos, cpfValido } from '../../shared/utils/formatadores'
 
 export type CampoBeneficiario =
   | 'nome'
@@ -38,41 +39,6 @@ const NOME_MAXIMO = 150
 const SENHA_MINIMA = 8
 const SENHA_MAXIMA = 72
 const REGEX_CELULAR = /^[1-9]{2}9\d{8}$/
-
-export const somenteDigitos = (valor: string): string => valor.replace(/\D/g, '')
-
-export function mascaraCpf(valor: string): string {
-  const d = somenteDigitos(valor).slice(0, 11)
-  let r = d.slice(0, 3)
-  if (d.length > 3) r += `.${d.slice(3, 6)}`
-  if (d.length > 6) r += `.${d.slice(6, 9)}`
-  if (d.length > 9) r += `-${d.slice(9, 11)}`
-  return r
-}
-
-export function mascaraPrecCp(valor: string): string {
-  const d = somenteDigitos(valor).slice(0, 11)
-  return d.length > 9 ? `${d.slice(0, 9)}-${d.slice(9)}` : d
-}
-
-export function mascaraTelefone(valor: string): string {
-  const d = somenteDigitos(valor).slice(0, 11)
-  if (d.length <= 2) return d ? `(${d}` : ''
-  let r = `(${d.slice(0, 2)}) ${d.slice(2, 7)}`
-  if (d.length > 7) r += `-${d.slice(7)}`
-  return r
-}
-
-function cpfValido(cpf: string): boolean {
-  if (!/^\d{11}$/.test(cpf) || /^(\d)\1{10}$/.test(cpf)) return false
-  const digitoVerificador = (tamanho: number): number => {
-    let soma = 0
-    for (let i = 0; i < tamanho; i++) soma += Number(cpf[i]) * (tamanho + 1 - i)
-    const resto = (soma * 10) % 11
-    return resto === 10 ? 0 : resto
-  }
-  return digitoVerificador(9) === Number(cpf[9]) && digitoVerificador(10) === Number(cpf[10])
-}
 
 function dataIsoLocal(data: Date): string {
   const mes = String(data.getMonth() + 1).padStart(2, '0')

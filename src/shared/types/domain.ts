@@ -5,7 +5,9 @@
  * Datas chegam como texto ISO ("2026-09-23" ou "2026-09-23T14:30:00").
  */
 
-export type StatusPreGuia = 'RASCUNHO' | 'PENDENTE' | 'EM_ANALISE' | 'APROVADA'
+export type StatusPreGuia = 'PENDENTE' | 'EM_ANALISE' | 'ATENCAO' | 'CONCLUIDA'
+
+export type OrigemPreGuia = 'BENEFICIARIO' | 'MEDICO'
 
 export interface Ocs {
   id: number

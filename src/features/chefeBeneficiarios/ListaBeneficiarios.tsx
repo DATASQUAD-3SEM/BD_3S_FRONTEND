@@ -1,5 +1,5 @@
 import type { BeneficiarioItem, SituacaoFiltro } from './tipos'
-import { mascaraCpf, mascaraPrecCp } from './validacaoBeneficiario'
+import { mascaraCpf, mascaraPrecCp } from '../../shared/utils/formatadores'
 
 export const TAMANHO_PAGINA = 10
 

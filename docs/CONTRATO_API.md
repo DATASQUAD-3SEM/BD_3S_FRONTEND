@@ -35,4 +35,4 @@ Vira `ApiError` no front (`message` = `mensagem`, `detalhes` = `detalhes`).
 
 Resposta: `PreGuia` (`id`, `status`, `dataEmissao`, `encaminhamentoUrl`, `ocsId`, `procedimentoIds`).
 
-O que o front ja faz: `features/preguia/api.ts` (`criarPreGuia`). Se o contrato mudar, so esse arquivo muda.
+O que o front ja faz: `features/novaPreGuia/api.ts` (`criarPreGuia`). Se o contrato mudar, so esse arquivo muda.

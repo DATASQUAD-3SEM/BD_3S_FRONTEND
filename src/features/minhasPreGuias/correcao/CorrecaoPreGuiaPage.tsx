@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '../../../shared/api/http';
-import StatusBadge from '../StatusBadge';
-import { formatarData } from '../formatters';
+import StatusBadge from '../../../shared/components/StatusBadge';
+import { formatarData } from '../../../shared/utils/formatadores';
 import ViewerEncaminhamento from '../../preGuiaSetor/components/ViewerEncaminhamento';
 import CartaoOcs from './components/CartaoOcs';
 import CartaoNovoEncaminhamento from './components/CartaoNovoEncaminhamento';

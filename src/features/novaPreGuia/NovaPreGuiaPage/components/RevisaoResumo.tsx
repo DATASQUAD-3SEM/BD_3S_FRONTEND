@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listarOcs } from '../../../ocs/api'
+import { listarOcs } from '../../ocsApi'
 import { calcularIdade } from '../../../beneficiario/calculosBeneficiario'
 
 import type {

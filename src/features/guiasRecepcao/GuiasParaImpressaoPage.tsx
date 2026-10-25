@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { guiasRecepcaoApi } from './api'
-import { formatarData, formatarPrecCp } from './formatters'
+import { formatarData, formatarPrecCp } from '../../shared/utils/formatadores'
 import { imprimirUrlEmSegundoPlano } from './imprimirPdf'
 import VisualizarGuiaModal from './VisualizarGuiaModal'
 import type { GuiaRecepcao, GuiasRecepcaoApi } from './types'

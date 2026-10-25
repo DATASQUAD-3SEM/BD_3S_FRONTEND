@@ -2,13 +2,11 @@ import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import type { MedicoDetalhe, MedicosApi } from './tipos'
 import {
   errosDoBackend,
-  mascaraCpf,
-  mascaraPrecCp,
-  somenteDigitos,
   validarFormulario,
   type ErrosMedico,
   type ValoresFormulario,
 } from './validacaoMedico'
+import { mascaraCpf, mascaraPrecCp, somenteDigitos } from '../../shared/utils/formatadores'
 
 const VAZIO: ValoresFormulario = {
   nome: '',

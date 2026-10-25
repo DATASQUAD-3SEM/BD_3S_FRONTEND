@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { buscarOcsMedico } from '../api'
-import { mensagemDeErro } from '../erros'
+import { mensagemDeErro } from '../../../../shared/api/erros'
 import { rotuloTipo } from '../formatadores'
 import type { OcsBusca, OcsBuscaResposta } from '../types'
-import { useValorComDebounce } from '../useValorComDebounce'
+import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
 interface Props {
   selecionada: OcsBusca | null
@@ -20,7 +20,7 @@ interface ResultadoBusca {
 
 export default function OcsSecao({ selecionada, onSelecionar, onTrocar }: Props) {
   const [busca, setBusca] = useState('')
-  const termo = useValorComDebounce(busca.trim(), 300)
+  const termo = useDebounce(busca.trim(), 300)
   const [resultado, setResultado] = useState<ResultadoBusca | null>(null)
 
   useEffect(() => {

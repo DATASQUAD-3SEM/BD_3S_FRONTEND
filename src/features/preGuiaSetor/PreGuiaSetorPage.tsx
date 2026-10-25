@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import StatusBadge from '../filaPreGuias/StatusBadge';
+import StatusBadge from '../../shared/components/StatusBadge';
 import { preGuiaSetorApi } from './api';
 import ColunaCorrecao from './components/ColunaCorrecao';
 import ColunaGerarGuia from './components/ColunaGerarGuia';
 import ViewerEncaminhamento from './components/ViewerEncaminhamento';
-import { formatarExame, formatarPrecCp, textoCriadaPor } from './formatters';
+import { formatarExame, textoCriadaPor } from './formatadores';
+import { formatarPrecCp } from '../../shared/utils/formatadores';
 import {
   ehNaoEncontrada,
   mensagemDeErro,

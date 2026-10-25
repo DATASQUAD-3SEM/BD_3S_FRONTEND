@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { listarOcs } from '../../../ocs/api'
+import { listarOcs } from '../../ocsApi'
 import { ApiError } from '../../../../shared/api/http'
 import type { Ocs } from '../../../../shared/types/domain'
 
@@ -8,7 +8,7 @@ interface Props {
   onChange: (ocsId: number | null) => void
 }
 
-/** SCRUM 35 - escolher a OCS (usa listarOcs de features/ocs/api.ts). */
+/** SCRUM 35 - escolher a OCS (usa listarOcs de features/novaPreGuia/ocsApi.ts). */
 export default function SelecaoOcs({ value, onChange }: Props) {
   const [ocs, setOcs] = useState<Ocs[]>([])
   const [busca, setBusca] = useState('')

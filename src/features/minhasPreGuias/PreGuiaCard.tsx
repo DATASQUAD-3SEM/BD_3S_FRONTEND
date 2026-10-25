@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import StatusBadge from './StatusBadge';
-import { formatarData } from './formatters';
+import StatusBadge from '../../shared/components/StatusBadge';
+import { formatarData } from '../../shared/utils/formatadores';
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 
 function baixarArquivo(blob: Blob, nome: string) {

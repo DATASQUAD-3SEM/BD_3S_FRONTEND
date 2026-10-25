@@ -90,13 +90,16 @@ src/
   App.tsx                    tabela de rotas
   shared/
     api/http.ts              cliente HTTP unico
-    types/domain.ts          tipos (Ocs, ProcedimentoExame, PreGuia...)
-    components/              AppLayout, EmConstrucao
+    api/erros.ts             leitura de erros da API
+    types/domain.ts          tipos (Ocs, PreGuia, StatusPreGuia...)
+    components/              AppLayout, EmConstrucao, StatusBadge
+    hooks/useDebounce.ts     atraso das buscas digitadas
+    utils/formatadores.ts    mascaras e formatacao (CPF, Prec CP, telefone, data)
   features/
     diagnostico/             tela "Teste de conexao"
-    ocs/api.ts               chamadas de OCS
-    preguia/
+    novaPreGuia/
       api.ts                 chamadas de pre-guia
+      ocsApi.ts              chamadas de OCS
       NovaPreGuiaPage/
         index.tsx            container magro (estado + junta os componentes)
         types.ts             estado compartilhado do formulario

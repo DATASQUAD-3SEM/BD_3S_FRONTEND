@@ -1,6 +1,7 @@
 import { ApiError } from '../../shared/api/http'
 import { calcularIdade } from '../beneficiario/calculosBeneficiario'
-import { faixaEtariaDe, somenteDigitos } from './validacaoBeneficiario'
+import { faixaEtariaDe } from './validacaoBeneficiario'
+import { somenteDigitos } from '../../shared/utils/formatadores'
 import type {
   BeneficiarioDetalhe,
   BeneficiariosApi,

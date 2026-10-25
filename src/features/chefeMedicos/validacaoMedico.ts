@@ -1,4 +1,5 @@
 import { ApiError } from '../../shared/api/http'
+import { somenteDigitos, cpfValido } from '../../shared/utils/formatadores'
 
 /** Campos do formulário. Servem para ligar o erro 422/409 do backend ao campo certo. */
 export type CampoMedico = 'nome' | 'patente' | 'cpf' | 'precCp' | 'crm' | 'senha' | 'novaSenha' | 'ativo'
@@ -27,38 +28,11 @@ const UFS = new Set([
   'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ])
 
-export const somenteDigitos = (valor: string): string => valor.replace(/\D/g, '')
-
-export function mascaraCpf(valor: string): string {
-  const d = somenteDigitos(valor).slice(0, 11)
-  let r = d.slice(0, 3)
-  if (d.length > 3) r += `.${d.slice(3, 6)}`
-  if (d.length > 6) r += `.${d.slice(6, 9)}`
-  if (d.length > 9) r += `-${d.slice(9, 11)}`
-  return r
-}
-
-export function mascaraPrecCp(valor: string): string {
-  const d = somenteDigitos(valor).slice(0, 11)
-  return d.length > 9 ? `${d.slice(0, 9)}-${d.slice(9)}` : d
-}
-
 /** Exibição na tabela: 000000-SP vira 000.000-SP. */
 export function mascaraCrm(valor: string): string {
   const m = /^(\d+)-([A-Z]{2})$/.exec(valor)
   if (!m) return valor
   return `${m[1].replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${m[2]}`
-}
-
-function cpfValido(cpf: string): boolean {
-  if (!/^\d{11}$/.test(cpf) || /^(\d)\1{10}$/.test(cpf)) return false
-  const digito = (tamanho: number): number => {
-    let soma = 0
-    for (let i = 0; i < tamanho; i++) soma += Number(cpf[i]) * (tamanho + 1 - i)
-    const resto = (soma * 10) % 11
-    return resto === 10 ? 0 : resto
-  }
-  return digito(9) === Number(cpf[9]) && digito(10) === Number(cpf[10])
 }
 
 export function crmValido(valor: string): boolean {

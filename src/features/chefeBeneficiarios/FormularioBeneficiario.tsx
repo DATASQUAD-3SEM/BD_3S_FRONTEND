@@ -2,15 +2,12 @@ import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import type { BeneficiarioDetalhe, BeneficiariosApi } from './tipos'
 import {
   errosDoBackend,
-  mascaraCpf,
-  mascaraPrecCp,
-  mascaraTelefone,
   resumoFaixa,
-  somenteDigitos,
   validarFormulario,
   type ErrosBeneficiario,
   type ValoresFormulario,
 } from './validacaoBeneficiario'
+import { mascaraCpf, mascaraPrecCp, mascaraTelefone, somenteDigitos } from '../../shared/utils/formatadores'
 
 const VAZIO: ValoresFormulario = {
   nome: '',
