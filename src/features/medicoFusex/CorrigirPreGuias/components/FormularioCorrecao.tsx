@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import type { CorrecaoApi, DetalheCorrecao, OcsResumo, ProcedimentoResumo } from '../correcaoTipos'
-import { mensagemDoErro, statusDoErro } from '../erros'
-import { formatarData } from '../formatadores'
+import { mensagemDeErro, statusDoErro } from '../../../../shared/api/erros'
+import { formatarData } from '../../../../shared/utils/formatadores'
 import BeneficiarioCard from './BeneficiarioCard'
 import ExamesCard from './ExamesCard'
 import OcsCard from './OcsCard'
@@ -59,7 +59,7 @@ export default function FormularioCorrecao({ detalhe, api, onCancelar, onSalvo }
       })
       onSalvo(`Pré-guia ${detalhe.numero} corrigida e reenviada ao setor de Guias.`)
     } catch (e) {
-      setErro(statusDoErro(e) === 409 ? MSG_409 : mensagemDoErro(e, 'Não foi possível salvar a correção. Tente novamente.'))
+      setErro(statusDoErro(e) === 409 ? MSG_409 : mensagemDeErro(e, 'Não foi possível salvar a correção. Tente novamente.'))
       enviandoRef.current = false
       setEnviando(false)
     }

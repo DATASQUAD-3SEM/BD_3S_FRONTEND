@@ -1,5 +1,5 @@
 import type { PreGuiaParaCorrigir } from '../types'
-import { formatarData, formatarPrecCp } from '../formatadores'
+import { formatarData, formatarPrecCp } from '../../../../shared/utils/formatadores'
 
 interface Props {
   preGuia: PreGuiaParaCorrigir

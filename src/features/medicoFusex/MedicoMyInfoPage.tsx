@@ -1,6 +1,6 @@
 import { useMedico } from './MedicoContext'
 import { alterarSenha, salvarAssinatura } from './medicoApi'
-import { formatarCpf, formatarPrecCp } from './formatadores'
+import { formatarCpf, formatarPrecCp } from '../../shared/utils/formatadores'
 import AlterarSenha from './components/AlterarSenha'
 import AssinaturaDigital from '../beneficiario/components/AssinaturaDigital'
 

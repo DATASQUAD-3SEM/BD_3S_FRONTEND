@@ -1,6 +1,6 @@
-export type StatusPreGuia = 'PENDENTE' | 'EM_ANALISE' | 'ATENCAO' | 'CONCLUIDA';
+import type { OrigemPreGuia, StatusPreGuia } from '../../shared/types/domain';
 
-export type OrigemPreGuia = 'BENEFICIARIO' | 'MEDICO';
+export type { OrigemPreGuia, StatusPreGuia };
 
 export type ModoPdf = 'baixar' | 'visualizar';
 

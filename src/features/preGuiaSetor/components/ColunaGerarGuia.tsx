@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { somenteDigitos } from '../formatters';
+import { somenteDigitos } from '../../../shared/utils/formatadores';
 import { ehPdf } from '../regras';
 import type { GuiaRascunhoDetalhe } from '../types';
 

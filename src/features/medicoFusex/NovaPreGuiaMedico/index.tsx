@@ -11,7 +11,7 @@ import BeneficiarioSecao, { type StatusBusca } from './components/BeneficiarioSe
 import ExamesSecao from './components/ExamesSecao'
 import MedicoSecao from './components/MedicoSecao'
 import OcsSecao from './components/OcsSecao'
-import { mensagemDeErro } from './erros'
+import { mensagemDeErro } from '../../../shared/api/erros'
 import type {
   BeneficiarioBusca,
   MedicoSolicitante,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { correcaoApi } from './correcaoApi'
 import type { CorrecaoApi, DetalheCorrecao } from './correcaoTipos'
-import { statusDoErro } from './erros'
+import { statusDoErro } from '../../../shared/api/erros'
 import FormularioCorrecao from './components/FormularioCorrecao'
 import './corrigirPreGuiaDetalhe.css'
 

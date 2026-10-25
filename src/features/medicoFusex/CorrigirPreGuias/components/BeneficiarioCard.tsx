@@ -1,5 +1,5 @@
 import type { BeneficiarioCorrecao } from '../correcaoTipos'
-import { formatarPrecCp } from '../formatadores'
+import { formatarPrecCp } from '../../../../shared/utils/formatadores'
 
 interface Props {
   beneficiario: BeneficiarioCorrecao

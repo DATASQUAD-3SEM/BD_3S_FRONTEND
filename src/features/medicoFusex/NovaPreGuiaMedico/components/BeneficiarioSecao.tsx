@@ -1,5 +1,5 @@
-import { formatarCpf } from '../../formatadores'
-import { formatarTelefone, mascaraPrecCp } from '../formatadores'
+import { formatarCpf } from '../../../../shared/utils/formatadores'
+import { formatarTelefone, mascaraPrecCp } from '../../../../shared/utils/formatadores'
 import type { BeneficiarioBusca } from '../types'
 
 export type StatusBusca = 'ocioso' | 'buscando' | 'encontrado' | 'naoEncontrado' | 'erro'

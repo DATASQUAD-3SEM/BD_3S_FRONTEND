@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { CorrecaoApi, OcsResumo } from '../correcaoTipos'
-import { mensagemDoErro } from '../erros'
-import { useDebounce } from '../useDebounce'
+import { mensagemDeErro } from '../../../../shared/api/erros'
+import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
 interface Props {
   selecionada: OcsResumo
@@ -37,7 +37,7 @@ export default function OcsCard({ selecionada, api, onSelecionar }: Props) {
             termo,
             itens: [],
             total: 0,
-            erro: mensagemDoErro(erro, 'Não foi possível buscar as OCS.'),
+            erro: mensagemDeErro(erro, 'Não foi possível buscar as OCS.'),
           })
       })
     return () => {

@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http'
-import { somenteDigitos } from './validacaoMedico'
+import { somenteDigitos } from '../../shared/utils/formatadores'
 import type { MedicoDetalhe, MedicosApi, SituacaoFiltro } from './tipos'
 
 const registros: MedicoDetalhe[] = [

@@ -1,5 +1,6 @@
 import type { MedicoItem, SituacaoFiltro } from './tipos'
-import { mascaraCpf, mascaraCrm, mascaraPrecCp } from './validacaoMedico'
+import { mascaraCrm } from './validacaoMedico'
+import { mascaraCpf, mascaraPrecCp } from '../../shared/utils/formatadores'
 
 export const TAMANHO_PAGINA = 10
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { CorrecaoApi, ProcedimentoResumo } from '../correcaoTipos'
-import { mensagemDoErro } from '../erros'
-import { useDebounce } from '../useDebounce'
+import { mensagemDeErro } from '../../../../shared/api/erros'
+import { useDebounce } from '../../../../shared/hooks/useDebounce'
 
 interface Props {
   exames: ProcedimentoResumo[]
@@ -34,7 +34,7 @@ export default function ExamesCard({ exames, api, onAdicionar, onRemover }: Prop
           setResultado({
             termo,
             itens: [],
-            erro: mensagemDoErro(erro, 'Não foi possível buscar os procedimentos.'),
+            erro: mensagemDeErro(erro, 'Não foi possível buscar os procedimentos.'),
           })
       })
     return () => {

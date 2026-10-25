@@ -1,4 +1,4 @@
-import type { StatusPreGuia } from './types';
+import type { StatusPreGuia } from '../types/domain';
 
 export const STATUS: Record<StatusPreGuia, { rotulo: string; classe: string }> = {
   PENDENTE: { rotulo: 'Pendente', classe: 'badge-pendente' },

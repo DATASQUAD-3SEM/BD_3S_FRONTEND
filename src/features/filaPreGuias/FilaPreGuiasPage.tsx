@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import StatusBadge, { STATUS } from './StatusBadge';
+import StatusBadge, { STATUS } from '../../shared/components/StatusBadge';
 import { filaPreGuiasApi } from './api';
-import { formatarDiaMes, ORIGEM } from './formatters';
+import { formatarDiaMes, ORIGEM } from './formatadores';
 import type { FilaPreGuiasApi, PaginaFila, StatusPreGuia } from './types';
 import './filaPreGuias.css';
 
