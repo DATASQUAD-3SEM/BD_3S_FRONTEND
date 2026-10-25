@@ -1,31 +1,12 @@
 /**
- * TIPOS DO DOMINIO - espelham as entidades do backend (Beneficiario, Ocs, ProcedimentoExame, PreGuia).
- * Nao recrie estes tipos em outro arquivo.
- * PROVISORIO: os controllers/DTOs do backend ainda nao existem. Quando existirem, ajuste aqui.
+ * TIPOS DO DOMINIO compartilhados por varias telas: status e origem da pre-guia e os dados dos perfis logados.
+ * Nao recrie estes tipos em outro arquivo. Contratos usados por uma unica tela ficam no types.ts da propria feature.
  * Datas chegam como texto ISO ("2026-09-23" ou "2026-09-23T14:30:00").
  */
 
 export type StatusPreGuia = 'PENDENTE' | 'EM_ANALISE' | 'ATENCAO' | 'CONCLUIDA'
 
 export type OrigemPreGuia = 'BENEFICIARIO' | 'MEDICO'
-
-export interface Ocs {
-  id: number
-  contratoNum: string
-  nome: string
-  tipo: string | null
-  inicioVigencia: string | null
-  terminoVigencia: string | null
-  diasParaVencimento: number | null
-}
-
-export interface PreGuia {
-  id: number
-  status: StatusPreGuia
-  dataEmissao: string
-  encaminhamentoUrl: string | null
-  ocsId: number
-}
 
 export interface Beneficiario {
   nome: string
