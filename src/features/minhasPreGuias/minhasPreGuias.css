@@ -1,0 +1,54 @@
+.minhas-pre-guias h1 { margin: 0 0 16px; font-size: 22px; color: #1f3d2b; }
+.pre-guia-card {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+.pre-guia-card__topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.pre-guia-card__topo h2 { margin: 0; font-size: 17px; }
+.pre-guia-card__meta { color: #5b6b62; font-size: 14px; margin: 8px 0 4px; }
+.pre-guia-card__acoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.pre-guia-card__erro { color: #b3261e; margin: 10px 0 0; }
+.pre-guia-card__observacao {
+  background: #fff1e0;
+  border: 1px solid #f0a64a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.pre-guia-card__observacao p { margin: 4px 0 0; }
+.pre-guia-card__explicacao {
+  background: #eef2ef;
+  border: 1px solid #c9d3cc;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+}
+.pre-guia-card__explicacao p { margin: 4px 0 0; }
+
+.badge { padding: 3px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.badge-pendente { background: #fff3c4; color: #7a5b00; }
+.badge-em-analise { background: #d9e8ff; color: #1b4a94; }
+.badge-atencao { background: #ffe0bd; color: #9a4a00; }
+.badge-concluida { background: #d5f0dc; color: #1c6b34; }
+
+/* Os botoes .botao, .botao-primario e .botao-atencao ficam em styles/global.css */
+
+.skeleton-card {
+  height: 96px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f7f5 50%, #e8ede9 75%);
+  background-size: 200% 100%;
+  animation: brilho 1.2s infinite;
+}
+@keyframes brilho { to { background-position: -200% 0; } }
+.estado-vazio, .estado-erro { background: #fff; border: 1px dashed #b9c4bd; border-radius: 10px; padding: 24px; text-align: center; }
+
+@media (max-width: 600px) {
+  .pre-guia-card__topo { flex-direction: column; align-items: flex-start; }
+}

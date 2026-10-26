@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, get, postForm } from './http'
 
+/**
+ * Testes do cliente HTTP unico: prefixo /api, header de login simulado e conversao de erros.
+ */
+
 function respostaJson(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } })
 }
@@ -14,8 +18,21 @@ describe('http', () => {
 
     const dados = await get<{ status: string }>('/actuator/health')
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/actuator/health', {})
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/actuator/health')
     expect(dados.status).toBe('UP')
+  })
+
+  it('envia o header X-Usuario-Login com o login guardado no navegador', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(respostaJson({ status: 'UP' }))
+    vi.stubGlobal('fetch', fetchMock)
+    localStorage.setItem('X-Usuario-Login', '52998224725')
+
+    await get('/beneficiarios/me')
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit
+    expect(new Headers(init.headers).get('X-Usuario-Login')).toBe('52998224725')
+    localStorage.removeItem('X-Usuario-Login')
   })
 
   it('converte o ErrorResponse do backend em ApiError', async () => {
@@ -50,6 +67,7 @@ describe('http', () => {
 
     await postForm('/pre-guias', dados)
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/pre-guias', { method: 'POST', body: dados })
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/pre-guias')
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST', body: dados })
   })
 })

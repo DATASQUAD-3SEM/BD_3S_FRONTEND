@@ -50,20 +50,43 @@ async function lerErro(res: Response): Promise<ApiError> {
   }
 }
 
-async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
+/** Faz a chamada com o cabecalho de login e converte erros de rede/HTTP em ApiError. */
+async function enviar(caminho: string, init: RequestInit = {}): Promise<Response> {
+  // O login e gravado pela tela de login (shared/auth/sessao.ts). Sem login, o header nao vai e o backend responde 401.
+  let login: string | null
+  try {
+    login = localStorage.getItem('X-Usuario-Login')
+  } catch {
+    login = null
+  }
+
+  const headers = new Headers(init.headers || {})
+  if (login) headers.set('X-Usuario-Login', login)
+
   let res: Response
   try {
-    res = await fetch(`${API_BASE}${caminho}`, init)
+    res = await fetch(`${API_BASE}${caminho}`, { ...init, headers })
   } catch {
     throw new ApiError(0, 'Sem conexao com o servidor. Verifique a rede.', [], true)
   }
   if (!res.ok) throw await lerErro(res)
+  return res
+}
+
+async function request<T>(caminho: string, init: RequestInit = {}): Promise<T> {
+  const res = await enviar(caminho, init)
   if (res.status === 204) return undefined as T
   return (await res.json()) as T
 }
 
 export function get<T>(caminho: string): Promise<T> {
   return request<T>(caminho)
+}
+
+/** Download de arquivo binario (ex.: PDF da Guia). Mesmos cabecalhos e erros das demais chamadas. */
+export async function getBlob(caminho: string): Promise<Blob> {
+  const res = await enviar(caminho)
+  return res.blob()
 }
 
 export function post<T>(caminho: string, corpo: unknown): Promise<T> {
@@ -77,6 +100,28 @@ export function post<T>(caminho: string, corpo: unknown): Promise<T> {
 /** Envio de arquivo (multipart). NAO defina Content-Type: o navegador coloca sozinho. */
 export function postForm<T>(caminho: string, formulario: FormData): Promise<T> {
   return request<T>(caminho, { method: 'POST', body: formulario })
+}
+
+/** Alteração parcial de um recurso (ex.: só o telefone). Envia JSON, como o post. */
+export function patch<T>(caminho: string, corpo: unknown): Promise<T> {
+  return request<T>(caminho, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo),
+  })
+}
+
+/** Substituição de um recurso enviando arquivo (multipart). Usado no PUT da assinatura. */
+export function putForm<T>(caminho: string, formulario: FormData): Promise<T> {
+  return request<T>(caminho, { method: 'PUT', body: formulario })
+}
+
+export function put<T>(caminho: string, corpo: unknown): Promise<T> {
+  return request<T>(caminho, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo),
+  })
 }
 
 export function del(caminho: string): Promise<void> {

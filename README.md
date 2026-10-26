@@ -83,6 +83,43 @@ navegador  ->  /api/ocs  ->  [Vite proxy]  ->  http://localhost:8080/ocs
 Por isso funciona igual no PC, no celular e no tunel, e nao existe erro de CORS.
 Use sempre `get / post / postForm` de `src/shared/api/http.ts`. Detalhes: `docs/ARQUITETURA.md`.
 
+### Login e acesso por perfil
+
+- A tela `/login` confere o CPF (ou nome de usuario) e a senha no backend (`POST /auth/login`).
+- Depois do login, cada perfil so abre a propria area (`RotaProtegida`). Quem tenta abrir a area de outro
+  perfil volta para o inicio do seu. O botao **Sair**, na barra superior, encerra a sessao.
+- O backend continua conferindo o perfil em todos os endpoints (403), entao a protecao nao depende so da tela.
+
+### Acesso rapido para testes e gravacoes
+
+Com `npm run dev`, a tela de login mostra o cartao **Acesso rapido (demonstracao)**, com um botao por perfil.
+Cada botao faz o login normal com a conta de exemplo do seed (senha `senha123`):
+
+| Perfil | Login |
+|---|---|
+| Beneficiario | `52998224725` |
+| Medico FUSEX | `11144477735` |
+| Chefe do FUSEX | `chefe.fusex` |
+| Setor de Guias | `setor.guias` |
+| Recepcao | `recepcao` |
+
+Para trocar de usuario, clique em **Sair** e escolha outro perfil. Para testar dois perfis ao mesmo tempo,
+use uma janela anonima (cada janela guarda a propria sessao). O cartao fica oculto no build de producao;
+para exibi-lo em outro ambiente, defina `VITE_ACESSO_RAPIDO=true`.
+
+Roteiro sugerido para gravar o fluxo completo de uma Guia:
+
+1. **Beneficiario**: Nova pre-guia -> escolher a OCS, anexar o encaminhamento e enviar.
+2. **Setor de Guias**: Fila de pre-guias -> Abrir -> informar o numero, anexar o PDF da Guia e Concluir.
+3. **Medico FUSEX** e **Chefe do FUSEX**: Minhas informacoes -> cadastrar a assinatura (se ainda nao tiver);
+   depois Guias para assinar -> Assinar com minha assinatura.
+4. **Beneficiario**: Minhas pre-guias -> a pre-guia aparece como Concluida -> Baixar, Visualizar ou Imprimir.
+5. **Recepcao**: Guias para impressao -> buscar pelo nome, Prec CP ou numero da Guia -> Visualizar ou Imprimir.
+
+Fluxo de correcao: no passo 2, use **Requerer correcao** com uma observacao. A pre-guia criada pelo beneficiario
+volta para ele em Minhas pre-guias (Visualizar e corrigir); a criada pelo medico aparece para o medico em
+Corrigir pre-guias.
+
 ## 6. Onde fica cada coisa
 
 ```
@@ -90,13 +127,16 @@ src/
   App.tsx                    tabela de rotas
   shared/
     api/http.ts              cliente HTTP unico
-    types/domain.ts          tipos (Ocs, ProcedimentoExame, PreGuia...)
-    components/              AppLayout, EmConstrucao
+    api/erros.ts             leitura de erros da API
+    types/domain.ts          tipos (Ocs, PreGuia, StatusPreGuia...)
+    components/              AppLayout, EmConstrucao, StatusBadge
+    hooks/useDebounce.ts     atraso das buscas digitadas
+    utils/formatadores.ts    mascaras e formatacao (CPF, Prec CP, telefone, data)
   features/
     diagnostico/             tela "Teste de conexao"
-    ocs/api.ts               chamadas de OCS
-    preguia/
+    novaPreGuia/
       api.ts                 chamadas de pre-guia
+      ocsApi.ts              chamadas de OCS
       NovaPreGuiaPage/
         index.tsx            container magro (estado + junta os componentes)
         types.ts             estado compartilhado do formulario

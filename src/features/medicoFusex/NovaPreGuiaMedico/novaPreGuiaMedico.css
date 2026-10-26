@@ -1,0 +1,179 @@
+/* Nova pré-guia do médico (T2-FE, SCRUM-83) */
+
+.npg-secao {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.npg-titulo {
+  font-family: var(--fonte-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+  margin: 0 0 1rem;
+}
+
+.npg-rotulo {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  margin-bottom: 0.35rem;
+}
+
+.npg-input {
+  width: 100%;
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  background: #fff;
+  color: var(--texto);
+}
+
+.npg-linha-busca {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.npg-linha-busca .npg-input {
+  flex: 1;
+}
+
+.npg-card-leitura {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+  background: var(--verde-claro-2);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 0;
+}
+
+.npg-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.npg-campo dt {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.npg-campo dd {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+.npg-aviso,
+.npg-ajuda,
+.npg-rodape {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  margin: 0.75rem 0 0;
+}
+
+.npg-aviso {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.npg-lista {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.npg-lista li + li {
+  border-top: 1px solid var(--borda);
+}
+
+.npg-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  background: #fff;
+  color: var(--texto);
+  border: 0;
+  border-radius: 0;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  min-height: 0;
+}
+
+.npg-item:hover:not(:disabled) {
+  background: var(--verde-claro);
+}
+
+.npg-item:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.npg-item-nome {
+  font-weight: 600;
+}
+
+.npg-item-detalhe {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.npg-faixa-selecionada {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--verde-claro);
+  color: var(--verde-escuro);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.npg-botao-secundario {
+  background: #fff;
+  color: var(--verde);
+  border: 1px solid var(--borda);
+}
+
+.npg-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.npg-tabela th,
+.npg-tabela td {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--borda);
+}
+
+.npg-tabela th {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.npg-envio {
+  margin: 1rem 0;
+}
+
+@media (max-width: 720px) {
+  .npg-card-leitura {
+    grid-template-columns: 1fr;
+  }
+
+  .npg-linha-busca {
+    flex-direction: column;
+  }
+}

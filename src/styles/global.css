@@ -4,7 +4,7 @@
   --verde-claro: #e8f2ea;
   --verde-claro-2: #eef5f0;
   --texto: #1c1c1c;
-  --texto-suave: #6b7d72;
+  --texto-suave: #4f6156; /* escurecido para contraste AA sobre branco e verde claro */
   --fundo: #f6f7f6;
   --borda: #d5dad6;
   --erro: #a61b1b;
@@ -150,6 +150,36 @@ button {
   padding: 0.65rem 1.1rem; font-size: 1rem; cursor: pointer; min-height: 44px;
 }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
+button:focus-visible { outline: 3px solid #7fb08c; outline-offset: 2px; }
+
+/*
+ * Botoes padrao das telas (todas usam a paleta verde). Toda classe de botao que trocar o fundo
+ * DEVE definir tambem a cor do texto: a regra "button" acima deixa o texto branco.
+ * - .botao: secundario (fundo branco, texto e borda verde-escuro)
+ * - .botao-primario: acao principal (fundo verde-escuro, texto branco)
+ * - .botao-atencao: acao principal em cartoes de Atencao (mesmo verde, para manter a paleta)
+ */
+.botao {
+  background: #fff;
+  color: var(--verde-escuro);
+  border: 1px solid var(--verde);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+  cursor: pointer;
+}
+.botao:hover:not(:disabled) { background: var(--verde-claro); }
+.botao:disabled { opacity: 0.6; cursor: not-allowed; }
+.botao-primario,
+.botao-atencao {
+  background: var(--verde-escuro);
+  border-color: var(--verde-escuro);
+  color: #fff;
+}
+.botao-primario:hover:not(:disabled),
+.botao-atencao:hover:not(:disabled) { background: var(--verde); }
 input, select { font-size: 1rem; min-height: 44px; }
 
 /* ===== Card de dados do beneficiario (estilo "readonly rows") ===== */
@@ -376,4 +406,329 @@ input, select { font-size: 1rem; min-height: 44px; }
     font-size: 0.85rem;
     padding: 0.45rem 0.6rem;
   }
+}
+
+
+
+
+
+
+
+
+
+/* ===== Tela Minhas informações ===== */
+
+.minhas-info-page {
+  width: 100%;
+}
+
+.minhas-info-page > h1 {
+  margin-bottom: 1rem;
+}
+
+.info-card {
+  background: #fff;
+  border: 1px solid #e0e7e2;
+  border-radius: 11px;
+  padding: 1.15rem 1.45rem;
+  margin-bottom: 1rem;
+}
+
+.info-card h2 {
+  font-family: var(--fonte-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+  margin: 0 0 0.65rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2rem;
+  row-gap: 0.7rem;
+}
+
+.info-dado span {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  margin-bottom: 0.1rem;
+}
+
+.info-dado p {
+  margin: 0;
+  color: #303d35;
+  font-size: 0.88rem;
+}
+
+.info-observacao {
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  margin: 0.75rem 0 0;
+}
+
+/* Campos e rótulos */
+
+.info-campo {
+  min-width: 0;
+}
+
+.info-campo label {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  margin-bottom: 0.12rem;
+}
+
+.info-campo input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #bac8bf;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.info-campo input[aria-invalid='true'] {
+  border-color: #c62828;
+}
+
+.info-campo input:focus {
+  outline: 2px solid #739b80;
+  outline-offset: 1px;
+}
+
+/* Contato */
+
+.info-contato-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1rem;
+}
+
+.info-campo-erro {
+  color: #c62828;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0.35rem 0 0;
+}
+
+.info-mensagem-sucesso {
+  color: #1d6b33;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0.35rem 0 0;
+}
+
+/* Alteração de senha */
+
+.info-senha-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem 1.2rem;
+}
+
+.info-senha-grid .senha-atual {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.info-senha-grid .senha-nova {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.info-senha-grid .senha-confirmacao {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.info-botao-senha {
+  margin-top: 0.85rem;
+}
+
+/* Assinatura digital */
+
+.info-assinatura-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.info-assinatura-cabecalho h2 {
+  margin-bottom: 0.35rem;
+}
+
+.info-status-pendente {
+  display: inline-block;
+  border-radius: 999px;
+  background: #f8edc5;
+  color: #786400;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.info-status-cadastrada {
+  display: inline-block;
+  border-radius: 999px;
+  background: #d7efdc;
+  color: #1d6b33;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.info-assinatura-descricao {
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  margin: 0 0 0.6rem;
+}
+
+.info-quadro-assinatura {
+  position: relative;
+  width: 100%;
+  height: 152px;
+
+  border: 2px dashed #c4d2c8;
+  border-radius: 8px;
+  background: #fff;
+
+  box-sizing: border-box;
+  margin-bottom: 0.65rem;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.info-quadro-assinatura canvas {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.info-quadro-assinatura svg {
+  display: block;
+  width: 290px;
+  max-width: 80%;
+  height: 100px;
+  color: var(--verde-escuro);
+}
+
+.info-assinatura-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Botões claros, como os da referência */
+
+.info-card .info-botao-secundario {
+  background: #fff;
+  color: var(--verde-escuro);
+  border: 1px solid #ccd8d0;
+}
+
+.info-card .info-botao-secundario:hover {
+  background: var(--verde-claro-2);
+}
+
+/* Adaptação para celulares */
+
+@media (max-width: 600px) {
+  .info-card {
+    padding: 0.9rem;
+  }
+
+  .info-grid {
+    column-gap: 0.8rem;
+    row-gap: 0.8rem;
+  }
+
+  .info-contato-linha {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .info-contato-linha button {
+    width: 100%;
+  }
+
+  .info-senha-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .info-senha-grid .senha-atual,
+  .info-senha-grid .senha-nova,
+  .info-senha-grid .senha-confirmacao {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .info-assinatura-acoes button {
+    flex: 1 1 auto;
+  }
+}
+
+/* ===== T0-FE: layout por perfil ===== */
+.app-topbar .brand { color: inherit; text-decoration: none; }
+
+.app-usuario {
+  color: #d6ead9;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Cartões da escolha de perfil no Início geral */
+.card-botao { text-align: left; font: inherit; cursor: pointer; width: 100%; }
+
+/* Perfis com telas largas (tabelas, duas colunas): menu de 240px e área principal sem limite */
+@media (min-width: 721px) {
+  .app-shell[data-perfil]:not([data-perfil='BENEFICIARIO']) .app-body { grid-template-columns: 240px 1fr; }
+  .app-shell[data-perfil]:not([data-perfil='BENEFICIARIO']) .app-main { max-width: none; padding: 2rem 2.5rem; }
+}
+
+@media (max-width: 720px) {
+  .app-usuario { font-size: 0.8rem; }
+}
+
+/* Barra superior: nome do usuario e botao Sair */
+.app-topbar-direita {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.app-sair {
+  font: inherit;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 0.2rem 0.75rem;
+  cursor: pointer;
+}
+.app-sair:hover {
+  background: rgba(255, 255, 255, 0.12);
 }

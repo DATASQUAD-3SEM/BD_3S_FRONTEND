@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import ConexaoPage from './ConexaoPage'
 
+/**
+ * Testes da tela de diagnostico de conexao com o backend.
+ */
+
 afterEach(() => vi.unstubAllGlobals())
 
 describe('ConexaoPage', () => {
