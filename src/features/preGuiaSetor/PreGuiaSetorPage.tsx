@@ -23,7 +23,13 @@ interface Props {
 }
 
 type Carga = 'carregando' | 'pronto' | 'nao-encontrada' | 'erro';
-type Acao = 'correcao' | 'anexo' | 'conclusao';
+type Acao = 'correcao' | 'conclusao';
+
+/** PDF escolhido nesta sessao (ainda nao enviado) e o numero que esta no campo. `null` = so o rascunho salvo. */
+interface AnexoSessao {
+  arquivo: File | null;
+  numero: string;
+}
 
 /** Tela "Pré-guia {número}" do Setor de Guias (T4-FE). */
 export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFila }: Props) {
@@ -32,7 +38,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const [versao, setVersao] = useState(0);
   const [acao, setAcao] = useState<Acao | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
-  const [numeroDigitado, setNumeroDigitado] = useState<string | null>(null);
+  const [anexo, setAnexo] = useState<AnexoSessao | null>(null);
   const [urlEncaminhamento, setUrlEncaminhamento] = useState<string | null>(null);
   const [erroEncaminhamento, setErroEncaminhamento] = useState(false);
 
@@ -138,7 +144,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
     );
   }
 
-  const numeroGuia = numeroDigitado ?? detalhe.guiaRascunho?.numero ?? '';
+  const rascunho = detalhe.guiaRascunho;
+  const numeroGuia = anexo ? anexo.numero : (rascunho?.numero ?? '');
+  const arquivoNovo = anexo?.arquivo ?? null;
+  const nomeArquivo = anexo ? (arquivoNovo?.name ?? null) : (rascunho?.nomeArquivo ?? null);
   const situacao = situacaoDecisao(detalhe);
   const ativa = situacao === 'ativa';
   const origemMedico = detalhe.origem === 'MEDICO';
@@ -162,16 +171,19 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
       padrao: 'Não foi possível requerer a correção.',
     });
 
-  const anexarGuia = (pdf: File) =>
-    executar('anexo', () => api.anexarGuia(detalhe.id, numeroGuia.trim(), pdf), {
-      padrao: 'Não foi possível anexar a Guia.',
-    });
-
+  // Envia o PDF escolhido (se houver) com o numero do campo e depois conclui a Guia.
   const concluirGuia = () =>
-    executar('conclusao', () => api.concluirGuia(detalhe.id), {
-      padrao: 'Não foi possível concluir a Guia.',
-      conflito: 'Não foi possível concluir: confira se a Guia está anexada e se ela ainda não foi enviada.',
-    });
+    executar(
+      'conclusao',
+      async () => {
+        if (arquivoNovo) await api.anexarGuia(detalhe.id, numeroGuia.trim(), arquivoNovo);
+        await api.concluirGuia(detalhe.id);
+      },
+      {
+        padrao: 'Não foi possível concluir a Guia.',
+        conflito: 'Não foi possível concluir: confira se a Guia está anexada e se ela ainda não foi enviada.',
+      },
+    );
 
   return (
     <section className="pgs" aria-labelledby="pgs-titulo">
@@ -254,12 +266,18 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
             <fieldset className="pgs__fieldset" disabled={!ativa}>
               <ColunaGerarGuia
                 numero={numeroGuia}
-                rascunho={detalhe.guiaRascunho}
-                podeConcluir={podeConcluirGuia(detalhe, numeroGuia)}
-                enviandoAnexo={acao === 'anexo'}
+                nomeArquivo={nomeArquivo}
+                arquivoNovo={arquivoNovo}
+                podeConcluir={podeConcluirGuia({
+                  numero: numeroGuia,
+                  arquivoNovo: arquivoNovo !== null,
+                  rascunho,
+                })}
                 enviandoConclusao={acao === 'conclusao'}
-                onNumeroChange={setNumeroDigitado}
-                onAnexar={anexarGuia}
+                extrairNumeroGuia={api.extrairNumeroGuia}
+                onNumeroChange={(numero) => setAnexo({ arquivo: arquivoNovo, numero })}
+                onAnexar={(pdf, numero) => setAnexo({ arquivo: pdf, numero })}
+                onRemover={() => setAnexo({ arquivo: null, numero: '' })}
                 onConcluir={concluirGuia}
               />
             </fieldset>
