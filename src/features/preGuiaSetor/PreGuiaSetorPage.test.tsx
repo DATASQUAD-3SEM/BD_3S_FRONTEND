@@ -273,6 +273,39 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     expect(screen.queryByText('Informe o número da Guia antes de anexar o PDF')).not.toBeInTheDocument();
   });
 
+  it('com rascunho salvo, editar o número mantém o anexo salvo visível', async () => {
+    const usuario = userEvent.setup();
+    const api = mockApi();
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    renderizar(11, api);
+    await screen.findByText('Guia_202610701.pdf');
+
+    const campo = screen.getByLabelText('Número da Guia');
+    await usuario.clear(campo);
+    await usuario.type(campo, '202610702');
+
+    expect(screen.getByText('PDF anexado')).toBeInTheDocument();
+    expect(screen.getByText('Guia_202610701.pdf')).toBeInTheDocument();
+    // o rascunho guarda outro número: sem novo PDF não há como salvar a edição
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+  });
+
+  it('com rascunho salvo, remover o anexo esconde o rascunho e desabilita Concluir mesmo com o número salvo', async () => {
+    const usuario = userEvent.setup();
+    const api = mockApi();
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    renderizar(11, api);
+    await screen.findByText('Guia_202610701.pdf');
+
+    await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
+    expect(screen.queryByText('PDF anexado')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Número da Guia')).toHaveValue('');
+
+    await usuario.type(screen.getByLabelText('Número da Guia'), '202610701');
+    expect(screen.queryByText('PDF anexado')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+  });
+
   it('concluir a Guia mostra que ela foi enviada para assinatura', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
