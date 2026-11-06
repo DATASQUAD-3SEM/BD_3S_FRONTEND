@@ -29,6 +29,8 @@ type Acao = 'correcao' | 'conclusao';
 interface AnexoSessao {
   arquivo: File | null;
   numero: string;
+  /** Usuario removeu o anexo nesta sessao: esconde tambem o rascunho salvo. */
+  removido: boolean;
 }
 
 /** Tela "Pré-guia {número}" do Setor de Guias (T4-FE). */
@@ -147,7 +149,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const rascunho = detalhe.guiaRascunho;
   const numeroGuia = anexo ? anexo.numero : (rascunho?.numero ?? '');
   const arquivoNovo = anexo?.arquivo ?? null;
-  const nomeArquivo = anexo ? (arquivoNovo?.name ?? null) : (rascunho?.nomeArquivo ?? null);
+  // Editar o número não esconde o anexo salvo; só "Remover" esconde.
+  const nomeArquivo = anexo?.removido ? null : (arquivoNovo?.name ?? rascunho?.nomeArquivo ?? null);
+  // Com o anexo escondido, o rascunho não pode ser concluído.
+  const rascunhoVisivel = nomeArquivo ? rascunho : null;
   const situacao = situacaoDecisao(detalhe);
   const ativa = situacao === 'ativa';
   const origemMedico = detalhe.origem === 'MEDICO';
@@ -271,13 +276,13 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 podeConcluir={podeConcluirGuia({
                   numero: numeroGuia,
                   arquivoNovo: arquivoNovo !== null,
-                  rascunho,
+                  rascunho: rascunhoVisivel,
                 })}
                 enviandoConclusao={acao === 'conclusao'}
                 extrairNumeroGuia={api.extrairNumeroGuia}
-                onNumeroChange={(numero) => setAnexo({ arquivo: arquivoNovo, numero })}
-                onAnexar={(pdf, numero) => setAnexo({ arquivo: pdf, numero })}
-                onRemover={() => setAnexo({ arquivo: null, numero: '' })}
+                onNumeroChange={(numero) => setAnexo({ arquivo: arquivoNovo, numero, removido: anexo?.removido ?? false })}
+                onAnexar={(pdf, numero) => setAnexo({ arquivo: pdf, numero, removido: false })}
+                onRemover={() => setAnexo({ arquivo: null, numero: '', removido: true })}
                 onConcluir={concluirGuia}
               />
             </fieldset>
