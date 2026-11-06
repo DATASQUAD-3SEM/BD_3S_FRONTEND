@@ -2,7 +2,11 @@ import { ApiError } from '../../shared/api/http';
 import type { DetalhePreGuia, GuiaRascunhoDetalhe, PreGuiaSetorApi } from './types';
 
 /**
- * Implementacao em memoria do contrato T4-BE1 a T4-BE6 (detalhe, abertura, correcao, anexo e conclusao da Guia).
+ * Implementacao em memoria do contrato T4-BE1 a T4-BE6 (detalhe, abertura, correcao, anexo e conclusao da Guia)
+ * e da leitura do numero da Guia (T11-BE1).
+ *
+ * Leitura: por padrao devolve 202610678. Para ver os outros retornos, use o nome do arquivo:
+ * "sem-numero" (422), "invalido" (400), "limite" (429) e "falha" (500).
  */
 
 interface OpcoesMock {
@@ -108,6 +112,16 @@ export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreG
       if (detalhe.status !== 'EM_ANALISE') throw new ApiError(409, 'Pré-guia não está em análise');
       detalhe.status = 'ATENCAO';
       return { status: detalhe.status, dataDecisao: new Date().toISOString() };
+    },
+
+    async extrairNumeroGuia(pdf) {
+      await espera();
+      const nome = pdf.name.toLowerCase();
+      if (nome.includes('sem-numero')) throw new ApiError(422, 'Número não encontrado');
+      if (nome.includes('invalido')) throw new ApiError(400, 'Arquivo inválido');
+      if (nome.includes('limite')) throw new ApiError(429, 'Excesso de requisições');
+      if (nome.includes('falha')) throw new ApiError(500, 'Falha inesperada');
+      return { numeroGuia: '202610678' };
     },
 
     async anexarGuia(id, numeroGuia, pdf) {

@@ -73,10 +73,16 @@ export interface GuiaConcluidaResposta {
   assinaturasPendentes: string[];
 }
 
+/** Contrato T11-BE1: POST /setor-guias/extrair-numero-guia. Nao grava nada. */
+export interface ExtracaoNumeroGuia {
+  numeroGuia: string;
+}
+
 export interface PreGuiaSetorApi {
   detalhar(id: number): Promise<DetalhePreGuia>;
   abrir(id: number): Promise<AberturaResposta>;
   requererCorrecao(id: number, observacao: string): Promise<CorrecaoResposta>;
+  extrairNumeroGuia(pdf: File): Promise<ExtracaoNumeroGuia>;
   anexarGuia(id: number, numeroGuia: string, pdf: File): Promise<GuiaRascunhoResposta>;
   concluirGuia(id: number): Promise<GuiaConcluidaResposta>;
   buscarEncaminhamento(id: number): Promise<Blob>;
