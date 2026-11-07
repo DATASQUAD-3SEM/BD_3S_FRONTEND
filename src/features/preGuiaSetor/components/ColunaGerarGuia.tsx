@@ -1,54 +1,99 @@
 import { useRef, useState, type ChangeEvent } from 'react';
+import { ApiError } from '../../../shared/api/http';
 import { somenteDigitos } from '../../../shared/utils/formatadores';
-import { ehPdf } from '../regras';
-import type { GuiaRascunhoDetalhe } from '../types';
+import { validarPdfGuia } from '../regras';
+import type { ExtracaoNumeroGuia } from '../types';
+
+const TAMANHO_MAXIMO_NUMERO = 20;
+
+interface Mensagem {
+  tipo: 'ok' | 'aviso' | 'erro';
+  texto: string;
+  tentarNovamente?: boolean;
+}
 
 interface Props {
   numero: string;
-  rascunho: GuiaRascunhoDetalhe | null;
+  /** Nome do PDF salvo como rascunho ou escolhido nesta sessao. */
+  nomeArquivo: string | null;
+  /** PDF escolhido nesta sessao e ainda nao enviado. */
+  arquivoNovo: File | null;
   podeConcluir: boolean;
-  enviandoAnexo: boolean;
   enviandoConclusao: boolean;
+  extrairNumeroGuia: (pdf: File) => Promise<ExtracaoNumeroGuia>;
   onNumeroChange: (numero: string) => void;
-  onAnexar: (pdf: File) => void;
+  onAnexar: (pdf: File, numero: string) => void;
+  onRemover: () => void;
   onConcluir: () => void;
 }
 
-/** Coluna "Gerar a Guia" (T4-FE). */
+/** Coluna "Gerar a Guia" (T4-FE, ajustada em T11-FE). */
 export default function ColunaGerarGuia({
                                           numero,
-                                          rascunho,
+                                          nomeArquivo,
+                                          arquivoNovo,
                                           podeConcluir,
-                                          enviandoAnexo,
                                           enviandoConclusao,
+                                          extrairNumeroGuia,
                                           onNumeroChange,
                                           onAnexar,
+                                          onRemover,
                                           onConcluir,
                                         }: Props) {
   const seletor = useRef<HTMLInputElement>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const numeroPreenchido = numero.trim() !== '';
-  const numeroMudou = rascunho !== null && numeroPreenchido && numero.trim() !== rascunho.numero;
+  const [lendo, setLendo] = useState(false);
+  const [mensagem, setMensagem] = useState<Mensagem | null>(null);
+  const ocupado = lendo || enviandoConclusao;
 
-  const abrirSeletor = () => {
-    if (!numeroPreenchido) {
-      setErro('Informe o número da Guia antes de anexar o PDF.');
-      return;
+  // Le o numero do PDF. A leitura nao grava nada; o arquivo so fica anexado nesta tela.
+  const lerArquivo = async (pdf: File) => {
+    setLendo(true);
+    setMensagem(null);
+    try {
+      const { numeroGuia } = await extrairNumeroGuia(pdf);
+      onAnexar(pdf, numeroGuia);
+      setMensagem({ tipo: 'ok', texto: 'Número extraído automaticamente. Você pode editar se necessário.' });
+    } catch (erro) {
+      const status = erro instanceof ApiError ? erro.status : 500;
+      if (status === 400) {
+        // Arquivo rejeitado pelo servidor: nao substitui o anexo anterior.
+        setMensagem({ tipo: 'erro', texto: 'Arquivo inválido. Envie um PDF válido e tente novamente.' });
+        return;
+      }
+      onAnexar(pdf, '');
+      if (status === 422) {
+        setMensagem({ tipo: 'aviso', texto: 'Não foi possível ler o número automaticamente. Digite o número da Guia.' });
+      } else if (status === 429) {
+        setMensagem({
+          tipo: 'erro',
+          texto: 'Muitas tentativas de leitura. Aguarde um instante e tente novamente.',
+          tentarNovamente: true,
+        });
+      } else {
+        setMensagem({ tipo: 'erro', texto: 'Não foi possível ler o PDF agora. Tente novamente.', tentarNovamente: true });
+      }
+    } finally {
+      setLendo(false);
     }
-    setErro(null);
-    seletor.current?.click();
   };
 
-  const aoEscolher = (evento: ChangeEvent<HTMLInputElement>) => {
+  const abrirSeletor = () => seletor.current?.click();
+
+  const aoEscolher = async (evento: ChangeEvent<HTMLInputElement>) => {
     const arquivo = evento.target.files?.[0];
     evento.target.value = ''; // permite escolher o mesmo arquivo de novo
     if (!arquivo) return;
-    if (!ehPdf(arquivo)) {
-      setErro('Envie um arquivo PDF.');
+    const problema = await validarPdfGuia(arquivo);
+    if (problema) {
+      setMensagem({ tipo: 'erro', texto: problema });
       return;
     }
-    setErro(null);
-    onAnexar(arquivo);
+    await lerArquivo(arquivo);
+  };
+
+  const aoRemover = () => {
+    setMensagem(null);
+    onRemover();
   };
 
   return (
@@ -56,32 +101,30 @@ export default function ColunaGerarGuia({
       <h3>Gerar a Guia</h3>
       <p className="pgs__pequeno">Emita a Guia no SIRE e anexe o PDF.</p>
 
-      <label htmlFor="pgs-numero-guia">Número da Guia</label>
-      <input
-        id="pgs-numero-guia"
-        className="pgs__campo"
-        type="text"
-        inputMode="numeric"
-        autoComplete="off"
-        value={numero}
-        onChange={(e) => onNumeroChange(somenteDigitos(e.target.value))}
-      />
-      {numeroMudou && (
-        <p className="pgs__pequeno">Anexe a Guia novamente para salvar o novo número.</p>
-      )}
-
-      {rascunho ? (
+      {nomeArquivo ? (
         <div className="pgs__anexo">
-          <span className="pgs__pill">Anexada</span>
-          <span className="pgs__nome-arquivo">{rascunho.nomeArquivo}</span>
-          <button type="button" className="botao" disabled={enviandoAnexo} onClick={abrirSeletor}>
-            {enviandoAnexo ? 'Enviando…' : 'Trocar'}
+          <span className="pgs__pill">PDF anexado</span>
+          <span className="pgs__nome-arquivo">{nomeArquivo}</span>
+          <button type="button" className="botao" disabled={ocupado} onClick={abrirSeletor}>
+            {lendo ? 'Lendo arquivo...' : 'Trocar arquivo'}
+          </button>
+          <button
+            type="button"
+            className="pgs__lixeira"
+            aria-label="Remover anexo"
+            title="Remover anexo"
+            disabled={ocupado}
+            onClick={aoRemover}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+            </svg>
           </button>
         </div>
       ) : (
         <div>
-          <button type="button" className="botao" disabled={enviandoAnexo} onClick={abrirSeletor}>
-            {enviandoAnexo ? 'Enviando…' : 'Anexar Guia'}
+          <button type="button" className="botao" disabled={ocupado} onClick={abrirSeletor}>
+            {lendo ? 'Lendo arquivo...' : 'Anexar Guia'}
           </button>
         </div>
       )}
@@ -95,12 +138,37 @@ export default function ColunaGerarGuia({
         tabIndex={-1}
         onChange={aoEscolher}
       />
-      {erro && <p role="alert" className="pgs__erro">{erro}</p>}
+
+      {mensagem && (
+        <div>
+          <p role={mensagem.tipo === 'erro' ? 'alert' : 'status'} className={`pgs__leitura pgs__leitura--${mensagem.tipo}`}>
+            {mensagem.texto}
+          </p>
+          {mensagem.tentarNovamente && arquivoNovo && (
+            <button type="button" className="botao" disabled={ocupado} onClick={() => lerArquivo(arquivoNovo)}>
+              Tentar novamente
+            </button>
+          )}
+        </div>
+      )}
+
+      <label htmlFor="pgs-numero-guia">Número da Guia</label>
+      <input
+        id="pgs-numero-guia"
+        className="pgs__campo"
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        disabled={lendo}
+        value={lendo ? '' : numero}
+        onChange={(e) => onNumeroChange(somenteDigitos(e.target.value).slice(0, TAMANHO_MAXIMO_NUMERO))}
+      />
+      {lendo && <p className="pgs__pequeno">Lendo o número da Guia...</p>}
 
       <button
         type="button"
         className="botao botao-primario pgs__concluir"
-        disabled={!podeConcluir || enviandoConclusao}
+        disabled={!podeConcluir || ocupado}
         onClick={onConcluir}
       >
         {enviandoConclusao ? 'Concluindo…' : 'Concluir'}
