@@ -1,12 +1,12 @@
 import { useChefe } from '../chefeFusex/ChefeContext'
 import { useMedico } from '../medicoFusex/MedicoContext'
 import { USAR_MOCK_GUIAS_ASSINAR } from './api'
-import { criarGuiasParaAssinarMock } from './api.mock'
+import { criarGuiasParaAssinarMock, GUIAS_CHEFE_MOCK } from './api.mock'
 import GuiasParaAssinarPage from './GuiasParaAssinarPage'
 
 // Criados uma vez, fora do render: a pagina usa o api como dependencia de efeito
 const apiMedicoMock = USAR_MOCK_GUIAS_ASSINAR ? criarGuiasParaAssinarMock('MEDICO') : undefined
-const apiChefeMock = USAR_MOCK_GUIAS_ASSINAR ? criarGuiasParaAssinarMock('CHEFE') : undefined
+const apiChefeMock = USAR_MOCK_GUIAS_ASSINAR ? criarGuiasParaAssinarMock('CHEFE', GUIAS_CHEFE_MOCK) : undefined
 
 export function GuiasParaAssinarMedico() {
   const { medico, carregando } = useMedico()

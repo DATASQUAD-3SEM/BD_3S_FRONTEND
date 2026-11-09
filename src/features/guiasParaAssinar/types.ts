@@ -18,8 +18,19 @@ export interface AssinaturaRegistrada {
 
 export type ModoPdfAssinatura = 'visualizar' | 'baixar'
 
+export interface FalhaAssinaturaLote {
+  guiaId: number
+  motivo: string
+}
+
+export interface AssinaturaLoteResultado {
+  assinadas: number[]
+  falhas: FalhaAssinaturaLote[]
+}
+
 export interface GuiasParaAssinarApi {
   listar(): Promise<GuiaParaAssinar[]>
   obterPdf(guiaId: number, modo: ModoPdfAssinatura): Promise<Blob>
   assinar(guiaId: number): Promise<AssinaturaRegistrada>
+  assinarLote(guiaIds: number[]): Promise<AssinaturaLoteResultado>
 }
