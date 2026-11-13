@@ -9,6 +9,7 @@ import NovaPreGuiaPage from './features/novaPreGuia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
 import MinhasPreGuiasRota from './features/minhasPreGuias/MinhasPreGuiasRota'
 import CorrecaoPreGuiaRota from './features/minhasPreGuias/correcao/CorrecaoPreGuiaRota'
+import MinhasGuiasPage from './features/minhasGuias/MinhasGuiasPage'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
         <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
+        <Route path="/guias" element={<MinhasGuiasPage />} />
         <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
       </Route>
 

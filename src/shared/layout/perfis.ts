@@ -42,12 +42,13 @@ export const INICIO_PERFIL: Record<Perfil, string> = {
 
 /** Menu lateral de cada perfil: mostra so os itens do perfil logado. */
 export const MENUS: Record<Perfil, ItemMenu[]> = {
-  BENEFICIARIO: [
-    { to: '/beneficiario/inicio', label: 'Início' },
-    { to: '/pre-guias/nova', label: 'Nova pré-guia' },
-    { to: '/pre-guias', label: 'Minhas pré-guias' },
-    { to: '/beneficiario/minhas-informacoes', label: 'Minhas informações' },
-  ],
+   BENEFICIARIO: [
+     { to: '/beneficiario/inicio', label: 'Início' },
+     { to: '/pre-guias/nova', label: 'Nova pré-guia' },
+     { to: '/pre-guias', label: 'Minhas pré-guias' },
+     { to: '/guias', label: 'Minhas guias' },
+     { to: '/beneficiario/minhas-informacoes', label: 'Minhas informações' },
+   ],
   MEDICO: [
     { to: '/medico/inicio', label: 'Início' },
     { to: '/medico/nova-pre-guia', label: 'Nova pré-guia' },
