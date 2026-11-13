@@ -1,0 +1,117 @@
+.mg-pagina h1 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  color: #1f3d2b;
+}
+
+/* Filtro "Mostrar" acima da lista */
+.mg-filtro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #5b6b62;
+  font-size: 14px;
+}
+.mg-filtro select {
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  min-height: 40px;
+}
+
+/* Lista de cartões */
+.mg-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Cartão de uma guia */
+.mg-card {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  overflow-wrap: anywhere;
+}
+.mg-card__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mg-card__topo h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #1f3d2b;
+}
+.mg-card__meta {
+  color: #5b6b62;
+  font-size: 14px;
+  margin: 8px 0 4px;
+}
+.mg-card__procedimentos {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+  font-size: 14px;
+  color: #303d35;
+}
+.mg-card__procedimentos li + li {
+  margin-top: 2px;
+}
+.mg-card__texto {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #1f2a24;
+}
+.mg-card__contadores {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #1f2a24;
+}
+
+/* Cores dos badges da situação (base ".badge" vem de styles/global.css) */
+.badge-nao-enviada  { background: #fff3c4; color: #7a5b00; } /* amarelo */
+.badge-enviada      { background: #d9e8ff; color: #1b4a94; } /* azul */
+.badge-em-execucao  { background: #e7defa; color: #4b2d92; } /* roxo */
+.badge-realizada    { background: #d5f0dc; color: #1c6b34; } /* verde */
+.badge-encerrada    { background: #e5e7eb; color: #374151; } /* cinza */
+.badge-vencida      { background: #fadcdc; color: #8a1c12; } /* vermelho */
+
+/* Estados da página */
+.mg-skeleton {
+  height: 120px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f7f5 50%, #e8ede9 75%);
+  background-size: 200% 100%;
+  animation: mg-brilho 1.2s infinite;
+}
+@keyframes mg-brilho {
+  to { background-position: -200% 0; }
+}
+
+.mg-estado-vazio,
+.mg-estado-erro {
+  background: #fff;
+  border: 1px dashed #b9c4bd;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  color: #5b6b62;
+}
+.mg-estado-erro button {
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .mg-card__topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
