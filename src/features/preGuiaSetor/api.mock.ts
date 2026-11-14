@@ -1,22 +1,12 @@
 import { ApiError } from '../../shared/api/http';
 import type { DetalhePreGuia, GuiaRascunhoDetalhe, PreGuiaSetorApi } from './types';
 
-/**
- * Implementacao em memoria do contrato T4-BE1 a T4-BE6 (detalhe, abertura, correcao, anexo e conclusao da Guia)
- * e da leitura do numero da Guia (T11-BE1).
- *
- * Leitura: por padrao devolve 202610678. Para ver os outros retornos, use o nome do arquivo:
- * "sem-numero" (422), "invalido" (400), "limite" (429) e "falha" (500).
- */
-
 interface OpcoesMock {
-  /** Atraso simulado em ms. Nos testes use 0. */
   atrasoMs?: number;
 }
 
 const LIMITE_OBSERVACAO = 500;
 
-/** Pré-guias de exemplo. A 0411 é a da arte: origem MÉDICO, sem anexo, em análise. */
 function sementes(): DetalhePreGuia[] {
   return [
     {
@@ -24,7 +14,12 @@ function sementes(): DetalhePreGuia[] {
       numero: '0411',
       status: 'EM_ANALISE',
       origem: 'MEDICO',
-      beneficiario: { nome: 'Marta Souza Lima', precCp: '45810020001', faixaEtaria: '41 a 50' },
+      beneficiario: {
+        nome: 'Marta Souza Lima',
+        cpf: '52998224725', // T17-FE
+        precCp: '45810020001',
+        faixaEtaria: '41 a 50'
+      },
       ocsNome: 'Laboratório Exemplo',
       procedimentos: [
         { codigoTuss: '40304361', nome: 'Hemograma completo' },
@@ -40,7 +35,12 @@ function sementes(): DetalhePreGuia[] {
       numero: '0412',
       status: 'PENDENTE',
       origem: 'BENEFICIARIO',
-      beneficiario: { nome: 'Antonio Carlos Ferreira', precCp: '45872213300', faixaEtaria: '51 a 60' },
+      beneficiario: {
+        nome: 'Antonio Carlos Ferreira',
+        cpf: '11144477735', // T17-FE
+        precCp: '45872213300',
+        faixaEtaria: '51 a 60'
+      },
       ocsNome: 'Hospital Exemplo',
       procedimentos: [{ codigoTuss: '40304361', nome: 'Hemograma completo' }],
       medicoCriador: null,
@@ -53,7 +53,12 @@ function sementes(): DetalhePreGuia[] {
       numero: '0409',
       status: 'ATENCAO',
       origem: 'BENEFICIARIO',
-      beneficiario: { nome: 'Antonio Carlos Ferreira', precCp: '45872213300', faixaEtaria: '51 a 60' },
+      beneficiario: {
+        nome: 'Antonio Carlos Ferreira',
+        cpf: '11144477735', // T17-FE
+        precCp: '45872213300',
+        faixaEtaria: '51 a 60'
+      },
       ocsNome: 'Laboratório Exemplo',
       procedimentos: [{ codigoTuss: '40301630', nome: 'Glicose' }],
       medicoCriador: null,
@@ -66,7 +71,12 @@ function sementes(): DetalhePreGuia[] {
       numero: '0401',
       status: 'CONCLUIDA',
       origem: 'BENEFICIARIO',
-      beneficiario: { nome: 'Antonio Carlos Ferreira', precCp: '45872213300', faixaEtaria: '51 a 60' },
+      beneficiario: {
+        nome: 'Antonio Carlos Ferreira',
+        cpf: '11144477735', // T17-FE
+        precCp: '45872213300',
+        faixaEtaria: '51 a 60'
+      },
       ocsNome: 'Hospital Exemplo',
       procedimentos: [{ codigoTuss: '40301630', nome: 'Glicose' }],
       medicoCriador: null,
@@ -77,7 +87,6 @@ function sementes(): DetalhePreGuia[] {
   ];
 }
 
-/** Implementa o mesmo contrato do cliente real, com estado em memória (para testes e demonstração). */
 export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreGuiaSetorApi {
   const registros = new Map(sementes().map((d) => [d.id, d]));
   const espera = () => (atrasoMs > 0 ? new Promise<void>((resolve) => setTimeout(resolve, atrasoMs)) : Promise.resolve());
