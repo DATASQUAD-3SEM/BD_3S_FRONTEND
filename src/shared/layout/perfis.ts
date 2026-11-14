@@ -46,6 +46,7 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
     { to: '/beneficiario/inicio', label: 'Início' },
     { to: '/pre-guias/nova', label: 'Nova pré-guia' },
     { to: '/pre-guias', label: 'Minhas pré-guias' },
+    { to: '/guias', label: 'Minhas guias' },
     { to: '/beneficiario/minhas-informacoes', label: 'Minhas informações' },
   ],
   MEDICO: [
