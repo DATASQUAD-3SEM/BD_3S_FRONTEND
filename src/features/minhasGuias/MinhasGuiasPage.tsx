@@ -23,6 +23,7 @@ const FINALIZADAS: SituacaoGuia[] = ['REALIZADA', 'ENCERRADA', 'VENCIDA']
 
 type Estado = 'carregando' | 'pronto' | 'erro'
 
+//Página "Minhas guias": busca as guias do beneficiário e controla carregando, erro, vazio e filtro
 export default function MinhasGuiasPage() {
   const [estado, setEstado] = useState<Estado>('carregando')
   const [guias, setGuias] = useState<GuiaDoBeneficiario[]>([])
