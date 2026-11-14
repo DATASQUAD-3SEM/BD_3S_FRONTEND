@@ -128,7 +128,7 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  // Conteúdo do cartão 
+  // Conteúdo do cartão
   it('chama GET /guias/minhas (sem parâmetros)', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
@@ -161,7 +161,7 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(within(cartao).getByText(/40301630 · Glicose · 1 sessão autorizada/)).toBeInTheDocument()
   })
 
-  // Situações (badge + texto) 
+  // Situações (badge + texto)
   it.each([
     ['202610706', 'Não enviada', 'Guia pronta. Envie para a OCS para que ela possa solicitar as sessões.'],
     ['202610705', 'Enviada', 'Enviada à OCS. Aguardando a OCS solicitar a assinatura de uma sessão.'],
@@ -203,7 +203,7 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(screen.queryByText(/A validade venceu/)).not.toBeInTheDocument()
   })
 
-  // Filtro "Mostrar" 
+  // Filtro "Mostrar"
   it('o filtro abre em "Todas" e mostra as seis guias', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
@@ -256,7 +256,7 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(screen.getByText('Nenhuma guia finalizada.')).toBeInTheDocument()
   })
 
-  // Escopo (FE-2/3/4 ainda não) 
+  // Escopo (FE-2/3/4 ainda não)
   it('não mostra os botões das próximas tasks (Enviar / Assinar sessões / Ver guia)', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
