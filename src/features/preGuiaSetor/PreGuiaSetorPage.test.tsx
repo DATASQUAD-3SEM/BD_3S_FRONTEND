@@ -27,7 +27,10 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     renderizar(11);
     expect(await screen.findByRole('heading', { name: 'Pré-guia 0411' })).toBeInTheDocument();
     expect(screen.getByText('Em análise')).toBeInTheDocument();
+
+    // Dados do beneficiário
     expect(screen.getByText('Marta Souza Lima')).toBeInTheDocument();
+    expect(screen.getByText('529.982.247-25')).toBeInTheDocument(); // T17-FE: CPF formatado
     expect(screen.getByText('458100200-01')).toBeInTheDocument();
     expect(screen.getByText('41 a 50')).toBeInTheDocument();
     expect(screen.getByText('Laboratório Exemplo')).toBeInTheDocument();
@@ -165,7 +168,6 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await screen.findByText('Guia_12.pdf');
     extrair.mockClear();
 
-    // applyAccept: false envia o arquivo mesmo fora do accept, como um usuario que escolhe "Todos os arquivos"
     const jpeg = new File(['\xff\xd8\xff'], 'foto.jpg', { type: 'image/jpeg' });
     await userEvent.setup({ applyAccept: false }).upload(screen.getByLabelText('Escolher PDF da Guia'), jpeg);
     expect(await screen.findByRole('alert')).toHaveTextContent('Arquivo inválido. Envie um PDF.');
