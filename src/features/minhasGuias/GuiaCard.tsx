@@ -17,6 +17,7 @@ interface Contadores {
   expiradas: number
 }
 
+//Conta as sessões da guia por situação; base do texto e dos contadores do cartão
 function contarSessoes(guia: GuiaDoBeneficiario): Contadores {
   return {
     total: guia.sessoes.length,
@@ -26,6 +27,7 @@ function contarSessoes(guia: GuiaDoBeneficiario): Contadores {
   }
 }
 
+//Texto principal do cartão, conforme a situação da guia (T18-FE-1)
 function textoPrincipal(guia: GuiaDoBeneficiario, c: Contadores): string {
   switch (guia.situacao) {
     case 'NAO_ENVIADA':
@@ -52,15 +54,15 @@ export default function GuiaCard({ guia }: Props) {
     <article className="mg-card" aria-label={`Guia nº ${guia.numero}`}>
       <header className="mg-card__topo">
         <h2>
-          Guia nº {guia.numero} · {guia.ocs.nome}
+          Guia nº {guia.numero} · {guia.ocs}
         </h2>
         <SituacaoGuiaBadge situacao={guia.situacao} />
       </header>
 
-       <p className="mg-card__meta">
+      <p className="mg-card__meta">
         Válida até {formatarData(guia.validadeAte) || '—'}
-         {guia.dataEnvio && <> · Enviada à OCS em {formatarData(guia.dataEnvio)}</>}
-       </p>
+        {guia.dataEnvio && <> · Enviada à OCS em {formatarData(guia.dataEnvio)}</>}
+      </p>
 
       {guia.procedimentos.length > 0 && (
         <ul className="mg-card__procedimentos">
