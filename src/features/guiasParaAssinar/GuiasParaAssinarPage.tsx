@@ -33,7 +33,12 @@ const NOTA_PERFIL: Record<PapelAssinatura, string> = {
 }
 
 const LIMITE_LOTE = 50
-const MOTIVO_JA_ASSINADA_CHEFE = 'ja_assinada_pelo_chefe'
+
+const MOTIVOS_QUE_SAEM_DA_LISTA = new Map<string, string>([
+  ['ja_assinada_por_medico', 'já assinada por outro médico do FUSEX'],
+  ['ja_assinada_pelo_chefe', 'já assinada pelo chefe do FUSEX'],
+  ['concluida', 'já está concluída'],
+])
 
 function textoPendencias(pendencias: PapelAssinatura[]): string {
   const faltaChefe = pendencias.includes('CHEFE')
@@ -93,7 +98,6 @@ export default function GuiasParaAssinarPage({
   const mestreRef = useRef<HTMLInputElement>(null)
 
   const selecionada = guias.find((g) => g.guiaId === selecionadaId) ?? null
-  const lote = perfil === 'CHEFE'
   const mestreMarcado = guias.length > 0 && selecionadas.length === guias.length
   const mestreParcial = selecionadas.length > 0 && !mestreMarcado
   const acimaDoLimite = selecionadas.length > LIMITE_LOTE
@@ -187,12 +191,13 @@ export default function GuiasParaAssinarPage({
       })
       setSelecionadas([])
     } else {
-      const removidas = resultado.falhas.filter((f) => f.motivo === MOTIVO_JA_ASSINADA_CHEFE)
-      const mantidas = resultado.falhas.filter((f) => f.motivo !== MOTIVO_JA_ASSINADA_CHEFE)
+      const removidas = resultado.falhas.filter((f) => MOTIVOS_QUE_SAEM_DA_LISTA.has(f.motivo))
+      const mantidas = resultado.falhas.filter((f) => !MOTIVOS_QUE_SAEM_DA_LISTA.has(f.motivo))
 
       const partes = [`${resultado.assinadas.length} assinada(s).`]
       for (const falha of removidas) {
-        partes.push(`Guia ${nomeDe(falha.guiaId)}: já assinada pelo chefe do FUSEX. Ela saiu da sua lista.`)
+        const descricao = MOTIVOS_QUE_SAEM_DA_LISTA.get(falha.motivo)
+        partes.push(`Guia ${nomeDe(falha.guiaId)}: ${descricao}. Ela saiu da sua lista.`)
       }
       if (mantidas.length > 0) {
         partes.push(`${mantidas.length} com falha continua(m) selecionada(s).`)
@@ -303,77 +308,73 @@ export default function GuiasParaAssinarPage({
       {estado === 'pronto' && guias.length > 0 && (
         <div className="gpa__painel">
           <div className="gpa__coluna">
-            {lote && (
-              <div className="gpa__lote">
-                <label className="gpa__mestre">
-                  <input
-                    ref={mestreRef}
-                    type="checkbox"
-                    checked={mestreMarcado}
-                    disabled={loteEnviando}
-                    onChange={alternarTodas}
-                  />
-                  Selecionar todas
-                </label>
+            <div className="gpa__lote">
+              <label className="gpa__mestre">
+                <input
+                  ref={mestreRef}
+                  type="checkbox"
+                  checked={mestreMarcado}
+                  disabled={loteEnviando}
+                  onChange={alternarTodas}
+                />
+                Selecionar todas
+              </label>
 
-                {selecionadas.length > 0 && (
-                  <div className="gpa__barra-lote" role="region" aria-label="Ação em lote">
-                    <span className="gpa__contador">{selecionadas.length} guia(s) selecionada(s)</span>
-                    {acimaDoLimite && (
-                      <p className="gpa__aviso">Selecione até 50 guias por vez.</p>
-                    )}
-                    <div className="gpa__acoes">
-                      <button
-                        type="button"
-                        className="botao gpa__botao-lote"
-                        disabled={!podeAssinarLote}
-                        onClick={() => void assinarLote()}
-                      >
-                        {loteEnviando ? 'Assinando...' : 'Assinar selecionadas'}
-                      </button>
-                      <button type="button" className="botao" disabled={loteEnviando} onClick={limparSelecao}>
-                        Limpar seleção
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {loteMensagem && (
-                  <div className="gpa__lote-resultado">
-                    <p
-                      role={loteMensagem.tipo === 'erro' ? 'alert' : 'status'}
-                      className={loteMensagem.tipo === 'erro' ? 'estado-erro' : 'gpa__sucesso'}
+              {selecionadas.length > 0 && (
+                <div className="gpa__barra-lote" role="region" aria-label="Ação em lote">
+                  <span className="gpa__contador">{selecionadas.length} guia(s) selecionada(s)</span>
+                  {acimaDoLimite && (
+                    <p className="gpa__aviso">Selecione até 50 guias por vez.</p>
+                  )}
+                  <div className="gpa__acoes">
+                    <button
+                      type="button"
+                      className="botao gpa__botao-lote"
+                      disabled={!podeAssinarLote}
+                      onClick={() => void assinarLote()}
                     >
-                      {loteMensagem.texto}
-                    </p>
-                    {loteErroRepetivel && (
-                      <button
-                        type="button"
-                        className="botao botao-primario"
-                        disabled={loteEnviando}
-                        onClick={() => void assinarLote()}
-                      >
-                        Tentar novamente
-                      </button>
-                    )}
+                      {loteEnviando ? 'Assinando...' : 'Assinar selecionadas'}
+                    </button>
+                    <button type="button" className="botao" disabled={loteEnviando} onClick={limparSelecao}>
+                      Limpar seleção
+                    </button>
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+
+              {loteMensagem && (
+                <div className="gpa__lote-resultado">
+                  <p
+                    role={loteMensagem.tipo === 'erro' ? 'alert' : 'status'}
+                    className={loteMensagem.tipo === 'erro' ? 'estado-erro' : 'gpa__sucesso'}
+                  >
+                    {loteMensagem.texto}
+                  </p>
+                  {loteErroRepetivel && (
+                    <button
+                      type="button"
+                      className="botao botao-primario"
+                      disabled={loteEnviando}
+                      onClick={() => void assinarLote()}
+                    >
+                      Tentar novamente
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             <ul className="gpa__lista" aria-label="Guias para assinar">
               {guias.map((guia) => (
                 <li key={guia.guiaId} className="gpa__cartao">
-                  {lote && (
-                    <input
-                      type="checkbox"
-                      className="gpa__check"
-                      aria-label={`Selecionar Guia ${guia.numero}`}
-                      checked={selecionadas.includes(guia.guiaId)}
-                      disabled={loteEnviando}
-                      onChange={() => alternarGuia(guia.guiaId)}
-                    />
-                  )}
+                  <input
+                    type="checkbox"
+                    className="gpa__check"
+                    aria-label={`Selecionar Guia ${guia.numero}`}
+                    checked={selecionadas.includes(guia.guiaId)}
+                    disabled={loteEnviando}
+                    onChange={() => alternarGuia(guia.guiaId)}
+                  />
                   <div className="gpa__cartao-corpo">
                     <button
                       type="button"
