@@ -25,7 +25,7 @@ function sessao(
 
 const guias: GuiaDoBeneficiario[] = [
   {
-    id: 6, numero: '202610706', ocs: { id: 1, nome: 'Laboratório Exemplo' },
+    id: 6, numero: '202610706', ocs: 'Laboratório Exemplo',
     validadeAte: '2026-12-28', dataEnvio: null, situacao: 'NAO_ENVIADA',
     procedimentos: [
       { codDgp: '40304361', descricao: 'Hemograma completo', quantidade: 2 },
@@ -34,13 +34,13 @@ const guias: GuiaDoBeneficiario[] = [
     sessoes: [],
   },
   {
-    id: 5, numero: '202610705', ocs: { id: 2, nome: 'Hospital Exemplo' },
+    id: 5, numero: '202610705', ocs: 'Hospital Exemplo',
     validadeAte: '2026-12-20', dataEnvio: '2026-11-02T09:30:00', situacao: 'ENVIADA',
     procedimentos: [{ codDgp: '40302040', descricao: 'Colesterol total', quantidade: 1 }],
     sessoes: [sessao(501, '40302040', 1, 'DISPONIVEL')],
   },
   {
-    id: 4, numero: '202610704', ocs: { id: 1, nome: 'Laboratório Exemplo' },
+    id: 4, numero: '202610704', ocs: 'Laboratório Exemplo',
     validadeAte: '2026-12-15', dataEnvio: '2026-10-25T14:00:00', situacao: 'EM_EXECUCAO',
     procedimentos: [{ codDgp: '40304361', descricao: 'Hemograma completo', quantidade: 2 }],
     sessoes: [
@@ -49,13 +49,13 @@ const guias: GuiaDoBeneficiario[] = [
     ],
   },
   {
-    id: 3, numero: '202610703', ocs: { id: 2, nome: 'Hospital Exemplo' },
+    id: 3, numero: '202610703', ocs: 'Hospital Exemplo',
     validadeAte: '2026-11-30', dataEnvio: '2026-10-10T11:00:00', situacao: 'REALIZADA',
     procedimentos: [{ codDgp: '40302040', descricao: 'Colesterol total', quantidade: 1 }],
     sessoes: [sessao(301, '40302040', 1, 'ASSINADA', '2026-10-11T09:00:00', '2026-10-11T09:20:00')],
   },
   {
-    id: 2, numero: '202610702', ocs: { id: 1, nome: 'Laboratório Exemplo' },
+    id: 2, numero: '202610702', ocs: 'Laboratório Exemplo',
     validadeAte: '2026-10-30', dataEnvio: '2026-09-15T10:00:00', situacao: 'ENCERRADA',
     procedimentos: [{ codDgp: '40304361', descricao: 'Hemograma completo', quantidade: 3 }],
     sessoes: [
@@ -65,7 +65,7 @@ const guias: GuiaDoBeneficiario[] = [
     ],
   },
   {
-    id: 1, numero: '202610701', ocs: { id: 2, nome: 'Hospital Exemplo' },
+    id: 1, numero: '202610701', ocs: 'Hospital Exemplo',
     validadeAte: '2026-10-15', dataEnvio: '2026-09-01T10:00:00', situacao: 'VENCIDA',
     procedimentos: [{ codDgp: '40301630', descricao: 'Glicose', quantidade: 1 }],
     sessoes: [sessao(101, '40301630', 1, 'EXPIRADA', '2026-09-05T10:00:00')],
