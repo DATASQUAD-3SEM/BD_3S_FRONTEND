@@ -5,7 +5,7 @@ import ColunaCorrecao from './components/ColunaCorrecao';
 import ColunaGerarGuia from './components/ColunaGerarGuia';
 import ViewerEncaminhamento from './components/ViewerEncaminhamento';
 import { formatarExame, textoCriadaPor } from './formatadores';
-import { formatarPrecCp } from '../../shared/utils/formatadores';
+import { formatarPrecCp, formatarCpf } from '../../shared/utils/formatadores'; // T17-FE
 import {
   ehNaoEncontrada,
   mensagemDeErro,
@@ -25,15 +25,12 @@ interface Props {
 type Carga = 'carregando' | 'pronto' | 'nao-encontrada' | 'erro';
 type Acao = 'correcao' | 'conclusao';
 
-/** PDF escolhido nesta sessao (ainda nao enviado) e o numero que esta no campo. `null` = so o rascunho salvo. */
 interface AnexoSessao {
   arquivo: File | null;
   numero: string;
-  /** Usuario removeu o anexo nesta sessao: esconde tambem o rascunho salvo. */
   removido: boolean;
 }
 
-/** Tela "Pré-guia {número}" do Setor de Guias (T4-FE). */
 export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFila }: Props) {
   const [detalhe, setDetalhe] = useState<DetalhePreGuia | null>(null);
   const [carga, setCarga] = useState<Carga>('carregando');
@@ -48,7 +45,6 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const statusAtual = detalhe?.status;
   const temEncaminhamento = detalhe?.encaminhamento != null;
 
-  // Carrega a pré-guia; "versao" força uma nova leitura depois de cada ação.
   useEffect(() => {
     let ativo = true;
     api
@@ -66,7 +62,6 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
     };
   }, [api, id, versao]);
 
-  // Ao carregar uma pré-guia Pendente, abre a análise (T4-BE3). O backend é idempotente.
   useEffect(() => {
     if (idAtual === undefined || statusAtual !== 'PENDENTE') return;
     let ativo = true;
@@ -83,7 +78,6 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
     };
   }, [api, idAtual, statusAtual]);
 
-  // Baixa o encaminhamento (foto ou PDF) como blob e libera a URL ao sair.
   useEffect(() => {
     if (idAtual === undefined || !temEncaminhamento) return;
     let ativo = true;
@@ -149,15 +143,12 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const rascunho = detalhe.guiaRascunho;
   const numeroGuia = anexo ? anexo.numero : (rascunho?.numero ?? '');
   const arquivoNovo = anexo?.arquivo ?? null;
-  // Editar o número não esconde o anexo salvo; só "Remover" esconde.
   const nomeArquivo = anexo?.removido ? null : (arquivoNovo?.name ?? rascunho?.nomeArquivo ?? null);
-  // Com o anexo escondido, o rascunho não pode ser concluído.
   const rascunhoVisivel = nomeArquivo ? rascunho : null;
   const situacao = situacaoDecisao(detalhe);
   const ativa = situacao === 'ativa';
   const origemMedico = detalhe.origem === 'MEDICO';
 
-  // Executa uma ação, mostra o erro se houver e sempre recarrega a pré-guia.
   const executar = async (tipo: Acao, operacao: () => Promise<unknown>, opcoes: OpcoesMensagemErro) => {
     setAcao(tipo);
     setErroAcao(null);
@@ -176,7 +167,6 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
       padrao: 'Não foi possível requerer a correção.',
     });
 
-  // Envia o PDF escolhido (se houver) com o numero do campo e depois conclui a Guia.
   const concluirGuia = () =>
     executar(
       'conclusao',
@@ -189,6 +179,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
         conflito: 'Não foi possível concluir: confira se a Guia está anexada e se ela ainda não foi enviada.',
       },
     );
+
+  // T17-FE: Tratamento seguro para o CPF
+  const cpfLimpo = detalhe.beneficiario.cpf?.replace(/\D/g, '');
+  const cpfFormatado = (cpfLimpo && cpfLimpo.length === 11) ? formatarCpf(cpfLimpo) : '—';
 
   return (
     <section className="pgs" aria-labelledby="pgs-titulo">
@@ -207,6 +201,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
               <div>
                 <dt>Beneficiário</dt>
                 <dd>{detalhe.beneficiario.nome}</dd>
+              </div>
+              <div>
+                <dt>CPF</dt>
+                <dd>{cpfFormatado}</dd>
               </div>
               <div>
                 <dt>Prec CP</dt>
