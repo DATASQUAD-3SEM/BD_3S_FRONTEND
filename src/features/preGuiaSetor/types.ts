@@ -6,6 +6,7 @@ import type { OrigemPreGuia, StatusPreGuia } from '../filaPreGuias/types';
 
 export interface BeneficiarioDetalhe {
   nome: string;
+  cpf?: string | null; // T17-FE: CPF do beneficiário
   precCp: string;
   faixaEtaria: string;
 }
