@@ -57,10 +57,10 @@ export default function GuiaCard({ guia }: Props) {
         <SituacaoGuiaBadge situacao={guia.situacao} />
       </header>
 
-      <p className="mg-card__meta">
-        Válida até {formatarData(guia.validadeAte)}
-        {guia.dataEnvio && <> · Enviada à OCS em {formatarData(guia.dataEnvio)}</>}
-      </p>
+       <p className="mg-card__meta">
+        Válida até {formatarData(guia.validadeAte) || '—'}
+         {guia.dataEnvio && <> · Enviada à OCS em {formatarData(guia.dataEnvio)}</>}
+       </p>
 
       {guia.procedimentos.length > 0 && (
         <ul className="mg-card__procedimentos">

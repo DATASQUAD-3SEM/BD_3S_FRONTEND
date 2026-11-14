@@ -33,18 +33,18 @@ export interface SessaoDaGuia {
   dataAssinatura: string | null
 }
 
-export interface GuiaDoBeneficiario {
-  id: number
-  numero: string
-  ocs: OcsDaGuia
-  /** Data-limite lida do PDF ("NÃO RECEBER APÓS"). Formato AAAA-MM-DD. */
-  validadeAte: string
-  /** ISO datetime. Nulo enquanto a guia está NAO_ENVIADA. */
-  dataEnvio: string | null
-  situacao: SituacaoGuia
-  procedimentos: ProcedimentoDaGuia[]
-  sessoes: SessaoDaGuia[]
-}
+ export interface GuiaDoBeneficiario {
+   id: number
+   numero: string
+   ocs: OcsDaGuia
+   /** Data-limite lida do PDF ("NÃO RECEBER APÓS"). Formato AAAA-MM-DD. Null em guias antigas até a T16-BE3 rodar o backfill. */
+   validadeAte: string | null
+   /** ISO datetime. Nulo enquanto a guia está NAO_ENVIADA. */
+   dataEnvio: string | null
+   situacao: SituacaoGuia
+   procedimentos: ProcedimentoDaGuia[]
+   sessoes: SessaoDaGuia[]
+ }
 
 export interface MinhasGuiasApi {
   /** GET /guias/minhas — o backend já devolve da mais recente para a mais antiga. */
