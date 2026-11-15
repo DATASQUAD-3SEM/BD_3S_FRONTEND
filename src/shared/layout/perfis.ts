@@ -3,7 +3,7 @@
  *
  * O login fica em shared/auth (tela /login e RotaProtegida): cada area so abre para o perfil dono dela.
  */
-export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'RECEPCAO'
+export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'RECEPCAO' | 'OCS'
 
 export interface ItemMenu {
   to: string
@@ -20,6 +20,7 @@ export const LOGIN_PADRAO: Record<Perfil, string> = {
   CHEFE_FUSEX: 'chefe.fusex',
   SETOR_GUIAS: 'setor.guias',
   RECEPCAO: 'recepcao',
+  OCS: 'ocs.laboratorio',
 }
 
 /** Nome do perfil na barra superior. */
@@ -29,6 +30,7 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
   CHEFE_FUSEX: 'Chefe do FUSEX',
   SETOR_GUIAS: 'Setor de Guias',
   RECEPCAO: 'Recepção',
+  OCS: 'OCS',
 }
 
 /** Página inicial de cada perfil. */
@@ -38,6 +40,7 @@ export const INICIO_PERFIL: Record<Perfil, string> = {
   CHEFE_FUSEX: '/chefe/guias-para-assinar',
   SETOR_GUIAS: '/setor-guias/fila',
   RECEPCAO: '/recepcao/guias-para-impressao',
+  OCS: '/ocs/espelho',
 }
 
 /** Menu lateral de cada perfil: mostra so os itens do perfil logado. */
@@ -64,4 +67,9 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
   ],
   SETOR_GUIAS: [{ to: '/setor-guias/fila', label: 'Fila de pré-guias' }],
   RECEPCAO: [{ to: '/recepcao/guias-para-impressao', label: 'Guias para impressão' }],
+  OCS: [
+    { to: '/ocs/guias-recebidas', label: 'Guias recebidas' },
+    { to: '/ocs/guias-finalizadas', label: 'Guias Finalizadas' },
+    { to: '/ocs/espelho', label: 'Espelho' },
+  ],
 }

@@ -22,6 +22,7 @@ export const CONTAS_DEMONSTRACAO: ContaDemonstracao[] = [
   { perfil: 'CHEFE_FUSEX', login: 'chefe.fusex', descricao: 'Assina Guias e gerencia beneficiários e médicos.' },
   { perfil: 'SETOR_GUIAS', login: 'setor.guias', descricao: 'Analisa as pré-guias e anexa as Guias do SIRE.' },
   { perfil: 'RECEPCAO', login: 'recepcao', descricao: 'Imprime Guias concluídas.' },
+  { perfil: 'OCS', login: 'ocs.laboratorio', descricao: 'Monta o espelho com as guias finalizadas e envia ao FUSEX.' },
 ]
 
 export function acessoRapidoHabilitado(): boolean {
