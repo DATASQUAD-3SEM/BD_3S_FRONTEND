@@ -16,3 +16,30 @@ export interface Espelho {
   itens: ItemEspelho[]
   valorTotal: number
 }
+
+export type SituacaoFinalizada = 'REALIZADA' | 'ENCERRADA'
+
+export type VinculoEspelho = 'DISPONIVEL' | 'EM_CONSTRUCAO' | 'ENVIADA'
+
+export interface ProcedimentoFinalizado {
+  codDgp: string
+  descricao: string
+  quantidade: number
+  quantidadeAssinadas: number
+}
+
+export interface GuiaFinalizada {
+  id: number
+  numero: string
+  beneficiario: { nome: string; precCp: string }
+  procedimentos: ProcedimentoFinalizado[]
+  dataEnvio: string
+  situacao: SituacaoFinalizada
+  vinculo: VinculoEspelho
+  idEspelho: number | null
+}
+
+export interface ValorProcedimento {
+  codDgp: string
+  valorSessao: number
+}
