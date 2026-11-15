@@ -427,5 +427,38 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
       ).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
     });
+
+    it('com rascunho salvo, os exames gravados voltam na tabela', async () => {
+      const api = mockApi();
+      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+      renderizar(11, api);
+      await screen.findByText('Guia_202610701.pdf');
+
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('41001109');
+      expect(screen.getByLabelText('Descrição do exame 1')).toHaveValue('TC - Abdome superior');
+      expect(screen.getByLabelText('Quantidade do exame 1')).toHaveValue('1');
+      expect(screen.getByLabelText('Cod DGP do exame 2')).toHaveValue('41001110');
+      expect(screen.getByLabelText('Quantidade do exame 2')).toHaveValue('2');
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
+    });
+
+    it('remover o anexo limpa a tabela, e um novo anexo não reaproveita os exames antigos', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('41001109');
+
+      await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
+      expect(screen.queryByText('Exames na Guia')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Cod DGP do exame 1')).not.toBeInTheDocument();
+
+      await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_sem-exames.pdf'));
+      expect(
+        await screen.findByText('Não foi possível ler os exames desta Guia. Digite os exames impressos na Guia.'),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('');
+      expect(screen.queryByDisplayValue('TC - Abdome superior')).not.toBeInTheDocument();
+    });
   });
 });
