@@ -36,6 +36,7 @@ const LOGINS: Record<Perfil, string> = {
   CHEFE_FUSEX: 'chefe.fusex',
   SETOR_GUIAS: 'setor.guias',
   RECEPCAO: 'recepcao',
+  OCS: 'ocs.laboratorio',
 }
 
 function entrarComo(perfil: Perfil) {
