@@ -8,7 +8,7 @@ import { espelhoApi } from './api'
 import type { Espelho } from './types'
 
 vi.mock('./api', () => ({
-  espelhoApi: { buscarEmConstrucao: vi.fn() },
+  espelhoApi: { buscarEmConstrucao: vi.fn(), listarHistorico: vi.fn().mockResolvedValue([]) },
 }))
 
 const vazio: Espelho = { id: null, dataInicio: null, dataEnvio: null, itens: [], valorTotal: 0 }

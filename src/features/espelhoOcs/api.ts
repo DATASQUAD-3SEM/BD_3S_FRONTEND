@@ -21,6 +21,9 @@ export const espelhoApi = {
   enviar(): Promise<Espelho> {
     return post<Espelho>('/ocs/espelho/enviar', {})
   },
+  listarHistorico(): Promise<Espelho[]> {
+    return get<Espelho[]>('/ocs/espelho/historico')
+  },
 }
 
 export const guiasFinalizadasApi = {
