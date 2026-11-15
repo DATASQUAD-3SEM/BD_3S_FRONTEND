@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import StatusBadge from '../../shared/components/StatusBadge';
 import { preGuiaSetorApi } from './api';
 import ColunaCorrecao from './components/ColunaCorrecao';
@@ -6,6 +6,14 @@ import ColunaGerarGuia from './components/ColunaGerarGuia';
 import ViewerEncaminhamento from './components/ViewerEncaminhamento';
 import { formatarExame, textoCriadaPor } from './formatadores';
 import { formatarPrecCp } from '../../shared/utils/formatadores';
+import {
+  erroDeExames,
+  examesIguaisAoSalvo,
+  examesValidos,
+  linhasDeExames,
+  paraExamesGuia,
+  type LinhaExame,
+} from './examesGuia';
 import {
   ehNaoEncontrada,
   mensagemDeErro,
@@ -43,6 +51,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const [anexo, setAnexo] = useState<AnexoSessao | null>(null);
   const [urlEncaminhamento, setUrlEncaminhamento] = useState<string | null>(null);
   const [erroEncaminhamento, setErroEncaminhamento] = useState(false);
+  // Tabela de exames (T22-FE1): so e preenchida na primeira carga, para nao perder edicoes em recargas.
+  const [linhas, setLinhas] = useState<LinhaExame[]>([]);
+  const [erroExames, setErroExames] = useState<string | null>(null);
+  const examesIniciados = useRef(false);
 
   const idAtual = detalhe?.id;
   const statusAtual = detalhe?.status;
@@ -56,6 +68,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
       .then((dados) => {
         if (!ativo) return;
         setDetalhe(dados);
+        if (!examesIniciados.current) {
+          examesIniciados.current = true;
+          setLinhas(linhasDeExames(dados.guiaRascunho?.exames));
+        }
         setCarga('pronto');
       })
       .catch((erro: unknown) => {
@@ -177,11 +193,24 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
     });
 
   // Envia o PDF escolhido (se houver) com o numero do campo e depois conclui a Guia.
-  const concluirGuia = () =>
-    executar(
+  // Com PDF novo, envia o PDF, o numero e os exames (T22-BE1) e depois conclui a Guia (T22-BE2).
+  // Um 422 sobre os exames aparece abaixo da tabela e a Guia nao e concluida.
+  const concluirGuia = () => {
+    setErroExames(null);
+    return executar(
       'conclusao',
       async () => {
-        if (arquivoNovo) await api.anexarGuia(detalhe.id, numeroGuia.trim(), arquivoNovo);
+        if (arquivoNovo) {
+          try {
+            await api.anexarGuia(detalhe.id, numeroGuia.trim(), arquivoNovo, paraExamesGuia(linhas));
+          } catch (erro) {
+            if (erroDeExames(erro)) {
+              setErroExames(mensagemDeErro(erro, { padrao: 'Confira os exames da Guia.' }));
+              return;
+            }
+            throw erro;
+          }
+        }
         await api.concluirGuia(detalhe.id);
       },
       {
@@ -189,6 +218,16 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
         conflito: 'Não foi possível concluir: confira se a Guia está anexada e se ela ainda não foi enviada.',
       },
     );
+  };
+
+  // Exames (T22-FE1): sem PDF novo, o PUT nao pode ser enviado (o backend exige o PDF), entao
+  // alterar a tabela de um rascunho salvo so e gravado depois de anexar o PDF de novo.
+  const examesOk = examesValidos(linhas);
+  const examesMudaramSemArquivo =
+    arquivoNovo === null && rascunhoVisivel !== null && !examesIguaisAoSalvo(linhas, rascunhoVisivel.exames);
+  const avisoConclusao = examesMudaramSemArquivo
+    ? 'Para salvar as alterações dos exames, anexe o PDF da Guia de novo.'
+    : null;
 
   return (
     <section className="pgs" aria-labelledby="pgs-titulo">
@@ -273,16 +312,34 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 numero={numeroGuia}
                 nomeArquivo={nomeArquivo}
                 arquivoNovo={arquivoNovo}
-                podeConcluir={podeConcluirGuia({
-                  numero: numeroGuia,
-                  arquivoNovo: arquivoNovo !== null,
-                  rascunho: rascunhoVisivel,
-                })}
+                linhasExames={linhas}
+                onExamesChange={(novas) => {
+                  setErroExames(null);
+                  setLinhas(novas);
+                }}
+                erroExames={erroExames}
+                avisoConclusao={avisoConclusao}
+                podeConcluir={
+                  podeConcluirGuia({
+                    numero: numeroGuia,
+                    arquivoNovo: arquivoNovo !== null,
+                    rascunho: rascunhoVisivel,
+                  }) &&
+                  examesOk &&
+                  !examesMudaramSemArquivo
+                }
                 enviandoConclusao={acao === 'conclusao'}
                 extrairNumeroGuia={api.extrairNumeroGuia}
                 onNumeroChange={(numero) => setAnexo({ arquivo: arquivoNovo, numero, removido: anexo?.removido ?? false })}
-                onAnexar={(pdf, numero) => setAnexo({ arquivo: pdf, numero, removido: false })}
-                onRemover={() => setAnexo({ arquivo: null, numero: '', removido: true })}
+                onAnexar={(pdf, numero, exames) => {
+                  setAnexo({ arquivo: pdf, numero, removido: false });
+                  setLinhas(linhasDeExames(exames));
+                  setErroExames(null);
+                }}
+                onRemover={() => {
+                  setAnexo({ arquivo: null, numero: '', removido: true });
+                  setLinhas([]);
+                }}
                 onConcluir={concluirGuia}
               />
             </fieldset>
