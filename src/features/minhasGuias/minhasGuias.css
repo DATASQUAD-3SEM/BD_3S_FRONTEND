@@ -115,3 +115,119 @@
     align-items: flex-start;
   }
 }
+
+/* Botão "Enviar para a OCS" (só em Não enviada) */
+.mg-card__acao-primaria {
+  margin-top: 12px;
+  font: inherit;
+  font-weight: 600;
+  background: #1f3d2b;
+  color: #fff;
+  border: 1px solid #1f3d2b;
+  border-radius: 8px;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+}
+
+.mg-card__acao-primaria:hover:not(:disabled) {
+  background: #2a523a;
+  border-color: #2a523a;
+}
+
+.mg-card__acao-primaria:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Painel de confirmação, dentro do cartão */
+.mg-confirmacao {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #eef5f0;
+  border: 1px solid #b9c4bd;
+  border-radius: 10px;
+}
+
+.mg-confirmacao__titulo {
+  margin: 0 0 10px;
+  color: #1f3d2b;
+  font-size: 15px;
+}
+
+.mg-confirmacao__dados {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.mg-confirmacao__dados > div {
+  display: contents;
+}
+
+.mg-confirmacao__dados dt {
+  color: #5b6b62;
+  font-size: 13px;
+}
+
+.mg-confirmacao__dados dd {
+  margin: 0;
+  color: #1f2a24;
+  overflow-wrap: anywhere;
+}
+
+.mg-confirmacao__erro {
+  margin: 0 0 12px;
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.mg-confirmacao__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botões do painel de confirmação */
+.mg-botao {
+  font: inherit;
+  font-weight: 600;
+  background: #fff;
+  color: #1f3d2b;
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.mg-botao:hover:not(:disabled) {
+  background: #f1f5f2;
+}
+
+.mg-botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mg-botao--primario {
+  background: #1f3d2b;
+  color: #fff;
+  border-color: #1f3d2b;
+}
+
+.mg-botao--primario:hover:not(:disabled) {
+  background: #2a523a;
+  border-color: #2a523a;
+}
+
+/* Mensagem de sucesso, depois do envio */
+.mg-sucesso {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: #eaf5ee;
+  border: 1px solid #b9dcc6;
+  border-radius: 8px;
+  color: #1d3d30;
+  font-size: 14px;
+}

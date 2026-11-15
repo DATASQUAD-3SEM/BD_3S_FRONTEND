@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import GuiaCard from './GuiaCard'
 import { minhasGuiasApi } from './api'
-import type { GuiaDoBeneficiario, SituacaoGuia } from './types'
+import type { GuiaDoBeneficiario, MinhasGuiasApi, SituacaoGuia } from './types'
 import './minhasGuias.css'
 
 /**
@@ -23,8 +23,12 @@ const FINALIZADAS: SituacaoGuia[] = ['REALIZADA', 'ENCERRADA', 'VENCIDA']
 
 type Estado = 'carregando' | 'pronto' | 'erro'
 
+interface Props {
+  api?: MinhasGuiasApi
+}
+
 //Página "Minhas guias": busca as guias do beneficiário e controla carregando, erro, vazio e filtro
-export default function MinhasGuiasPage() {
+export default function MinhasGuiasPage({ api = minhasGuiasApi }: Props) {
   const [estado, setEstado] = useState<Estado>('carregando')
   const [guias, setGuias] = useState<GuiaDoBeneficiario[]>([])
   const [filtro, setFiltro] = useState<FiltroMostrar>('todas')
@@ -32,7 +36,7 @@ export default function MinhasGuiasPage() {
 
   useEffect(() => {
     let cancelado = false
-    minhasGuiasApi
+      api
       .listar()
       .then((lista) => {
         if (cancelado) return
@@ -46,12 +50,19 @@ export default function MinhasGuiasPage() {
     return () => {
       cancelado = true
     }
-  }, [tentativa])
+}, [api, tentativa])
 
   function tentarNovamente() {
     setEstado('carregando')
     setTentativa((n) => n + 1)
   }
+
+  // Atualiza uma guia na lista pelo id, preservando a posição original.
+  function atualizarGuia(guiaAtualizada: GuiaDoBeneficiario) {
+  setGuias((atuais) =>
+    atuais.map((g) => (g.id === guiaAtualizada.id ? guiaAtualizada : g)),
+  )
+}
 
   const filtradas = useMemo(() => {
     if (filtro === 'todas') return guias
@@ -106,11 +117,17 @@ export default function MinhasGuiasPage() {
               {filtro === 'em-andamento' ? 'Nenhuma guia em andamento.' : 'Nenhuma guia finalizada.'}
             </p>
           ) : (
-            <div className="mg-lista">
-              {filtradas.map((guia) => (
-                <GuiaCard key={guia.id} guia={guia} />
-              ))}
-            </div>
+            
+          <div className="mg-lista">
+            {filtradas.map((guia) => (
+              <GuiaCard
+               key={guia.id}
+               guia={guia}
+               api={api}
+               onAtualizar={atualizarGuia}
+             />
+            ))}
+          </div>
           )}
         </>
       )}

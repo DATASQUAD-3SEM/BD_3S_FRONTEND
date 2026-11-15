@@ -72,6 +72,67 @@ const guias: GuiaDoBeneficiario[] = [
   },
 ]
 
+// Guia 6 do mock (Não enviada) já atualizada como o backend devolveria após o POST.
+function guiaAtualizada(): GuiaDoBeneficiario {
+  const base = guias.find((g) => g.id === 6)!
+  return {
+    ...base,
+    situacao: 'ENVIADA',
+    dataEnvio: '2026-11-15T10:00:00',
+    sessoes: [
+      sessao(601, '40304361', 1, 'DISPONIVEL'),
+      sessao(602, '40304361', 2, 'DISPONIVEL'),
+      sessao(603, '40301630', 1, 'DISPONIVEL'),
+    ],
+  }
+}
+
+// Mock de fetch que responde à lista (GET) e ao envio (POST com sucesso).
+function stubbearListaEEnvio(resposta: GuiaDoBeneficiario = guiaAtualizada()) {
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      return Promise.resolve(respostaJson(guias))
+    }
+    if (/^\/api\/guias\/\d+\/envio$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(respostaJson(resposta))
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+// Mock de fetch em que o POST responde 409 (guia já enviada, por exemplo).
+function stubbearEnvioComErro() {
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      return Promise.resolve(respostaJson(guias))
+    }
+    if (/^\/api\/guias\/\d+\/envio$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(
+        respostaJson(
+          {
+            status: 409,
+            erro: 'Conflict',
+            mensagem: 'Esta guia ja foi enviada à OCS',
+            detalhes: [],
+            timestamp: '',
+          },
+          409,
+        ),
+      )
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+const chamadasPost = () =>
+  fetchMock.mock.calls.filter(([, init]) => init?.method === 'POST')
+
 let fetchMock: ReturnType<typeof vi.fn>
 
 function stubbearLista(lista: GuiaDoBeneficiario[]) {
@@ -260,8 +321,120 @@ describe('T18-FE-1 · Minhas guias', () => {
   it('não mostra os botões das próximas tasks (Enviar / Assinar sessões / Ver guia)', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
-    expect(screen.queryByRole('button', { name: /Enviar para a OCS/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Assinar sessões/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Ver guia/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('T18-FE-2 · Enviar guia à OCS', () => {
+  it('o botão Enviar para a OCS aparece só em guia Não enviada', async () => {
+    stubbearListaEEnvio()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    expect(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    ).toBeInTheDocument()
+
+    for (const numero of ['202610705', '202610704', '202610703', '202610702', '202610701']) {
+      expect(
+        within(cartaoDe(numero)).queryByRole('button', { name: 'Enviar para a OCS' }),
+      ).not.toBeInTheDocument()
+    }
+  })
+
+  it('clicar em Enviar para a OCS abre a confirmação com os dados da guia', async () => {
+    stubbearListaEEnvio()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    )
+
+    const painel = screen.getByRole('region', { name: 'Confirmação de envio' })
+    expect(within(painel).getByText('Enviar a guia nº 202610706 para a OCS?')).toBeInTheDocument()
+    expect(within(painel).getByText(/Hemograma completo \(2\) · Glicose \(1\)/)).toBeInTheDocument()
+    expect(within(painel).getByText('Laboratório Exemplo')).toBeInTheDocument()
+    expect(within(painel).getByText('3')).toBeInTheDocument() // sessões autorizadas
+    expect(within(painel).getByRole('button', { name: 'Confirmar envio' })).toBeInTheDocument()
+    expect(within(painel).getByRole('button', { name: 'Cancelar' })).toBeInTheDocument()
+  })
+
+  it('Cancelar fecha a confirmação sem enviar nada', async () => {
+    stubbearListaEEnvio()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(screen.queryByRole('region', { name: 'Confirmação de envio' })).not.toBeInTheDocument()
+    expect(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    ).toBeInTheDocument()
+    expect(chamadasPost()).toHaveLength(0)
+  })
+
+  it('Confirmar envia no endpoint certo, mostra a mensagem e muda o badge para Enviada', async () => {
+    stubbearListaEEnvio()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar envio' }))
+
+    // Chamada POST no endpoint certo
+    const post = chamadasPost()
+    expect(post).toHaveLength(1)
+    expect(post[0][0]).toBe('/api/guias/6/envio')
+
+    // Mensagem de sucesso
+    expect(await screen.findByText('Guia nº 202610706 enviada à OCS')).toBeInTheDocument()
+
+    // Cartão atualizado: badge Enviada, sem botão Enviar, texto novo, linha "Enviada à OCS em"
+    const cartao = cartaoDe('202610706')
+    expect(within(cartao).getByText('Enviada')).toHaveClass('badge-enviada')
+    expect(
+      within(cartao).queryByRole('button', { name: 'Enviar para a OCS' }),
+    ).not.toBeInTheDocument()
+    expect(
+      within(cartao).getByText(/Enviada à OCS\. Aguardando a OCS solicitar/),
+    ).toBeInTheDocument()
+    expect(within(cartao).getByText(/Enviada à OCS em 15\/11\/2026/)).toBeInTheDocument()
+
+    // Painel de confirmação fechou
+    expect(screen.queryByRole('region', { name: 'Confirmação de envio' })).not.toBeInTheDocument()
+  })
+
+  it('erro no envio mantém a guia Não enviada, mostra a mensagem e o painel permite tentar de novo', async () => {
+    stubbearEnvioComErro()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Enviar para a OCS' }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar envio' }))
+
+    // Mensagem de erro dentro do painel
+    const painel = screen.getByRole('region', { name: 'Confirmação de envio' })
+    expect(await within(painel).findByRole('alert')).toHaveTextContent(
+      'Não foi possível enviar a guia. Tente novamente.',
+    )
+    // Botão Confirmar volta a ficar habilitado (permite tentar de novo)
+    expect(within(painel).getByRole('button', { name: 'Confirmar envio' })).toBeEnabled()
+
+    // Guia continua Não enviada
+    const cartao = cartaoDe('202610706')
+     expect(within(cartao).getByText('Não enviada')).toHaveClass('badge-nao-enviada')
+     expect(
+      within(cartao).queryByRole('button', { name: 'Enviar para a OCS' }),
+    ).not.toBeInTheDocument()
+
   })
 })
