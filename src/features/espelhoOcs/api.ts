@@ -18,6 +18,9 @@ export const espelhoApi = {
   removerGuias(guiaIds: number[]): Promise<Espelho> {
     return delComCorpo<Espelho>('/ocs/espelho/guias', guiaIds)
   },
+  enviar(): Promise<Espelho> {
+    return post<Espelho>('/ocs/espelho/enviar', {})
+  },
 }
 
 export const guiasFinalizadasApi = {

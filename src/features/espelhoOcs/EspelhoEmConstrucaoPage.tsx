@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import EmConstrucao from '../../shared/components/EmConstrucao'
 import { mensagemDeErro } from '../../shared/api/erros'
 import CartaoGuiaEspelho from './CartaoGuiaEspelho'
+import ConfirmarEnvio from './ConfirmarEnvio'
 import ConfirmarRemocao from './ConfirmarRemocao'
 import { espelhoApi } from './api'
 import { formatarMoeda } from './formatadores'
@@ -21,7 +21,9 @@ export default function EspelhoEmConstrucaoPage() {
   const [confirmandoRemocao, setConfirmandoRemocao] = useState(false)
   const [removendo, setRemovendo] = useState(false)
   const [erroRemocao, setErroRemocao] = useState<string | null>(null)
-  const [envioSolicitado, setEnvioSolicitado] = useState(false)
+  const [confirmandoEnvio, setConfirmandoEnvio] = useState(false)
+  const [enviando, setEnviando] = useState(false)
+  const [erroEnvio, setErroEnvio] = useState<string | null>(null)
   const [tentativa, setTentativa] = useState(0)
 
   useEffect(() => {
@@ -91,6 +93,29 @@ export default function EspelhoEmConstrucaoPage() {
     const atualizado = await espelhoApi.editarValores(guiaId, valores)
     setEspelho(atualizado)
     setEditandoGuiaId(null)
+  }
+
+  function abrirEnvio() {
+    setConfirmandoRemocao(false)
+    setErroEnvio(null)
+    setConfirmandoEnvio(true)
+  }
+
+  function cancelarEnvio() {
+    setConfirmandoEnvio(false)
+    setErroEnvio(null)
+  }
+
+  async function confirmarEnvio() {
+    setErroEnvio(null)
+    setEnviando(true)
+    try {
+      await espelhoApi.enviar()
+      navigate('/ocs/espelho', { replace: true })
+    } catch (falha) {
+      setErroEnvio(mensagemDeErro(falha, 'Não foi possível enviar o espelho ao FUSEX.'))
+      setEnviando(false)
+    }
   }
 
   return (
@@ -168,12 +193,19 @@ export default function EspelhoEmConstrucaoPage() {
           <footer className="ee-rodape">
             <span>VALOR TOTAL</span>
             <strong>{formatarMoeda(espelho.valorTotal)}</strong>
-            <button type="button" className="botao botao-primario" onClick={() => setEnvioSolicitado(true)}>
+            <button type="button" className="botao botao-primario" onClick={abrirEnvio}>
               Enviar para o FUSEX
             </button>
           </footer>
 
-          {envioSolicitado && <EmConstrucao nome="Confirmar envio ao FUSEX" task="T20-FE4" dono="rubensvnc" />}
+          {confirmandoEnvio && (
+            <ConfirmarEnvio
+              enviando={enviando}
+              erro={erroEnvio}
+              onConfirmar={() => void confirmarEnvio()}
+              onCancelar={cancelarEnvio}
+            />
+          )}
         </>
       )}
     </section>
