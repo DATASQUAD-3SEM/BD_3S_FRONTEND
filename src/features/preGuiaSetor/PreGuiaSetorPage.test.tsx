@@ -6,20 +6,13 @@ import PreGuiaSetorPage from './PreGuiaSetorPage';
 import { criarMockPreGuiaSetor } from './api.mock';
 import { ApiError } from '../../shared/api/http';
 
-/**
- * Testes do detalhe da pre-guia do Setor de Guias (T4-FE): abertura, decisao, anexo e conclusao da Guia.
- */
-
 beforeAll(() => {
-  // O jsdom não implementa URLs de objeto (blob)
   URL.createObjectURL = vi.fn(() => 'blob:teste');
   URL.revokeObjectURL = vi.fn();
 });
 
 const mockApi = () => criarMockPreGuiaSetor({ atrasoMs: 0 });
-
 const renderizar = (id: number, api = mockApi()) => render(<PreGuiaSetorPage id={id} api={api} />);
-
 const pdf = (nome: string) => new File(['%PDF-1.4'], nome, { type: 'application/pdf' });
 
 describe('T4-FE · Tela Pré-guia {número}', () => {
@@ -27,7 +20,10 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     renderizar(11);
     expect(await screen.findByRole('heading', { name: 'Pré-guia 0411' })).toBeInTheDocument();
     expect(screen.getByText('Em análise')).toBeInTheDocument();
+
+    // Dados do beneficiário
     expect(screen.getByText('Marta Souza Lima')).toBeInTheDocument();
+    expect(screen.getByText('529.982.247-25')).toBeInTheDocument(); // T17-FE: CPF
     expect(screen.getByText('458100200-01')).toBeInTheDocument();
     expect(screen.getByText('41 a 50')).toBeInTheDocument();
     expect(screen.getByText('Laboratório Exemplo')).toBeInTheDocument();
@@ -60,10 +56,8 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     renderizar(11);
     const botao = await screen.findByRole('button', { name: 'Requerer correção' });
     expect(botao).toBeDisabled();
-
     await usuario.type(screen.getByLabelText('Observação (obrigatória)'), 'Falta o documento');
     expect(botao).toBeEnabled();
-
     await usuario.click(botao);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
@@ -88,16 +82,13 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     expect(await screen.findByText('Número extraído automaticamente. Você pode editar se necessário.')).toBeInTheDocument();
     expect(screen.getByLabelText('Número da Guia')).toHaveValue('202610678');
     expect(screen.getByText('PDF anexado')).toBeInTheDocument();
     expect(screen.getByText('Guia_12.pdf')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
-    expect(
-      screen.getByText('Ao concluir, a Guia segue para a assinatura do médico e do chefe.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Ao concluir, a Guia segue para a assinatura do médico e do chefe.')).toBeInTheDocument();
   });
 
   it('a leitura não grava nada: só o PUT do Concluir envia o PDF', async () => {
@@ -106,11 +97,9 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const anexar = vi.spyOn(api, 'anexarGuia');
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     await screen.findByText('Número extraído automaticamente. Você pode editar se necessário.');
     expect(anexar).not.toHaveBeenCalled();
-
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
     expect(anexar).toHaveBeenCalledWith(11, '202610678', expect.any(File));
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
@@ -120,18 +109,14 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     const api = mockApi();
     let liberar: () => void = () => {};
-    vi.spyOn(api, 'extrairNumeroGuia').mockImplementationOnce(
-      () => new Promise((resolve) => (liberar = () => resolve({ numeroGuia: '202610678' }))),
-    );
+    vi.spyOn(api, 'extrairNumeroGuia').mockImplementationOnce(() => new Promise((resolve) => (liberar = () => resolve({ numeroGuia: '202610678' }))));
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     expect(await screen.findByRole('button', { name: 'Lendo arquivo...' })).toBeDisabled();
     expect(screen.getByLabelText('Número da Guia')).toBeDisabled();
     expect(screen.getByText('Lendo o número da Guia...')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
-
     liberar();
     expect(await screen.findByRole('button', { name: 'Trocar arquivo' })).toBeEnabled();
   });
@@ -140,16 +125,12 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_sem-numero.pdf'));
-    expect(
-      await screen.findByText('Não foi possível ler o número automaticamente. Digite o número da Guia.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Não foi possível ler o número automaticamente. Digite o número da Guia.')).toBeInTheDocument();
     const campo = screen.getByLabelText('Número da Guia');
     expect(campo).toBeEnabled();
     expect(campo).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
-
     await usuario.type(campo, '987');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
   });
@@ -160,12 +141,9 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const extrair = vi.spyOn(api, 'extrairNumeroGuia');
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     await screen.findByText('Guia_12.pdf');
     extrair.mockClear();
-
-    // applyAccept: false envia o arquivo mesmo fora do accept, como um usuario que escolhe "Todos os arquivos"
     const jpeg = new File(['\xff\xd8\xff'], 'foto.jpg', { type: 'image/jpeg' });
     await userEvent.setup({ applyAccept: false }).upload(screen.getByLabelText('Escolher PDF da Guia'), jpeg);
     expect(await screen.findByRole('alert')).toHaveTextContent('Arquivo inválido. Envie um PDF.');
@@ -178,7 +156,6 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     const grande = pdf('grande.pdf');
     Object.defineProperty(grande, 'size', { value: 10 * 1024 * 1024 + 1 });
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), grande);
@@ -190,10 +167,8 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     await screen.findByText('Guia_12.pdf');
-
     await usuario.click(screen.getByRole('button', { name: 'Trocar arquivo' }));
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_sem-numero.pdf'));
     expect(await screen.findByText('Guia_sem-numero.pdf')).toBeInTheDocument();
@@ -205,10 +180,8 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     await screen.findByText('Guia_12.pdf');
-
     await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
     expect(screen.queryByText('PDF anexado')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Número da Guia')).toHaveValue('');
@@ -221,13 +194,11 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const anexar = vi.spyOn(api, 'anexarGuia');
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
     const campo = await screen.findByLabelText('Número da Guia');
     await screen.findByDisplayValue('202610678');
     await usuario.clear(campo);
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
-
     await usuario.type(campo, '202699999');
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
     expect(anexar).toHaveBeenCalledWith(11, '202699999', expect.any(File));
@@ -239,13 +210,9 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     vi.spyOn(api, 'extrairNumeroGuia').mockRejectedValueOnce(new ApiError(429, 'limite'));
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
-    expect(
-      await screen.findByText('Muitas tentativas de leitura. Aguarde um instante e tente novamente.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Muitas tentativas de leitura. Aguarde um instante e tente novamente.')).toBeInTheDocument();
     expect(screen.getByText('Guia_12.pdf')).toBeInTheDocument();
-
     await usuario.click(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(await screen.findByLabelText('Número da Guia')).toHaveValue('202610678');
   });
@@ -254,7 +221,6 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const usuario = userEvent.setup();
     renderizar(11);
     await screen.findByRole('button', { name: 'Concluir' });
-
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_falha.pdf'));
     expect(await screen.findByText('Não foi possível ler o PDF agora. Tente novamente.')).toBeInTheDocument();
     expect(screen.getByText('Guia_falha.pdf')).toBeInTheDocument();
@@ -265,7 +231,6 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const api = mockApi();
     await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
     renderizar(11, api);
-
     expect(await screen.findByText('PDF anexado')).toBeInTheDocument();
     expect(screen.getByText('Guia_202610701.pdf')).toBeInTheDocument();
     expect(screen.getByLabelText('Número da Guia')).toHaveValue('202610701');
@@ -279,14 +244,11 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
-
     const campo = screen.getByLabelText('Número da Guia');
     await usuario.clear(campo);
     await usuario.type(campo, '202610702');
-
     expect(screen.getByText('PDF anexado')).toBeInTheDocument();
     expect(screen.getByText('Guia_202610701.pdf')).toBeInTheDocument();
-    // o rascunho guarda outro número: sem novo PDF não há como salvar a edição
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
   });
 
@@ -296,11 +258,9 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
-
     await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
     expect(screen.queryByText('PDF anexado')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Número da Guia')).toHaveValue('');
-
     await usuario.type(screen.getByLabelText('Número da Guia'), '202610701');
     expect(screen.queryByText('PDF anexado')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
@@ -311,7 +271,6 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const api = mockApi();
     await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
     renderizar(11, api);
-
     await usuario.click(await screen.findByRole('button', { name: 'Concluir' }));
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
   });
@@ -321,11 +280,9 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     const api = mockApi();
     vi.spyOn(api, 'requererCorrecao').mockRejectedValueOnce(new ApiError(409, 'conflito'));
     renderizar(11, api);
-
     await usuario.type(await screen.findByLabelText('Observação (obrigatória)'), 'Falta documento');
     await usuario.click(screen.getByRole('button', { name: 'Requerer correção' }));
     await usuario.click(screen.getByRole('button', { name: 'Confirmar correção' }));
-
     expect(await screen.findByRole('alert')).toHaveTextContent('Esta pré-guia já foi alterada');
   });
 
