@@ -46,8 +46,6 @@ const espelhoSoComGuia11: Espelho = {
   itens: [espelhoComDuasGuias.itens[2]],
 }
 
-const rodape = await screen.findByText('VALOR TOTAL')
-
 function renderizar() {
   return render(
     <MemoryRouter initialEntries={['/ocs/espelho/atual']}>
@@ -133,6 +131,7 @@ describe('EspelhoEmConstrucaoPage (T20-FE3)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sim, remover' }))
 
     await waitFor(() => expect(espelhoApi.removerGuias).toHaveBeenCalledWith([10]))
+    const rodape = await screen.findByText('VALOR TOTAL')
     expect(rodape.parentElement).toHaveTextContent(/100,00/)
     expect(screen.queryByRole('checkbox', { name: 'Guia nº 202610701' })).not.toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Guia nº 202610702' })).toBeInTheDocument()
