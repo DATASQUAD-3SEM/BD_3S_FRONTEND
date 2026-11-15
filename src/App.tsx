@@ -30,7 +30,7 @@ import OcsLayout from './features/espelhoOcs/OcsLayout'
 import EspelhoPage from './features/espelhoOcs/EspelhoPage'
 import GuiasFinalizadasPage from './features/espelhoOcs/GuiasFinalizadasPage'
 import EspelhoEmConstrucaoPage from './features/espelhoOcs/EspelhoEmConstrucaoPage'
-
+import EspelhoEnviadoDetalhePage from './features/espelhoOcs/EspelhoEnviadoDetalhePage'
 
 /**
  * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
@@ -100,6 +100,7 @@ export default function App() {
         <Route path="guias-finalizadas" element={<GuiasFinalizadasPage />} />
         <Route path="espelho" element={<EspelhoPage />} />
         <Route path="espelho/atual" element={<EspelhoEmConstrucaoPage />} />
+        <Route path="espelho/historico/:id" element={<EspelhoEnviadoDetalhePage />} />
       </Route>
 
       <Route path="*" element={<main className="app-main"><p>Página não encontrada.</p></main>} />
