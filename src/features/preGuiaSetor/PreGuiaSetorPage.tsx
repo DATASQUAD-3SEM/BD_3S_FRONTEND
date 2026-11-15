@@ -5,7 +5,7 @@ import ColunaCorrecao from './components/ColunaCorrecao';
 import ColunaGerarGuia from './components/ColunaGerarGuia';
 import ViewerEncaminhamento from './components/ViewerEncaminhamento';
 import { formatarExame, textoCriadaPor } from './formatadores';
-import { formatarPrecCp } from '../../shared/utils/formatadores';
+import { formatarPrecCp, formatarCpf } from '../../shared/utils/formatadores'; // T17-FE
 import {
   ehNaoEncontrada,
   mensagemDeErro,
@@ -190,6 +190,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
       },
     );
 
+  // T17-FE: Tratamento seguro para o CPF
+  const cpfLimpo = detalhe.beneficiario.cpf?.replace(/\D/g, '');
+  const cpfFormatado = (cpfLimpo && cpfLimpo.length === 11) ? formatarCpf(cpfLimpo) : '—';
+
   return (
     <section className="pgs" aria-labelledby="pgs-titulo">
       <div className="pgs__cabecalho">
@@ -207,6 +211,10 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
               <div>
                 <dt>Beneficiário</dt>
                 <dd>{detalhe.beneficiario.nome}</dd>
+              </div>
+              <div>
+                <dt>CPF</dt>
+                <dd>{cpfFormatado}</dd>
               </div>
               <div>
                 <dt>Prec CP</dt>
