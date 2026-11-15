@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import EspelhoEmConstrucaoPage from './EspelhoEmConstrucaoPage'
-import { espelhoApi } from './api'
+import { espelhoApi, guiasFinalizadasApi } from './api'
 import type { Espelho } from './types'
 
 vi.mock('./api', () => ({
@@ -45,6 +45,8 @@ const espelhoSoComGuia11: Espelho = {
   valorTotal: 100,
   itens: [espelhoComDuasGuias.itens[2]],
 }
+
+const rodape = await screen.findByText('VALOR TOTAL')
 
 function renderizar() {
   return render(
@@ -131,7 +133,7 @@ describe('EspelhoEmConstrucaoPage (T20-FE3)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sim, remover' }))
 
     await waitFor(() => expect(espelhoApi.removerGuias).toHaveBeenCalledWith([10]))
-    expect(await screen.findByText(/100,00/)).toBeInTheDocument()
+    expect(rodape.parentElement).toHaveTextContent(/100,00/)
     expect(screen.queryByRole('checkbox', { name: 'Guia nº 202610701' })).not.toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Guia nº 202610702' })).toBeInTheDocument()
   })
@@ -180,6 +182,7 @@ describe('EspelhoEmConstrucaoPage (T20-FE3)', () => {
 
   it('Ver guia (PDF) abre o visualizador somente leitura dentro do cartao', async () => {
     vi.mocked(espelhoApi.buscarEmConstrucao).mockResolvedValue(espelhoComDuasGuias)
+    vi.mocked(guiasFinalizadasApi.obterPdf).mockResolvedValue(new Blob(['pdf'], { type: 'application/pdf' }))
     renderizar()
 
     await userEvent.click((await screen.findAllByRole('button', { name: 'Ver guia (PDF)' }))[0])
