@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import EmConstrucao from '../../shared/components/EmConstrucao'
 import CartaoEspelhoEmConstrucao from './CartaoEspelhoEmConstrucao'
+import HistoricoEspelhos from './HistoricoEspelhos'
 import { espelhoApi } from './api'
 import { contarGuias } from './formatadores'
 import type { Espelho } from './types'
@@ -76,7 +76,7 @@ export default function EspelhoPage() {
       )}
 
       <h2>Histórico de espelhos enviados</h2>
-      <EmConstrucao nome="Histórico de espelhos enviados" task="T20-FE5" dono="rubensvnc" />
+      <HistoricoEspelhos />
     </section>
   )
 }
