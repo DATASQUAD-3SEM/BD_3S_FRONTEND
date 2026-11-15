@@ -1,8 +1,10 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { ApiError } from '../../../shared/api/http';
 import { somenteDigitos } from '../../../shared/utils/formatadores';
+import type { LinhaExame } from '../examesGuia';
 import { validarPdfGuia } from '../regras';
-import type { ExtracaoNumeroGuia } from '../types';
+import type { ExameGuia, ExtracaoNumeroGuia } from '../types';
+import TabelaExamesGuia from './TabelaExamesGuia';
 
 const TAMANHO_MAXIMO_NUMERO = 20;
 
@@ -18,20 +20,31 @@ interface Props {
   nomeArquivo: string | null;
   /** PDF escolhido nesta sessao e ainda nao enviado. */
   arquivoNovo: File | null;
+  /** Exames da Guia, editaveis na tabela (T22-FE1). */
+  linhasExames: LinhaExame[];
+  onExamesChange: (linhas: LinhaExame[]) => void;
+  /** Erro 422 do servidor sobre os exames, mostrado abaixo da tabela. */
+  erroExames: string | null;
+  /** Motivo que impede o Concluir, quando nao e so a falta de dados. */
+  avisoConclusao: string | null;
   podeConcluir: boolean;
   enviandoConclusao: boolean;
   extrairNumeroGuia: (pdf: File) => Promise<ExtracaoNumeroGuia>;
   onNumeroChange: (numero: string) => void;
-  onAnexar: (pdf: File, numero: string) => void;
+  onAnexar: (pdf: File, numero: string, exames: ExameGuia[]) => void;
   onRemover: () => void;
   onConcluir: () => void;
 }
 
-/** Coluna "Gerar a Guia" (T4-FE, ajustada em T11-FE). */
+/** Coluna "Gerar a Guia" (T4-FE, ajustada em T11-FE e T22-FE1). */
 export default function ColunaGerarGuia({
                                           numero,
                                           nomeArquivo,
                                           arquivoNovo,
+                                          linhasExames,
+                                          onExamesChange,
+                                          erroExames,
+                                          avisoConclusao,
                                           podeConcluir,
                                           enviandoConclusao,
                                           extrairNumeroGuia,
@@ -50,8 +63,8 @@ export default function ColunaGerarGuia({
     setLendo(true);
     setMensagem(null);
     try {
-      const { numeroGuia } = await extrairNumeroGuia(pdf);
-      onAnexar(pdf, numeroGuia);
+      const { numeroGuia, exames } = await extrairNumeroGuia(pdf);
+      onAnexar(pdf, numeroGuia, exames ?? []);
       setMensagem({ tipo: 'ok', texto: 'Número extraído automaticamente. Você pode editar se necessário.' });
     } catch (erro) {
       const status = erro instanceof ApiError ? erro.status : 500;
@@ -60,7 +73,7 @@ export default function ColunaGerarGuia({
         setMensagem({ tipo: 'erro', texto: 'Arquivo inválido. Envie um PDF válido e tente novamente.' });
         return;
       }
-      onAnexar(pdf, '');
+      onAnexar(pdf, '', []);
       if (status === 422) {
         setMensagem({ tipo: 'aviso', texto: 'Não foi possível ler o número automaticamente. Digite o número da Guia.' });
       } else if (status === 429) {
@@ -165,6 +178,14 @@ export default function ColunaGerarGuia({
       />
       {lendo && <p className="pgs__pequeno">Lendo o número da Guia...</p>}
 
+      {nomeArquivo && !lendo && (
+        <div>
+          <h4>Exames na Guia</h4>
+          <TabelaExamesGuia linhas={linhasExames} onChange={onExamesChange} disabled={ocupado} />
+          {erroExames && <p role="alert" className="pgs__erro-campo">{erroExames}</p>}
+        </div>
+      )}
+
       <button
         type="button"
         className="botao botao-primario pgs__concluir"
@@ -178,6 +199,7 @@ export default function ColunaGerarGuia({
           ? 'Ao concluir, a Guia segue para a assinatura do médico e do chefe.'
           : 'Disponível depois de anexar a Guia.'}
       </p>
+      {avisoConclusao && <p role="status" className="pgs__aviso">{avisoConclusao}</p>}
     </div>
   );
 }
