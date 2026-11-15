@@ -26,6 +26,8 @@ import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
 import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiaPage'
+import OcsLayout from './features/espelhoOcs/OcsLayout'
+import EspelhoPage from './features/espelhoOcs/EspelhoPage'
 
 /**
  * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
@@ -87,6 +89,14 @@ export default function App() {
       <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-impressao" replace />} />
         <Route path="guias-para-impressao" element={<GuiasParaImpressaoPage />} />
+      </Route>
+
+      <Route path="/ocs" element={<RotaProtegida perfil="OCS"><OcsLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="espelho" replace />} />
+        <Route path="guias-recebidas" element={<EmConstrucao nome="Guias recebidas" task="T19-FE" dono="a definir" />} />
+        <Route path="guias-finalizadas" element={<EmConstrucao nome="Guias Finalizadas" task="T20-FE2" dono="rubensvnc" />} />
+        <Route path="espelho" element={<EspelhoPage />} />
+        <Route path="espelho/atual" element={<EmConstrucao nome="Espelho em construção" task="T20-FE3" dono="rubensvnc" />} />
       </Route>
 
       <Route path="*" element={<main className="app-main"><p>Página não encontrada.</p></main>} />
