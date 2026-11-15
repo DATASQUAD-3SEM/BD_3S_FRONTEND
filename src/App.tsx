@@ -29,6 +29,8 @@ import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/Corrigi
 import OcsLayout from './features/espelhoOcs/OcsLayout'
 import EspelhoPage from './features/espelhoOcs/EspelhoPage'
 import GuiasFinalizadasPage from './features/espelhoOcs/GuiasFinalizadasPage'
+import EspelhoEmConstrucaoPage from './features/espelhoOcs/EspelhoEmConstrucaoPage'
+
 
 /**
  * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
@@ -97,7 +99,7 @@ export default function App() {
         <Route path="guias-recebidas" element={<EmConstrucao nome="Guias recebidas" task="T19-FE" dono="a definir" />} />
         <Route path="guias-finalizadas" element={<GuiasFinalizadasPage />} />
         <Route path="espelho" element={<EspelhoPage />} />
-        <Route path="espelho/atual" element={<EmConstrucao nome="Espelho em construção" task="T20-FE3" dono="rubensvnc" />} />
+        <Route path="espelho/atual" element={<EspelhoEmConstrucaoPage />} />
       </Route>
 
       <Route path="*" element={<main className="app-main"><p>Página não encontrada.</p></main>} />
