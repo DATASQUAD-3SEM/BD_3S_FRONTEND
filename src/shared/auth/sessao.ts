@@ -17,7 +17,7 @@ export interface Sessao {
 export const CHAVE_SESSAO = 'nexus-sessao'
 export const CHAVE_LOGIN = 'X-Usuario-Login'
 
-const PERFIS_VALIDOS: Perfil[] = ['BENEFICIARIO', 'MEDICO', 'CHEFE_FUSEX', 'SETOR_GUIAS', 'RECEPCAO']
+const PERFIS_VALIDOS: Perfil[] = ['BENEFICIARIO', 'MEDICO', 'CHEFE_FUSEX', 'SETOR_GUIAS', 'RECEPCAO', 'OCS']
 
 /** Le a sessao atual; devolve null se nao houver login ou se o conteudo guardado for invalido. */
 export function lerSessao(): Sessao | null {
