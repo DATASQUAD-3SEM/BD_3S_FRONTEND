@@ -13,8 +13,13 @@ afterEach(() => {
 describe('minhasPreGuiasApi', () => {
   it('lista as pre-guias com o prefixo /api e o login simulado', async () => {
     localStorage.setItem('X-Usuario-Login', '52998224725')
+
+    // listar() espera JSON  →  mock devolve JSON
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }),
+      new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
     )
     vi.stubGlobal('fetch', fetchMock)
 
@@ -26,13 +31,21 @@ describe('minhasPreGuiasApi', () => {
   })
 
   it('baixa o PDF da Guia no modo pedido', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(new Blob(['%PDF']), { status: 200 }))
+    // obterPdf() espera binário  →  mock devolve bytes (evita Blob do jsdom sem .stream())
+    const pdfBytes = new TextEncoder().encode('%PDF')
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(pdfBytes, {
+        status: 200,
+        headers: { 'Content-Type': 'application/pdf' },
+      }),
+    )
     vi.stubGlobal('fetch', fetchMock)
 
     const pdf = await minhasPreGuiasApi.obterPdf(2, 'baixar')
 
     expect(fetchMock.mock.calls[0][0]).toBe('/api/beneficiarios/me/pre-guias/2/guia/pdf?modo=baixar')
-    expect(pdf).toBeInstanceOf(Blob)
+    expect(pdf.size).toBe(pdfBytes.length)
+    expect(pdf.type).toBe('application/pdf')
   })
 
   it('erro do backend vira ApiError com a mensagem do servidor', async () => {
