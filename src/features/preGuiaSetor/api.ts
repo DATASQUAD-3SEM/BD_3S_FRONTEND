@@ -1,4 +1,4 @@
-// Cliente HTTP real da tela de detalhe do setor (T4-FE). Contratos: T4-BE1 a T4-BE6.
+// Cliente HTTP real da tela de detalhe do setor (T4-FE). Contratos: T4-BE1 a T4-BE6, T22-BE1.
 import { get, getBlob, post, postForm, putForm } from '../../shared/api/http';
 import type {
   AberturaResposta,
@@ -26,10 +26,11 @@ export const preGuiaSetorApi: PreGuiaSetorApi = {
     return postForm<ExtracaoNumeroGuia>('/setor-guias/extrair-numero-guia', formulario);
   },
 
-  anexarGuia: (id, numeroGuia, pdf) => {
+  anexarGuia: (id, numeroGuia, pdf, exames) => {
     const formulario = new FormData();
     formulario.append('numeroGuia', numeroGuia);
     formulario.append('pdf', pdf);
+    formulario.append('exames', JSON.stringify(exames));
     return putForm<GuiaRascunhoResposta>(`${base(id)}/guia-rascunho`, formulario);
   },
 
