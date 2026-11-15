@@ -44,5 +44,8 @@ export interface GuiaDoBeneficiario {
 
 export interface MinhasGuiasApi {
   /** GET /guias/minhas — o backend já devolve da mais recente para a mais antiga. */
-  listar(): Promise<GuiaDoBeneficiario[]>
-}
+    listar(): Promise<GuiaDoBeneficiario[]>
+
+  /** POST /guias/{id}/envio — envia a guia pronta à OCS da pré-guia. */
+  enviar(id: number): Promise<GuiaDoBeneficiario>
+ }
