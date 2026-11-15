@@ -179,10 +179,10 @@ describe('GuiasParaAssinarPage', () => {
       'Esta Guia ja foi assinada por um medico do FUSEX',
     )
     await waitFor(() => expect(listar).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(screen.queryByRole('button', { name: /202610701/ })).not.toBeInTheDocument())
   })
 })
 
-// Lote do chefe: checkboxes, "Selecionar todas", barra de acao, envio { guiaIds } e respostas 200/207/erro
 describe('lote do chefe (T10-FE)', () => {
   const GUIAS_CHEFE: GuiaParaAssinar[] = [
     { guiaId: 1, numero: '202610711', beneficiarioNome: 'Carla Mendes', pendencias: ['CHEFE'] },
@@ -335,11 +335,155 @@ describe('lote do chefe (T10-FE)', () => {
     expect(checkbox('202610711')).toBeChecked()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
+})
+describe('lote do médico (T9-FE1)', () => {
+  const GUIAS_MEDICO: GuiaParaAssinar[] = [
+    { guiaId: 1, numero: '202610721', beneficiarioNome: 'Mariana Teixeira', pendencias: ['MEDICO'] },
+    { guiaId: 2, numero: '202610722', beneficiarioNome: 'Gustavo Nunes', pendencias: ['MEDICO'] },
+    { guiaId: 3, numero: '202610723', beneficiarioNome: 'Vitória Almeida', pendencias: ['MEDICO'] },
+  ]
 
-  it('o médico não vê checkboxes de lote', async () => {
-    renderizar(criarApi())
+  const checkbox = (numero: string) => screen.getByRole('checkbox', { name: `Selecionar Guia ${numero}` })
 
-    await screen.findByRole('button', { name: /202610701/ })
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+  beforeEach(() => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+  })
+
+  it('mostra um checkbox por cartão com o selo de médico e o mestre marca e desmarca todas', async () => {
+    renderizar(criarApi({ listar: vi.fn(async () => GUIAS_MEDICO) }))
+
+    await screen.findByRole('button', { name: /202610721/ })
+    expect(screen.getAllByText('Falta assinatura de um médico.')).toHaveLength(3)
+    expect(checkbox('202610721')).not.toBeChecked()
+    expect(checkbox('202610722')).not.toBeChecked()
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Selecionar todas' }))
+    expect(checkbox('202610721')).toBeChecked()
+    expect(checkbox('202610722')).toBeChecked()
+    expect(checkbox('202610723')).toBeChecked()
+
+    await userEvent.click(checkbox('202610722'))
+    expect(screen.getByRole('checkbox', { name: 'Selecionar todas' })).not.toBeChecked()
+  })
+
+  it('a barra aparece com a seleção, mostra o contador e some ao limpar', async () => {
+    renderizar(criarApi({ listar: vi.fn(async () => GUIAS_MEDICO) }))
+
+    await screen.findByRole('button', { name: /202610721/ })
+    expect(screen.queryByRole('region', { name: 'Ação em lote' })).not.toBeInTheDocument()
+
+    await userEvent.click(checkbox('202610721'))
+    expect(screen.getByRole('region', { name: 'Ação em lote' })).toHaveTextContent('1 guia(s) selecionada(s)')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Limpar seleção' }))
+    expect(screen.queryByRole('region', { name: 'Ação em lote' })).not.toBeInTheDocument()
+    expect(checkbox('202610721')).not.toBeChecked()
+  })
+
+  it('clicar no checkbox não abre o detalhe da Guia', async () => {
+    const api = criarApi({ listar: vi.fn(async () => GUIAS_MEDICO) })
+    renderizar(api)
+
+    await screen.findByRole('button', { name: /202610721/ })
+    await userEvent.click(checkbox('202610722'))
+
+    expect(screen.getByRole('button', { name: /202610721/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(api.obterPdf).not.toHaveBeenCalledWith(2, 'visualizar')
+  })
+
+  it('desabilita o botão e avisa quando há mais de 50 guias selecionadas', async () => {
+    const muitas: GuiaParaAssinar[] = Array.from({ length: 51 }, (_, i) => ({
+      guiaId: i + 1,
+      numero: `2026${String(i + 1).padStart(5, '0')}`,
+      beneficiarioNome: `Beneficiário ${i + 1}`,
+      pendencias: ['MEDICO' as const],
+    }))
+    renderizar(criarApi({ listar: vi.fn(async () => muitas) }))
+
+    await screen.findByRole('button', { name: /202600001/ })
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Selecionar todas' }))
+
+    expect(screen.getByText('Selecione até 50 guias por vez.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Assinar selecionadas' })).toBeDisabled()
+  })
+
+  it('envia o lote no formato { guiaIds } com as guias selecionadas', async () => {
+    const api = criarApi({ listar: vi.fn(async () => GUIAS_MEDICO) })
+    renderizar(api)
+
+    await screen.findByRole('button', { name: /202610721/ })
+    await userEvent.click(checkbox('202610721'))
+    await userEvent.click(checkbox('202610723'))
+    await userEvent.click(screen.getByRole('button', { name: 'Assinar selecionadas' }))
+
+    expect(api.assinarLote).toHaveBeenCalledWith([1, 3])
+  })
+
+  it('200 remove as guias da lista e da seleção e atualiza o detalhe para a primeira restante', async () => {
+    const listar = vi.fn().mockResolvedValueOnce(GUIAS_MEDICO).mockResolvedValue([GUIAS_MEDICO[1]])
+    const api = criarApi({ listar })
+    renderizar(api)
+
+    await screen.findByRole('button', { name: /202610721/ })
+    await userEvent.click(checkbox('202610721'))
+    await userEvent.click(checkbox('202610723'))
+    await userEvent.click(screen.getByRole('button', { name: 'Assinar selecionadas' }))
+
+    expect(await screen.findByText('2 guia(s) assinada(s) com sucesso.')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('button', { name: /202610721/ })).not.toBeInTheDocument())
+    expect(screen.queryByRole('region', { name: 'Ação em lote' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('article', { name: 'Prévia da Guia 202610722' })).toBeInTheDocument()
+  })
+
+  it('207 remove a guia já assinada por outro médico e mantém as falhas selecionadas com o motivo', async () => {
+    const listar = vi.fn().mockResolvedValueOnce(GUIAS_MEDICO).mockResolvedValue([GUIAS_MEDICO[1]])
+    const api = criarApi({
+      listar,
+      assinarLote: vi.fn(async () => ({
+        assinadas: [1],
+        falhas: [
+          { guiaId: 3, motivo: 'ja_assinada_por_medico' },
+          { guiaId: 2, motivo: 'guia_nao_encontrada' },
+        ],
+      })),
+    })
+    renderizar(api)
+
+    await screen.findByRole('button', { name: /202610721/ })
+    await userEvent.click(checkbox('202610721'))
+    await userEvent.click(checkbox('202610722'))
+    await userEvent.click(checkbox('202610723'))
+    await userEvent.click(screen.getByRole('button', { name: 'Assinar selecionadas' }))
+
+    expect(
+      await screen.findByText(
+        '1 assinada(s). Guia 202610723: já assinada por outro médico do FUSEX. Ela saiu da sua lista. 1 com falha continua(m) selecionada(s).',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Falhou: guia_nao_encontrada')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('button', { name: /202610723/ })).not.toBeInTheDocument())
+    expect(checkbox('202610722')).toBeChecked()
+  })
+
+  it.each([
+    [400, 'A seleção não pôde ser enviada. Atualize a lista e tente de novo.'],
+    [403, 'Seu perfil não tem permissão para assinar em lote.'],
+    [429, 'Muitas tentativas em pouco tempo. Aguarde um instante.'],
+    [500, 'Erro no servidor. Sua seleção foi mantida.'],
+  ])('erro %i mantém a seleção e oferece tentar novamente', async (status, mensagem) => {
+    renderizar(
+      criarApi({
+        listar: vi.fn(async () => GUIAS_MEDICO),
+        assinarLote: vi.fn().mockRejectedValue(new ApiError(status, 'erro')),
+      }),
+    )
+
+    await screen.findByRole('button', { name: /202610721/ })
+    await userEvent.click(checkbox('202610721'))
+    await userEvent.click(screen.getByRole('button', { name: 'Assinar selecionadas' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(mensagem)
+    expect(checkbox('202610721')).toBeChecked()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 })
