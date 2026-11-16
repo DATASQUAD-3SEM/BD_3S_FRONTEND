@@ -17,3 +17,27 @@ export interface GuiaRecebida {
   dataEnvio: string;
   situacao: SituacaoGuia;
 }
+
+/** Situacao de uma sessao (T18/T19): so o que a grade mostra. */
+export type SituacaoSessaoOcs = 'DISPONIVEL' | 'SOLICITADA' | 'ASSINADA' | 'EXPIRADA';
+
+export interface SessaoRecebida {
+  id: number;
+  /** Cod DGP do procedimento a que a sessao pertence. */
+  procedimento: string;
+  numero: number;
+  status: SituacaoSessaoOcs;
+  dataSolicitacao: string | null;
+  dataAssinatura: string | null;
+}
+
+/** Contrato T19-BE2: GET /ocs/guias/{id}. Sem CPF nem dados da assinatura do beneficiario. */
+export interface GuiaRecebidaDetalhe {
+  id: number;
+  numero: string;
+  /** Data limite lida do PDF ("NAO RECEBER APOS"), AAAA-MM-DD. */
+  validadeAte: string;
+  beneficiario: { nome: string; precCp: string };
+  procedimentos: ProcedimentoRecebido[];
+  sessoes: SessaoRecebida[];
+}
