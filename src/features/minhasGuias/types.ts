@@ -30,8 +30,6 @@ export interface SessaoDaGuia {
 
 export interface GuiaDoBeneficiario {
   id: number
-  /** Id da pré-guia da guia: o PDF é pedido por ele (GET /beneficiarios/me/pre-guias/{id}/guia/pdf). */
-  preGuiaId: number
   numero: string
   /** Nome da OCS da pré-guia (o backend devolve só o nome, como texto). */
   ocs: string
@@ -51,6 +49,6 @@ export interface MinhasGuiasApi {
   /** POST /guias/{id}/envio — envia a guia pronta à OCS da pré-guia. */
   enviar(id: number): Promise<GuiaDoBeneficiario>
 
-  /** GET /beneficiarios/me/pre-guias/{preGuiaId}/guia/pdf?modo=visualizar — PDF com as assinaturas (T23-FE1). */
-  obterPdf(preGuiaId: number): Promise<Blob>
+  /** GET /guias/{id}/pdf — PDF com as assinaturas, inline (T23-BE2). */
+  obterPdf(id: number): Promise<Blob>
  }
