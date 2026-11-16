@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ApiError } from '../../shared/api/http';
 import { formatarData, formatarPrecCp } from '../../shared/utils/formatadores';
+import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf';
 import GradeSessoes from './components/GradeSessoes';
 import { guiasRecebidasApi } from './api';
 import { guiaVencida } from './regras';
@@ -35,6 +36,7 @@ export default function DetalheGuiaRecebidaPage() {
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
+  const [pdfAberto, setPdfAberto] = useState(false);
 
   const idValido = Number.isInteger(idGuia) && idGuia > 0;
   // Id invalido na rota nao chama a API: a tela ja mostra "nao encontrada".
@@ -133,7 +135,20 @@ export default function DetalheGuiaRecebidaPage() {
           <h1>Guia {guia.numero}</h1>
 
           <section className="gr-cartao" aria-labelledby="gr-dados">
-            <h2 id="gr-dados">Dados da guia (lidos do PDF)</h2>
+            <div className="gr-cabecalho-cartao">
+              <h2 id="gr-dados">Dados da guia (lidos do PDF)</h2>
+              <button
+                type="button"
+                className="botao"
+                aria-expanded={pdfAberto}
+                onClick={() => setPdfAberto((aberto) => !aberto)}
+              >
+                Ver guia (PDF)
+              </button>
+            </div>
+            {pdfAberto && (
+              <VisualizadorPdf guiaId={guia.id} numero={guia.numero} onFechar={() => setPdfAberto(false)} />
+            )}
             <dl className="gr-dados">
               <div>
                 <dt>Número da guia</dt>
