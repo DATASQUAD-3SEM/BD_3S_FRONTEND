@@ -66,7 +66,7 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
 
   // Ver guia (PDF), T23-FE1: o painel busca o PDF a cada abertura (desmonta ao fechar)
   const [pdfAberto, setPdfAberto] = useState(false)
-  const obterPdf = useCallback(() => api.obterPdf(guia.preGuiaId), [api, guia.preGuiaId])
+  const obterPdf = useCallback(() => api.obterPdf(guia.id), [api, guia.id])
 
   // Abre a confirmação, limpando resultado anterior
   function abrirConfirmacao() {
