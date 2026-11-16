@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { formatarData } from '../../shared/utils/formatadores'
+import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf'
 import SituacaoGuiaBadge from './SituacaoGuiaBadge'
 import type { GuiaDoBeneficiario, MinhasGuiasApi } from './types'
 
@@ -63,6 +64,10 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
   const [erroEnvio, setErroEnvio] = useState<string | null>(null)
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null)
 
+  // Ver guia (PDF), T23-FE1: o painel busca o PDF a cada abertura (desmonta ao fechar)
+  const [pdfAberto, setPdfAberto] = useState(false)
+  const obterPdf = useCallback(() => api.obterPdf(guia.preGuiaId), [api, guia.preGuiaId])
+
   // Abre a confirmação, limpando resultado anterior
   function abrirConfirmacao() {
     setErroEnvio(null)
@@ -125,6 +130,25 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         <p className="mg-card__contadores">
           Sessões assinadas: {c.assinadas}. Sessões expiradas (não cobráveis): {c.expiradas}.
         </p>
+      )}
+
+      {/* botão Ver guia (PDF), em todo cartão (T23-FE1) */}
+      <button
+        type="button"
+        className="mg-botao"
+        aria-expanded={pdfAberto}
+        onClick={() => setPdfAberto((aberto) => !aberto)}
+      >
+        Ver guia (PDF)
+      </button>
+
+      {pdfAberto && (
+        <VisualizadorPdf
+          guiaId={guia.id}
+          numero={guia.numero}
+          obterPdf={obterPdf}
+          onFechar={() => setPdfAberto(false)}
+        />
       )}
 
       {/* botão Enviar para a OCS, só em Não enviada */}
