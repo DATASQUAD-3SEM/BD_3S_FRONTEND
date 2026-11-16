@@ -221,3 +221,17 @@
   background: #fee2e2;
   color: #991b1b;
 }
+
+/* Ver guia (PDF) (T19-FE-4): titulo e botao lado a lado */
+.gr-cabecalho-cartao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.gr-cabecalho-cartao h2 {
+  margin: 0;
+}
