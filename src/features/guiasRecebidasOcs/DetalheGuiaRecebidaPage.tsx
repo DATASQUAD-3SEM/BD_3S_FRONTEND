@@ -4,18 +4,37 @@ import { ApiError } from '../../shared/api/http';
 import { formatarData, formatarPrecCp } from '../../shared/utils/formatadores';
 import GradeSessoes from './components/GradeSessoes';
 import { guiasRecebidasApi } from './api';
-import type { GuiaRecebidaDetalhe } from './types';
+import { guiaVencida } from './regras';
+import type { GuiaRecebidaDetalhe, SessaoRecebida } from './types';
 import './guiasRecebidas.css';
 
 type Estado = 'carregando' | 'pronto' | 'nao-encontrada' | 'erro';
 
-/** Modelo digitalizado da guia recebida pela OCS (T19-FE-2). Somente leitura. */
+const MSG_CONFLITO = 'Esta sessão não pode ser requerida agora: a guia pode estar vencida ou a sessão já foi solicitada.';
+
+function mensagemErroRequerer(erro: unknown): string {
+  if (erro instanceof ApiError) {
+    if (erro.status === 409) return MSG_CONFLITO;
+    if (erro.status === 403) return 'Esta guia não é da sua OCS.';
+    if (erro.status === 404) return 'Sessão não encontrada.';
+  }
+  return 'Não foi possível requerer a assinatura. Tente novamente.';
+}
+
+/**
+ * Modelo digitalizado da guia recebida pela OCS (T19-FE-2), com o pedido de assinatura de uma sessao
+ * por vez (T19-FE-3). O pedido so acontece com a guia dentro da validade.
+ */
 export default function DetalheGuiaRecebidaPage() {
   const { id } = useParams();
   const idGuia = Number(id);
   const [estado, setEstado] = useState<Estado>('carregando');
   const [guia, setGuia] = useState<GuiaRecebidaDetalhe | null>(null);
   const [tentativa, setTentativa] = useState(0);
+  const [selecionada, setSelecionada] = useState<SessaoRecebida | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [erroAcao, setErroAcao] = useState<string | null>(null);
 
   const idValido = Number.isInteger(idGuia) && idGuia > 0;
   // Id invalido na rota nao chama a API: a tela ja mostra "nao encontrada".
@@ -39,6 +58,40 @@ export default function DetalheGuiaRecebidaPage() {
       cancelado = true;
     };
   }, [idGuia, idValido, tentativa]);
+
+  const vencida = guia ? guiaVencida(guia.validadeAte) : false;
+
+  // Clicar na sessao selecionada de novo desmarca; clicar em outra troca a selecao (so uma por vez).
+  function selecionar(sessao: SessaoRecebida) {
+    setErroAcao(null);
+    setSelecionada((atual) => (atual?.id === sessao.id ? null : sessao));
+  }
+
+  async function requererAssinatura() {
+    if (!guia || !selecionada) return;
+    const sessao = selecionada;
+    setEnviando(true);
+    setErroAcao(null);
+    setMensagem(null);
+    try {
+      const atualizada = await guiasRecebidasApi.solicitarAssinatura(guia.id, sessao.id);
+      setGuia(atualizada);
+      setSelecionada(null);
+      const procedimento = guia.procedimentos.find((p) => p.codDgp === sessao.procedimento)?.descricao ?? sessao.procedimento;
+      setMensagem(
+        `Assinatura requerida para a sessão ${sessao.numero} de ${procedimento}. O beneficiário assina em Minhas guias.`,
+      );
+    } catch (erro) {
+      setErroAcao(mensagemErroRequerer(erro));
+      setSelecionada(null);
+      if (erro instanceof ApiError && erro.status === 409) {
+        // Recarrega para a grade mostrar o estado real da guia e das sessoes
+        guiasRecebidasApi.buscarDetalhe(guia.id).then(setGuia).catch(() => undefined);
+      }
+    } finally {
+      setEnviando(false);
+    }
+  }
 
   return (
     <section className="gr-pagina">
@@ -127,7 +180,42 @@ export default function DetalheGuiaRecebidaPage() {
 
           <section className="gr-cartao" aria-labelledby="gr-sessoes">
             <h2 id="gr-sessoes">Sessões</h2>
-            <GradeSessoes procedimentos={guia.procedimentos} sessoes={guia.sessoes} />
+
+            {vencida && (
+              <p role="status" className="gr-banner-vencida">
+                Guia vencida em {formatarData(guia.validadeAte)}. Não aceita novas solicitações de sessão.
+              </p>
+            )}
+
+            <GradeSessoes
+              procedimentos={guia.procedimentos}
+              sessoes={guia.sessoes}
+              selecionadaId={selecionada?.id ?? null}
+              onSelecionar={selecionar}
+              vencida={vencida}
+            />
+
+            <div className="gr-requerer">
+              <button
+                type="button"
+                className="botao botao-primario"
+                disabled={!selecionada || vencida || enviando}
+                onClick={requererAssinatura}
+              >
+                {enviando ? 'Requerendo…' : 'Requerer assinatura'}
+              </button>
+            </div>
+
+            {mensagem && (
+              <p role="status" className="gr-mensagem-ok">
+                {mensagem}
+              </p>
+            )}
+            {erroAcao && (
+              <p role="alert" className="gr-mensagem-erro">
+                {erroAcao}
+              </p>
+            )}
           </section>
         </>
       )}
