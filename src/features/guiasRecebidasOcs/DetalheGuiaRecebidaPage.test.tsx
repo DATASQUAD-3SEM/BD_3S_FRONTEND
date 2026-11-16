@@ -12,13 +12,13 @@ import { formatarPrecCp } from '../../shared/utils/formatadores';
 /** Testes do modelo digitalizado da guia recebida pela OCS (T19-FE-2). */
 
 vi.mock('./api', () => ({
-  guiasRecebidasApi: { listar: vi.fn(), buscarDetalhe: vi.fn() },
+  guiasRecebidasApi: { listar: vi.fn(), buscarDetalhe: vi.fn(), solicitarAssinatura: vi.fn() },
 }));
 
 const guia: GuiaRecebidaDetalhe = {
   id: 7,
   numero: '202610703',
-  validadeAte: '2026-12-24',
+  validadeAte: '2099-12-31',
   beneficiario: { nome: 'Antonio Carlos Ferreira', precCp: '45872213300' },
   procedimentos: [
     { codDgp: '40304361', descricao: 'Hemograma completo', quantidade: 4 },
@@ -44,6 +44,7 @@ const renderizar = (caminho = '/ocs/guias-recebidas/7') =>
 describe('T19-FE-2 · Modelo digitalizado da guia', () => {
   beforeEach(() => {
     vi.mocked(guiasRecebidasApi.buscarDetalhe).mockReset();
+    vi.mocked(guiasRecebidasApi.solicitarAssinatura).mockReset();
   });
 
   it('mostra os dados lidos do PDF, com a validade e sem a UG', async () => {
@@ -53,7 +54,7 @@ describe('T19-FE-2 · Modelo digitalizado da guia', () => {
     expect(await screen.findByRole('heading', { name: 'Guia 202610703' })).toBeInTheDocument();
     const dados = screen.getByRole('region', { name: 'Dados da guia (lidos do PDF)' });
     expect(within(dados).getByText('202610703')).toBeInTheDocument();
-    expect(within(dados).getByText('24/12/2026')).toBeInTheDocument();
+    expect(within(dados).getByText('31/12/2099')).toBeInTheDocument();
     expect(within(dados).getByText('Antonio Carlos Ferreira')).toBeInTheDocument();
     expect(within(dados).getByText(formatarPrecCp('45872213300'))).toBeInTheDocument();
     expect(screen.queryByText(/Unidade Gestora|\bUG\b/)).not.toBeInTheDocument();
@@ -149,5 +150,124 @@ describe('T19-FE-2 · Modelo digitalizado da guia', () => {
     expect(screen.getByLabelText('Carregando guia')).toBeInTheDocument();
     liberar(guia);
     expect(await screen.findByRole('heading', { name: 'Guia 202610703' })).toBeInTheDocument();
+  });
+
+  describe('requerer assinatura, uma sessão por vez (T19-FE-3)', () => {
+    const comDuasDisponiveis: GuiaRecebidaDetalhe = {
+      ...guia,
+      procedimentos: [{ codDgp: '40301630', descricao: 'Glicose', quantidade: 2 }],
+      sessoes: [
+        { id: 10, procedimento: '40301630', numero: 1, status: 'DISPONIVEL', dataSolicitacao: null, dataAssinatura: null },
+        { id: 11, procedimento: '40301630', numero: 2, status: 'DISPONIVEL', dataSolicitacao: null, dataAssinatura: null },
+      ],
+    };
+
+    const vencida: GuiaRecebidaDetalhe = { ...guia, validadeAte: '2020-01-01' };
+
+    it('selecionar uma sessão disponível habilita Requerer; clicar de novo desmarca', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      renderizar();
+
+      const requerer = await screen.findByRole('button', { name: 'Requerer assinatura' });
+      expect(requerer).toBeDisabled();
+
+      const casela = screen.getByRole('button', { name: 'Sessão 3: Disponível' });
+      await usuario.click(casela);
+      expect(casela).toHaveAttribute('aria-pressed', 'true');
+      expect(requerer).toBeEnabled();
+
+      await usuario.click(casela);
+      expect(casela).toHaveAttribute('aria-pressed', 'false');
+      expect(requerer).toBeDisabled();
+    });
+
+    it('só uma sessão fica selecionada por vez', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(comDuasDisponiveis);
+      renderizar();
+
+      const primeira = await screen.findByRole('button', { name: 'Sessão 1: Disponível' });
+      const segunda = screen.getByRole('button', { name: 'Sessão 2: Disponível' });
+      await usuario.click(primeira);
+      await usuario.click(segunda);
+
+      expect(segunda).toHaveAttribute('aria-pressed', 'true');
+      expect(primeira).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it('requerer muda a sessão para Solicitada, limpa a seleção e mostra a mensagem', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasRecebidasApi.solicitarAssinatura).mockResolvedValue({
+        ...guia,
+        sessoes: guia.sessoes.map((s) => (s.id === 3 ? { ...s, status: 'SOLICITADA' as const } : s)),
+      });
+      renderizar();
+
+      await usuario.click(await screen.findByRole('button', { name: 'Sessão 3: Disponível' }));
+      await usuario.click(screen.getByRole('button', { name: 'Requerer assinatura' }));
+
+      expect(guiasRecebidasApi.solicitarAssinatura).toHaveBeenCalledWith(7, 3);
+      expect(
+        await screen.findByText(
+          'Assinatura requerida para a sessão 3 de Hemograma completo. O beneficiário assina em Minhas guias.',
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Sessão 3: Solicitada')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Requerer assinatura' })).toBeDisabled();
+    });
+
+    it('sessão que não está disponível não vira botão de seleção', async () => {
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      renderizar();
+      await screen.findByRole('button', { name: 'Sessão 3: Disponível' });
+
+      expect(screen.getByLabelText('Sessão 1: Assinada').tagName).toBe('LI');
+      expect(screen.getByLabelText('Sessão 2: Solicitada').tagName).toBe('LI');
+      expect(screen.getByLabelText('Sessão 4: Sem sessão cadastrada').tagName).toBe('LI');
+    });
+
+    it('guia vencida mostra o banner, não permite seleção e desabilita Requerer', async () => {
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(vencida);
+      renderizar();
+
+      expect(
+        await screen.findByText('Guia vencida em 01/01/2020. Não aceita novas solicitações de sessão.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Sessão 3: Disponível' })).not.toBeInTheDocument();
+      expect(screen.getByLabelText('Sessão 3: Disponível').tagName).toBe('LI');
+      expect(screen.getByRole('button', { name: 'Requerer assinatura' })).toBeDisabled();
+    });
+
+    it('409 mostra o aviso, desmarca a seleção e recarrega a guia', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasRecebidasApi.solicitarAssinatura).mockRejectedValue(new ApiError(409, 'conflito'));
+      renderizar();
+
+      await usuario.click(await screen.findByRole('button', { name: 'Sessão 3: Disponível' }));
+      await usuario.click(screen.getByRole('button', { name: 'Requerer assinatura' }));
+
+      expect(
+        await screen.findByText(
+          'Esta sessão não pode ser requerida agora: a guia pode estar vencida ou a sessão já foi solicitada.',
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Requerer assinatura' })).toBeDisabled();
+      expect(guiasRecebidasApi.buscarDetalhe).toHaveBeenCalledTimes(2);
+    });
+
+    it('403 (guia de outra OCS) mostra a mensagem de guia que não é da OCS', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasRecebidasApi.solicitarAssinatura).mockRejectedValue(new ApiError(403, 'negado'));
+      renderizar();
+
+      await usuario.click(await screen.findByRole('button', { name: 'Sessão 3: Disponível' }));
+      await usuario.click(screen.getByRole('button', { name: 'Requerer assinatura' }));
+
+      expect(await screen.findByText('Esta guia não é da sua OCS.')).toBeInTheDocument();
+    });
   });
 });
