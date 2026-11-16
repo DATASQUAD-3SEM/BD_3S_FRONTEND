@@ -1,5 +1,18 @@
 import { ApiError } from '../../shared/api/http';
-import type { DetalhePreGuia, GuiaRascunhoDetalhe, PreGuiaSetorApi } from './types';
+import type { DetalhePreGuia, ExameGuia, GuiaRascunhoDetalhe, PreGuiaSetorApi } from './types';
+
+/**
+ * Implementacao em memoria do contrato T4-BE1 a T4-BE6 (detalhe, abertura, correcao, anexo e conclusao da Guia)
+ * e da leitura do numero da Guia (T11-BE1), com os exames de exemplo (T22-FE1).
+ *
+ * Leitura: por padrao devolve 202610678 e dois exames. Para ver os outros retornos, use o nome do arquivo:
+ * "sem-numero" (422), "invalido" (400), "limite" (429), "falha" (500) e "sem-exames" (numero lido, nenhum exame).
+ */
+
+const EXAMES_EXEMPLO: ExameGuia[] = [
+  { codDgp: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 },
+  { codDgp: '41001110', descricao: 'Ultrassonografia de abdome total', quantidade: 2 },
+];
 
 interface OpcoesMock {
   atrasoMs?: number;
@@ -61,7 +74,11 @@ function sementes(): DetalhePreGuia[] {
       procedimentos: [{ codigoTuss: '40301630', nome: 'Glicose' }],
       medicoCriador: null,
       encaminhamento: { nome: 'encaminhamento-0401.pdf', tipo: 'application/pdf', tamanhoBytes: 1024 },
-      guiaRascunho: { numero: '202610401', nomeArquivo: 'Guia_202610401.pdf' },
+      guiaRascunho: {
+        numero: '202610401',
+        nomeArquivo: 'Guia_202610401.pdf',
+        exames: [{ codDgp: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 }],
+      },
       guiaConcluida: true,
     },
   ];
@@ -105,15 +122,22 @@ export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreG
       if (nome.includes('invalido')) throw new ApiError(400, 'Arquivo inválido');
       if (nome.includes('limite')) throw new ApiError(429, 'Excesso de requisições');
       if (nome.includes('falha')) throw new ApiError(500, 'Falha inesperada');
-      return { numeroGuia: '202610678' };
+      if (nome.includes('sem-exames')) return { numeroGuia: '202610678', exames: [] };
+      return { numeroGuia: '202610678', exames: EXAMES_EXEMPLO.map((e) => ({ ...e })) };
     },
-    async anexarGuia(id, numeroGuia, pdf) {
+
+    async anexarGuia(id, numeroGuia, pdf, exames) {
       await espera();
       const detalhe = obter(id);
       if (!/^\d+$/.test(numeroGuia)) throw new ApiError(422, 'Dados invalidos', ['numeroGuia: Informe um número com apenas dígitos']);
       if (pdf.type !== 'application/pdf') throw new ApiError(422, 'Dados invalidos', ['pdf: Envie um arquivo PDF']);
-      if (detalhe.status !== 'EM_ANALISE' || detalhe.guiaConcluida) throw new ApiError(409, 'Pré-guia não permite anexar a Guia');
-      const rascunho: GuiaRascunhoDetalhe = { numero: numeroGuia, nomeArquivo: pdf.name };
+      if (exames.length === 0) {
+        throw new ApiError(422, 'Dados invalidos', ['exames: Informe ao menos um exame da Guia']);
+      }
+      if (detalhe.status !== 'EM_ANALISE' || detalhe.guiaConcluida) {
+        throw new ApiError(409, 'Pré-guia não permite anexar a Guia');
+      }
+      const rascunho: GuiaRascunhoDetalhe = { numero: numeroGuia, nomeArquivo: pdf.name, exames };
       detalhe.guiaRascunho = rascunho;
       return { ...rascunho };
     },

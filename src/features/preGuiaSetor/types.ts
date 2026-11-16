@@ -28,9 +28,18 @@ export interface EncaminhamentoDetalhe {
   tamanhoBytes: number;
 }
 
+/** Exame da Guia conferido pelo Setor de Guias (T22-BE1). */
+export interface ExameGuia {
+  codDgp: string;
+  descricao: string;
+  quantidade: number;
+}
+
 export interface GuiaRascunhoDetalhe {
   numero: string;
   nomeArquivo: string;
+  /** Na ordem gravada; vazia quando o rascunho e anterior aos exames (T22-BE1). */
+  exames: ExameGuia[];
 }
 
 /** Contrato T4-BE1: GET /setor-guias/pre-guias/{id} */
@@ -69,8 +78,13 @@ export interface GuiaConcluidaResposta {
   assinaturasPendentes: string[];
 }
 
+/**
+ * Contrato T11-BE1: POST /setor-guias/extrair-numero-guia. Nao grava nada.
+ * `exames` so vem quando a leitura dos exames existir (T21); hoje a resposta traz so o numero.
+ */
 export interface ExtracaoNumeroGuia {
   numeroGuia: string;
+  exames?: ExameGuia[];
 }
 
 export interface PreGuiaSetorApi {
@@ -78,7 +92,7 @@ export interface PreGuiaSetorApi {
   abrir(id: number): Promise<AberturaResposta>;
   requererCorrecao(id: number, observacao: string): Promise<CorrecaoResposta>;
   extrairNumeroGuia(pdf: File): Promise<ExtracaoNumeroGuia>;
-  anexarGuia(id: number, numeroGuia: string, pdf: File): Promise<GuiaRascunhoResposta>;
+  anexarGuia(id: number, numeroGuia: string, pdf: File, exames: ExameGuia[]): Promise<GuiaRascunhoResposta>;
   concluirGuia(id: number): Promise<GuiaConcluidaResposta>;
   buscarEncaminhamento(id: number): Promise<Blob>;
 }

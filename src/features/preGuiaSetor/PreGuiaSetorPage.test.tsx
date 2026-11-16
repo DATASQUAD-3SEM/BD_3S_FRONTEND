@@ -15,6 +15,12 @@ const mockApi = () => criarMockPreGuiaSetor({ atrasoMs: 0 });
 const renderizar = (id: number, api = mockApi()) => render(<PreGuiaSetorPage id={id} api={api} />);
 const pdf = (nome: string) => new File(['%PDF-1.4'], nome, { type: 'application/pdf' });
 
+/** Exames que a leitura de exemplo devolve (mock: nome do PDF sem marcas especiais). */
+const EXAMES_EXEMPLO = [
+  { codDgp: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 },
+  { codDgp: '41001110', descricao: 'Ultrassonografia de abdome total', quantidade: 2 },
+];
+
 describe('T4-FE · Tela Pré-guia {número}', () => {
   it('mostra o título, o badge e os dados do beneficiário', async () => {
     renderizar(11);
@@ -101,7 +107,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await screen.findByText('Número extraído automaticamente. Você pode editar se necessário.');
     expect(anexar).not.toHaveBeenCalled();
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
-    expect(anexar).toHaveBeenCalledWith(11, '202610678', expect.any(File));
+    expect(anexar).toHaveBeenCalledWith(11, '202610678', expect.any(File), EXAMES_EXEMPLO);
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
   });
 
@@ -132,6 +138,12 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     expect(campo).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
     await usuario.type(campo, '987');
+    // sem exames lidos, a linha da tabela precisa ser preenchida antes de concluir
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+
+    await usuario.type(screen.getByLabelText('Cod DGP do exame 1'), '41001109');
+    await usuario.type(screen.getByLabelText('Descrição do exame 1'), 'TC - Abdome superior');
+    await usuario.type(screen.getByLabelText('Quantidade do exame 1'), '1');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
   });
 
@@ -201,7 +213,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
     await usuario.type(campo, '202699999');
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
-    expect(anexar).toHaveBeenCalledWith(11, '202699999', expect.any(File));
+    expect(anexar).toHaveBeenCalledWith(11, '202699999', expect.any(File), EXAMES_EXEMPLO);
   });
 
   it('429 mostra "Tentar novamente" e mantém o arquivo anexado', async () => {
@@ -229,7 +241,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
 
   it('com rascunho salvo, mostra o anexo e o número salvos com Concluir habilitado', async () => {
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
     renderizar(11, api);
     expect(await screen.findByText('PDF anexado')).toBeInTheDocument();
     expect(screen.getByText('Guia_202610701.pdf')).toBeInTheDocument();
@@ -241,7 +253,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('com rascunho salvo, editar o número mantém o anexo salvo visível', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
     const campo = screen.getByLabelText('Número da Guia');
@@ -255,7 +267,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('com rascunho salvo, remover o anexo esconde o rascunho e desabilita Concluir mesmo com o número salvo', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
     await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
@@ -269,7 +281,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('concluir a Guia mostra que ela foi enviada para assinatura', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'));
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
     renderizar(11, api);
     await usuario.click(await screen.findByRole('button', { name: 'Concluir' }));
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
@@ -294,5 +306,159 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('pré-guia com Guia concluída mostra que ela já foi enviada para assinatura', async () => {
     renderizar(1);
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
+  });
+
+  describe('exames da Guia (T22-FE1)', () => {
+    const anexarComLeitura = async (usuario: ReturnType<typeof userEvent.setup>, nome: string) => {
+      await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf(nome));
+      await screen.findByText('PDF anexado');
+    };
+
+    it('sem exames lidos, mostra a mensagem para digitar e mantém Concluir desabilitado', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+
+      await anexarComLeitura(usuario, 'Guia_sem-exames.pdf');
+      expect(
+        screen.getByText('Não foi possível ler os exames desta Guia. Digite os exames impressos na Guia.'),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    });
+
+    it('linha nova em branco não mostra erro até ser mexida, e Concluir continua desabilitado', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      await usuario.click(screen.getByRole('button', { name: 'Adicionar exame' }));
+      expect(screen.getByLabelText('Cod DGP do exame 3')).toBeInTheDocument();
+      expect(screen.queryByText('Informe a descrição do exame.')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    });
+
+    it('quantidade zero mostra o erro no campo e desabilita Concluir', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      const quantidade = screen.getByLabelText('Quantidade do exame 1');
+      await usuario.clear(quantidade);
+      await usuario.type(quantidade, '0');
+      expect(screen.getByText('A quantidade deve ser um número inteiro maior que zero.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+
+      await usuario.clear(quantidade);
+      await usuario.type(quantidade, '3');
+      expect(screen.queryByText('A quantidade deve ser um número inteiro maior que zero.')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
+    });
+
+    it('código repetido na lista mostra o erro na segunda linha', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      await usuario.click(screen.getByRole('button', { name: 'Adicionar exame' }));
+      await usuario.type(screen.getByLabelText('Cod DGP do exame 3'), '41001109');
+      expect(
+        screen.getByText('Este código já está na lista. Some as quantidades numa linha só.'),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    });
+
+    it('remover a última linha mostra "Informe ao menos um exame" e desabilita Concluir', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      await usuario.click(screen.getAllByRole('button', { name: 'Remover' })[0]);
+      await usuario.click(screen.getByRole('button', { name: 'Remover' }));
+      expect(screen.getByText('Informe ao menos um exame da Guia.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    });
+
+    it('trocar o arquivo substitui a tabela pelos exames do novo arquivo', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      await usuario.click(screen.getByRole('button', { name: 'Trocar arquivo' }));
+      await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_sem-exames.pdf'));
+      expect(
+        await screen.findByText('Não foi possível ler os exames desta Guia. Digite os exames impressos na Guia.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByDisplayValue('TC - Abdome superior')).not.toBeInTheDocument();
+    });
+
+    it('422 sobre os exames aparece abaixo da tabela e a Guia não é concluída', async () => {
+      const usuario = userEvent.setup();
+      const api = mockApi();
+      vi.spyOn(api, 'anexarGuia').mockRejectedValueOnce(
+        new ApiError(422, 'Dados invalidos', ['exames: Cod DGP repetido na lista: 41001109']),
+      );
+      renderizar(11, api);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+
+      await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
+      expect(await screen.findByText('Cod DGP repetido na lista: 41001109')).toBeInTheDocument();
+      expect(screen.queryByText('Guia já enviada para assinatura')).not.toBeInTheDocument();
+    });
+
+    it('com rascunho salvo, editar um exame sem anexar o PDF de novo desabilita Concluir e explica o motivo', async () => {
+      const usuario = userEvent.setup();
+      const api = mockApi();
+      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+      renderizar(11, api);
+      await screen.findByText('Guia_202610701.pdf');
+
+      const quantidade = screen.getByLabelText('Quantidade do exame 1');
+      await usuario.clear(quantidade);
+      await usuario.type(quantidade, '3');
+      expect(
+        screen.getByText('Para salvar as alterações dos exames, anexe o PDF da Guia de novo.'),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    });
+
+    it('com rascunho salvo, os exames gravados voltam na tabela', async () => {
+      const api = mockApi();
+      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+      renderizar(11, api);
+      await screen.findByText('Guia_202610701.pdf');
+
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('41001109');
+      expect(screen.getByLabelText('Descrição do exame 1')).toHaveValue('TC - Abdome superior');
+      expect(screen.getByLabelText('Quantidade do exame 1')).toHaveValue('1');
+      expect(screen.getByLabelText('Cod DGP do exame 2')).toHaveValue('41001110');
+      expect(screen.getByLabelText('Quantidade do exame 2')).toHaveValue('2');
+      expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
+    });
+
+    it('remover o anexo limpa a tabela, e um novo anexo não reaproveita os exames antigos', async () => {
+      const usuario = userEvent.setup();
+      renderizar(11);
+      await screen.findByRole('button', { name: 'Concluir' });
+      await anexarComLeitura(usuario, 'Guia_12.pdf');
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('41001109');
+
+      await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
+      expect(screen.queryByText('Exames na Guia')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Cod DGP do exame 1')).not.toBeInTheDocument();
+
+      await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_sem-exames.pdf'));
+      expect(
+        await screen.findByText('Não foi possível ler os exames desta Guia. Digite os exames impressos na Guia.'),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Cod DGP do exame 1')).toHaveValue('');
+      expect(screen.queryByDisplayValue('TC - Abdome superior')).not.toBeInTheDocument();
+    });
   });
 });
