@@ -31,6 +31,7 @@ import EspelhoPage from './features/espelhoOcs/EspelhoPage'
 import GuiasFinalizadasPage from './features/espelhoOcs/GuiasFinalizadasPage'
 import EspelhoEmConstrucaoPage from './features/espelhoOcs/EspelhoEmConstrucaoPage'
 import GuiasRecebidasPage from './features/guiasRecebidasOcs/GuiasRecebidasPage'
+import DetalheGuiaRecebidaPage from './features/guiasRecebidasOcs/DetalheGuiaRecebidaPage'
 import EspelhoEnviadoDetalhePage from './features/espelhoOcs/EspelhoEnviadoDetalhePage'
 
 /**
@@ -98,6 +99,7 @@ export default function App() {
       <Route path="/ocs" element={<RotaProtegida perfil="OCS"><OcsLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="espelho" replace />} />
         <Route path="guias-recebidas" element={<GuiasRecebidasPage />} />
+        <Route path="guias-recebidas/:id" element={<DetalheGuiaRecebidaPage />} />
         <Route path="guias-finalizadas" element={<GuiasFinalizadasPage />} />
         <Route path="espelho" element={<EspelhoPage />} />
         <Route path="espelho/atual" element={<EspelhoEmConstrucaoPage />} />
