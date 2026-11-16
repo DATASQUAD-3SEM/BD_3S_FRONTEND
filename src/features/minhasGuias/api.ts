@@ -11,8 +11,8 @@ export const minhasGuiasApi: MinhasGuiasApi = {
     return post<GuiaDoBeneficiario>(`/guias/${id}/envio`, undefined)
   },
 
-  // T23-FE1: modo visualizar devolve o PDF para exibir no visualizador (inline).
-  obterPdf(preGuiaId: number): Promise<Blob> {
-    return getBlob(`/beneficiarios/me/pre-guias/${preGuiaId}/guia/pdf?modo=visualizar`)
+  // T23-FE1: PDF da guia do beneficiario, inline, para o visualizador (T23-BE2).
+  obterPdf(id: number): Promise<Blob> {
+    return getBlob(`/guias/${id}/pdf`)
   },
 }
