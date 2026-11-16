@@ -18,6 +18,26 @@ export function filtrarGuias(guias: GuiaRecebida[], termo: string): GuiaRecebida
   );
 }
 
+/** Data de hoje no fuso local, em AAAA-MM-DD (mesmo formato de validadeAte). */
+export function hojeIso(agora: Date = new Date()): string {
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${agora.getFullYear()}-${mes}-${dia}`;
+}
+
+/**
+ * Guia vencida: hoje passou da data NAO RECEBER APOS. A mesma regra do backend (hoje.isAfter(validadeAte)).
+ * Com a guia vencida, nenhuma sessao pode ser requerida.
+ */
+export function guiaVencida(validadeAte: string, hoje: string = hojeIso()): boolean {
+  return hoje > validadeAte;
+}
+
+/** Uma sessao so pode ser selecionada se estiver disponivel e a guia nao estiver vencida. */
+export function sessaoSelecionavel(sessao: SessaoRecebida, vencida: boolean): boolean {
+  return !vencida && sessao.status === 'DISPONIVEL';
+}
+
 /** Sessoes de um procedimento (pelo Cod DGP), na ordem do numero. */
 export function sessoesDoProcedimento(sessoes: SessaoRecebida[], codDgp: string): SessaoRecebida[] {
   return sessoes.filter((s) => s.procedimento === codDgp).sort((a, b) => a.numero - b.numero);
