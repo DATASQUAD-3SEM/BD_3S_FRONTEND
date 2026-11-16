@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import DetalheGuiaRecebidaPage from './DetalheGuiaRecebidaPage';
 import { guiasRecebidasApi } from './api';
+import { guiasFinalizadasApi } from '../espelhoOcs/api';
 import type { GuiaRecebidaDetalhe } from './types';
 import { ApiError } from '../../shared/api/http';
 import { formatarPrecCp } from '../../shared/utils/formatadores';
@@ -14,6 +15,15 @@ import { formatarPrecCp } from '../../shared/utils/formatadores';
 vi.mock('./api', () => ({
   guiasRecebidasApi: { listar: vi.fn(), buscarDetalhe: vi.fn(), solicitarAssinatura: vi.fn() },
 }));
+
+// O visualizador de PDF e o mesmo da OCS (espelhoOcs), que le GET /ocs/guias/{id}/pdf
+vi.mock('../espelhoOcs/api', () => ({
+  guiasFinalizadasApi: { obterPdf: vi.fn() },
+}));
+
+// O jsdom nao implementa URLs de objeto (blob)
+URL.createObjectURL = vi.fn(() => 'blob:teste');
+URL.revokeObjectURL = vi.fn();
 
 const guia: GuiaRecebidaDetalhe = {
   id: 7,
@@ -268,6 +278,55 @@ describe('T19-FE-2 · Modelo digitalizado da guia', () => {
       await usuario.click(screen.getByRole('button', { name: 'Requerer assinatura' }));
 
       expect(await screen.findByText('Esta guia não é da sua OCS.')).toBeInTheDocument();
+    });
+  });
+
+  describe('ver a guia em PDF (T19-FE-4)', () => {
+    const pdf = () => new Blob(['%PDF-1.4'], { type: 'application/pdf' });
+
+    it('o botão Ver guia (PDF) abre o visualizador e o mesmo botão fecha', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasFinalizadasApi.obterPdf).mockResolvedValue(pdf());
+      renderizar();
+
+      const botao = await screen.findByRole('button', { name: 'Ver guia (PDF)' });
+      expect(botao).toHaveAttribute('aria-expanded', 'false');
+
+      await usuario.click(botao);
+      expect(guiasFinalizadasApi.obterPdf).toHaveBeenCalledWith(7);
+      expect(await screen.findByText('Visualização somente leitura')).toBeInTheDocument();
+      expect(screen.getByLabelText('PDF da guia 202610703')).toBeInTheDocument();
+      expect(botao).toHaveAttribute('aria-expanded', 'true');
+
+      await usuario.click(botao);
+      expect(screen.queryByText('Visualização somente leitura')).not.toBeInTheDocument();
+      expect(botao).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('enquanto o PDF carrega, mostra "Carregando guia…"', async () => {
+      const usuario = userEvent.setup();
+      let liberar: (arquivo: Blob) => void = () => {};
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasFinalizadasApi.obterPdf).mockImplementation(
+        () => new Promise<Blob>((resolve) => (liberar = resolve)),
+      );
+      renderizar();
+
+      await usuario.click(await screen.findByRole('button', { name: 'Ver guia (PDF)' }));
+      expect(await screen.findByText('Carregando guia…')).toBeInTheDocument();
+      liberar(pdf());
+      expect(await screen.findByText('Visualização somente leitura')).toBeInTheDocument();
+    });
+
+    it('erro ao carregar o PDF mostra "Não foi possível carregar a guia."', async () => {
+      const usuario = userEvent.setup();
+      vi.mocked(guiasRecebidasApi.buscarDetalhe).mockResolvedValue(guia);
+      vi.mocked(guiasFinalizadasApi.obterPdf).mockRejectedValue(new Error('falhou'));
+      renderizar();
+
+      await usuario.click(await screen.findByRole('button', { name: 'Ver guia (PDF)' }));
+      expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar a guia.');
     });
   });
 });
