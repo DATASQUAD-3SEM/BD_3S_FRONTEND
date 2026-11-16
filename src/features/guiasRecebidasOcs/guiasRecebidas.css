@@ -1,0 +1,59 @@
+.gr-pagina h1 {
+  margin: 0 0 4px;
+}
+
+.gr-subtitulo {
+  margin: 0 0 16px;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+.gr-skeleton {
+  height: 48px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #e9edf2;
+}
+
+.gr-vazio {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+.gr-busca {
+  display: grid;
+  gap: 6px;
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+.gr-busca input {
+  padding: 8px 10px;
+  border: 1px solid #c7ced8;
+  border-radius: 6px;
+  font: inherit;
+}
+
+/* A tabela rola dentro da propria area, sem rolagem horizontal da pagina (telas pequenas). */
+.gr-tabela-area {
+  overflow-x: auto;
+}
+
+.gr-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gr-tabela th,
+.gr-tabela td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e3e7ed;
+  text-align: left;
+  vertical-align: top;
+}
+
+.gr-tabela th {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave, #5b6470);
+  font-weight: 600;
+}
