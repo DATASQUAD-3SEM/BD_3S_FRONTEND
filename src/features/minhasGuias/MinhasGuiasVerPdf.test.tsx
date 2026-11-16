@@ -5,20 +5,20 @@ import '@testing-library/jest-dom/vitest'
 import MinhasGuiasPage from './MinhasGuiasPage'
 import type { GuiaDoBeneficiario } from './types'
 
-// T23-FE1: botao "Ver guia (PDF)" em todo cartao, PDF pelo id da pre-guia e estados do visualizador.
+// T23-FE1: botao "Ver guia (PDF)" em todo cartao, PDF pelo id da guia (GET /guias/{id}/pdf) e estados do visualizador.
 
-const URL_PDF_NAO_ENVIADA = '/api/beneficiarios/me/pre-guias/60/guia/pdf?modo=visualizar'
-const URL_PDF_VENCIDA = '/api/beneficiarios/me/pre-guias/10/guia/pdf?modo=visualizar'
+const URL_PDF_NAO_ENVIADA = '/api/guias/6/pdf'
+const URL_PDF_VENCIDA = '/api/guias/1/pdf'
 
 const guias: GuiaDoBeneficiario[] = [
   {
-    id: 6, preGuiaId: 60, numero: '202610706', ocs: 'Laboratório Exemplo',
+    id: 6, numero: '202610706', ocs: 'Laboratório Exemplo',
     validadeAte: '2026-12-28', dataEnvio: null, situacao: 'NAO_ENVIADA',
     procedimentos: [{ codDgp: '40304361', descricao: 'Hemograma completo', quantidade: 2 }],
     sessoes: [],
   },
   {
-    id: 1, preGuiaId: 10, numero: '202610701', ocs: 'Hospital Exemplo',
+    id: 1, numero: '202610701', ocs: 'Hospital Exemplo',
     validadeAte: '2026-10-15', dataEnvio: '2026-09-01T10:00:00', situacao: 'VENCIDA',
     procedimentos: [{ codDgp: '40301630', descricao: 'Glicose', quantidade: 1 }],
     sessoes: [{ id: 101, procedimento: '40301630', numero: 1, status: 'EXPIRADA', dataSolicitacao: null, dataAssinatura: null }],
@@ -76,7 +76,7 @@ describe('T23-FE1 · Ver guia (PDF) em Minhas guias', () => {
     expect(screen.getAllByRole('button', { name: 'Ver guia (PDF)' })).toHaveLength(2)
   })
 
-  it('abre o PDF pelo id da pré-guia, em modo visualizar', async () => {
+  it('abre o PDF pelo id da guia', async () => {
     const fetchMock = stubbearComPdf()
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
