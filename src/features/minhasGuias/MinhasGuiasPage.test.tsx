@@ -318,11 +318,10 @@ describe('T18-FE-1 · Minhas guias', () => {
   })
 
   // Escopo (FE-2/3/4 ainda não)
-  it('não mostra os botões das próximas tasks (Enviar / Assinar sessões / Ver guia)', async () => {
+  it('não mostra o botão da próxima task (Assinar sessões)', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
     expect(screen.queryByRole('button', { name: /Assinar sessões/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Ver guia/i })).not.toBeInTheDocument()
   })
 })
 

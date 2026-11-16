@@ -48,4 +48,7 @@ export interface MinhasGuiasApi {
 
   /** POST /guias/{id}/envio — envia a guia pronta à OCS da pré-guia. */
   enviar(id: number): Promise<GuiaDoBeneficiario>
+
+  /** GET /guias/{id}/pdf — PDF com as assinaturas, inline (T23-BE2). */
+  obterPdf(id: number): Promise<Blob>
  }
