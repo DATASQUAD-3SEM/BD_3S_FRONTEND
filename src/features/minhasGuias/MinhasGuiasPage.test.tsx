@@ -317,16 +317,28 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(screen.getByText('Nenhuma guia finalizada.')).toBeInTheDocument()
   })
 
-  // Escopo (FE-2/3/4 ainda não)
-  it('não mostra os botões das próximas tasks (Enviar / Assinar sessões / Ver guia)', async () => {
+  it('só mostra "Assinar sessões" em guia Em execução; "Ver guia" segue fora (T18-FE-4)', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
-    expect(screen.queryByRole('button', { name: /Assinar sessões/i })).not.toBeInTheDocument()
+
+    // "Assinar sessões" NÃO aparece nas guias que não estão em EM_EXECUCAO
+    for (const numero of ['202610706', '202610705', '202610703', '202610702', '202610701']) {
+      expect(
+        within(cartaoDe(numero)).queryByRole('button', { name: /Assinar sessões/i }),
+      ).not.toBeInTheDocument()
+    }
+
+    // Aparece na guia Em execução (202610704 tem 1 sessão SOLICITADA)
+    expect(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (1)' }),
+    ).toBeInTheDocument()
+
+    // "Ver guia" continua fora de escopo (T18-FE-4, ainda não existe)
     expect(screen.queryByRole('button', { name: /Ver guia/i })).not.toBeInTheDocument()
   })
 })
 
-describe('T18-FE-2 · Enviar guia à OCS', () => {
+  describe('T18-FE-2 · Enviar guia à OCS', () => {
   it('o botão Enviar para a OCS aparece só em guia Não enviada', async () => {
     stubbearListaEEnvio()
     render(<MinhasGuiasPage />)
@@ -436,5 +448,361 @@ describe('T18-FE-2 · Enviar guia à OCS', () => {
       within(cartao).queryByRole('button', { name: 'Enviar para a OCS' }),
     ).not.toBeInTheDocument()
 
+  })
+})
+
+// ============================================================================
+// T18-FE-3 · Assinar sessão (uma por vez)
+// ============================================================================
+
+/** Guia 4 (Em execução) com 2 sessões SOLICITADAS e 1 ASSINADA — cenário principal da task. */
+function guiasComSessoesSolicitadas(): GuiaDoBeneficiario[] {
+  const base = guias.find((g) => g.id === 4)!
+  return [
+    ...guias.filter((g) => g.id !== 4),
+    {
+      ...base,
+      sessoes: [
+        sessao(401, '40304361', 1, 'ASSINADA', '2026-10-26T10:00:00', '2026-10-26T10:15:00'),
+        sessao(402, '40304361', 2, 'SOLICITADA', '2026-11-01T08:45:00'),
+        sessao(403, '40304361', 3, 'SOLICITADA', '2026-11-01T09:00:00'),
+      ],
+    },
+  ]
+}
+
+/** Guia 4 já atualizada como o backend devolveria depois de assinar a sessão 402. */
+function guiaAposAssinar402(): GuiaDoBeneficiario {
+  const lista = guiasComSessoesSolicitadas()
+  const guia = lista.find((g) => g.id === 4)!
+  return {
+    ...guia,
+    situacao: 'EM_EXECUCAO',
+    sessoes: guia.sessoes.map((s) =>
+      s.id === 402
+        ? { ...s, status: 'ASSINADA' as const, dataAssinatura: '2026-11-15T10:30:00' }
+        : s,
+    ),
+  }
+}
+
+/** Guia 4 já atualizada como o backend devolveria depois de assinar a última (403). */
+function guiaAposAssinarUltima(): GuiaDoBeneficiario {
+  const lista = guiasComSessoesSolicitadas()
+  const guia = lista.find((g) => g.id === 4)!
+  return {
+    ...guia,
+    situacao: 'REALIZADA',
+    sessoes: guia.sessoes.map((s) =>
+      s.status === 'SOLICITADA'
+        ? { ...s, status: 'ASSINADA' as const, dataAssinatura: '2026-11-15T10:30:00' }
+        : s,
+    ),
+  }
+}
+
+/** Mock de fetch: GET lista guias com 2 SOLICITADAS; POST assina (retorna guia atualizada). */
+function stubbearListaEAssinatura(resposta: GuiaDoBeneficiario = guiaAposAssinar402()) {
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      return Promise.resolve(respostaJson(guiasComSessoesSolicitadas()))
+    }
+    if (/^\/api\/guias\/\d+\/sessoes\/\d+\/assinatura$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(respostaJson(resposta))
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+/** Mock de fetch: POST responde 409 (sessão já não está SOLICITADA). */
+function stubbearAssinaturaComConflito() {
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      return Promise.resolve(respostaJson(guiasComSessoesSolicitadas()))
+    }
+    if (/^\/api\/guias\/\d+\/sessoes\/\d+\/assinatura$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(
+        respostaJson(
+          {
+            status: 409,
+            erro: 'Conflict',
+            mensagem: 'A sessao nao esta aguardando assinatura',
+            detalhes: [],
+            timestamp: '',
+          },
+          409,
+        ),
+      )
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+/** Mock de fetch: POST responde 422 (usuário sem assinatura cadastrada). */
+function stubbearAssinaturaSemAssinaturaCadastrada() {
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      return Promise.resolve(respostaJson(guiasComSessoesSolicitadas()))
+    }
+    if (/^\/api\/guias\/\d+\/sessoes\/\d+\/assinatura$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(
+        respostaJson(
+          {
+            status: 422,
+            erro: 'Unprocessable Entity',
+            mensagem: 'Dados invalidos',
+            detalhes: ['assinatura: Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.'],
+            timestamp: '',
+          },
+          422,
+        ),
+      )
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+/** Extrai o botão "Assinar" da sessão N dentro do painel. */
+function botaoAssinarDaSessao(numero: number): HTMLElement {
+  const painel = screen.getByRole('region', { name: 'Sessões para assinar' })
+  const item = within(painel)
+    .getAllByRole('listitem')
+    .find((li) => li.textContent?.includes(`Sessão ${numero} ·`))
+  if (!item) throw new Error(`Sessão ${numero} não encontrada no painel`)
+  return within(item as HTMLElement).getByRole('button', { name: 'Assinar' })
+}
+
+describe('T18-FE-3 · Assinar sessão', () => {
+  it('só mostra "Assinar sessões (Z)" em guia Em execução com Z > 0', async () => {
+    stubbearListaEAssinatura()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    // Guia EM_EXECUCAO com 2 SOLICITADAS: mostra o botão com o contador
+    expect(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    ).toBeInTheDocument()
+
+    // As demais (não EM_EXECUCAO) não mostram
+    for (const numero of ['202610706', '202610705', '202610703', '202610702', '202610701']) {
+      expect(
+        within(cartaoDe(numero)).queryByRole('button', { name: /Assinar sessões/i }),
+      ).not.toBeInTheDocument()
+    }
+  })
+
+  it('abrir "Assinar sessões" lista só as sessões SOLICITADA', async () => {
+    stubbearListaEAssinatura()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+
+    const painel = screen.getByRole('region', { name: 'Sessões para assinar' })
+    // As duas SOLICITADAS aparecem
+    expect(within(painel).getByText(/Sessão 2 · 40304361/)).toBeInTheDocument()
+    expect(within(painel).getByText(/Sessão 3 · 40304361/)).toBeInTheDocument()
+    // A ASSINADA (sessão 1) não aparece como solicitada
+    expect(within(painel).queryByText(/Sessão 1 · 40304361 · solicitada/)).not.toBeInTheDocument()
+    // "Já assinadas: sessão 1 em ..." aparece
+    expect(within(painel).getByText(/Já assinadas: sessão 1 em 26\/10\/2026/)).toBeInTheDocument()
+  })
+
+  it('enquanto uma sessão está em confirmação, os "Assinar" das outras ficam desabilitados', async () => {
+    stubbearListaEAssinatura()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+
+    await userEvent.click(botaoAssinarDaSessao(2))
+
+    // Confirmação da sessão 2 está aberta
+    expect(
+      screen.getByRole('region', { name: 'Confirmação da sessão 2' }),
+    ).toBeInTheDocument()
+    // Botão "Assinar" da sessão 3 fica desabilitado
+    expect(botaoAssinarDaSessao(3)).toBeDisabled()
+  })
+
+  it('Cancelar da confirmação fecha só aquela sessão, sem POST', async () => {
+    stubbearListaEAssinatura()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(screen.queryByRole('region', { name: 'Confirmação da sessão 2' })).not.toBeInTheDocument()
+    // A sessão 2 continua na lista com botão "Assinar" habilitado
+    expect(botaoAssinarDaSessao(2)).toBeEnabled()
+    // Nenhum POST foi feito
+    expect(chamadasPost()).toHaveLength(0)
+  })
+
+  it('Confirmar envia no endpoint certo, some a sessão da lista e mostra "Falta 1"', async () => {
+    stubbearListaEAssinatura(guiaAposAssinar402())
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+
+    // POST no endpoint certo
+    const post = chamadasPost()
+    expect(post).toHaveLength(1)
+    expect(post[0][0]).toBe('/api/guias/4/sessoes/402/assinatura')
+
+    // Mensagem "Falta 1"
+    expect(await screen.findByText('Sessão assinada. Falta 1 sessão.')).toBeInTheDocument()
+
+    // Sessão 2 saiu da lista de SOLICITADAS
+    const painel = screen.getByRole('region', { name: 'Sessões para assinar' })
+    expect(within(painel).queryByText(/Sessão 2 · 40304361 · solicitada/)).not.toBeInTheDocument()
+    // Sessão 3 continua
+    expect(within(painel).getByText(/Sessão 3 · 40304361/)).toBeInTheDocument()
+    // "Já assinadas" agora tem 1 e 2
+    expect(within(painel).getByText(/Já assinadas: sessão 2 em 15\/11\/2026/)).toBeInTheDocument()
+  })
+
+  it('ao assinar a última sessão, a guia vira Realizada e o painel fecha', async () => {
+    // Primeiro assina a 402 (ainda falta 1), depois a 403 (última) -> REALIZADA
+    fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+      const metodo = init?.method ?? 'GET'
+      if (url === '/api/guias/minhas' && metodo === 'GET') {
+        return Promise.resolve(respostaJson(guiasComSessoesSolicitadas()))
+      }
+      if (url === '/api/guias/4/sessoes/402/assinatura' && metodo === 'POST') {
+        return Promise.resolve(respostaJson(guiaAposAssinar402()))
+      }
+      if (url === '/api/guias/4/sessoes/403/assinatura' && metodo === 'POST') {
+        return Promise.resolve(respostaJson(guiaAposAssinarUltima()))
+      }
+      return Promise.resolve(new Response('', { status: 404 }))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+    await screen.findByText('Sessão assinada. Falta 1 sessão.')
+
+    // Agora assina a última (403)
+    await userEvent.click(botaoAssinarDaSessao(3))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+
+    // Painel fecha (todas assinadas)
+    expect(await screen.findByText('Todas as sessões solicitadas foram assinadas.')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Sessões para assinar' })).not.toBeInTheDocument()
+    // Guia virou REALIZADA
+    expect(within(cartaoDe('202610704')).getByText('Realizada')).toHaveClass('badge-realizada')
+  })
+
+  it('sem assinatura cadastrada: mostra a mensagem e desabilita "Confirmar assinatura"', async () => {
+    stubbearListaEAssinatura()
+    const originalFetch = fetchMock.getMockImplementation() as unknown as (
+      url: string,
+      init?: RequestInit,
+    ) => Promise<Response>
+
+    fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+      if (url === '/api/beneficiarios/me') {
+        return Promise.resolve(
+          respostaJson({
+            nome: 'Antonio Carlos',
+            cpf: '12345678900',
+            precCp: '45872213300',
+            telefone: '11987654321',
+            dataNascimento: '1978-05-10',
+            grupo: 'Exército Brasileiro · FUSEX',
+            assinaturaCadastrada: false,
+          }),
+        )
+      }
+      return originalFetch(url, init)
+    })
+
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+
+    // Mensagem visível e botão desabilitado
+    const confirmacao = screen.getByRole('region', { name: 'Confirmação da sessão 2' })
+    expect(
+      await within(confirmacao).findByText(
+        'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.',
+      ),
+    ).toBeInTheDocument()
+    expect(within(confirmacao).getByRole('button', { name: 'Confirmar assinatura' })).toBeDisabled()
+    // Nenhum POST foi feito
+    expect(chamadasPost()).toHaveLength(0)
+  })
+
+  it('409 ao confirmar (sessão já assinada): mostra a mensagem de erro dentro da confirmação', async () => {
+    stubbearAssinaturaComConflito()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+
+    const confirmacao = screen.getByRole('region', { name: 'Confirmação da sessão 2' })
+    expect(await within(confirmacao).findByRole('alert')).toHaveTextContent(
+      'Não foi possível assinar esta sessão. Ela pode ter sido assinada em outra aba.',
+    )
+    // Botão volta a ficar habilitado (permite tentar de novo)
+    expect(within(confirmacao).getByRole('button', { name: 'Confirmar assinatura' })).toBeEnabled()
+  })
+
+  it('422 ao confirmar (sem assinatura cadastrada): mostra a mensagem dentro da confirmação', async () => {
+    stubbearAssinaturaSemAssinaturaCadastrada()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    // Sem a chamada a /api/beneficiarios/me no stub, o client-side não barra —
+    // o fluxo cai no POST, e o back devolve 422 com a mensagem da seção 3.
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+
+    const confirmacao = screen.getByRole('region', { name: 'Confirmação da sessão 2' })
+    expect(await within(confirmacao).findByRole('alert')).toHaveTextContent(
+      'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.',
+    )
+    // Sessão continua SOLICITADA: o botão "Confirmar" segue disponível
+    expect(within(confirmacao).getByRole('button', { name: 'Confirmar assinatura' })).toBeEnabled()
   })
 })

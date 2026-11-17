@@ -10,4 +10,12 @@ export const minhasGuiasApi: MinhasGuiasApi = {
   enviar(id: number): Promise<GuiaDoBeneficiario> {
     return post<GuiaDoBeneficiario>(`/guias/${id}/envio`, undefined)
   },
+
+  // POST: a sessão precisa estar SOLICITADA (validação no backend, T18-BE-3).
+  assinar(idGuia: number, idSessao: number): Promise<GuiaDoBeneficiario> {
+    return post<GuiaDoBeneficiario>(
+      `/guias/${idGuia}/sessoes/${idSessao}/assinatura`,
+      undefined,
+    )
+  },
 }

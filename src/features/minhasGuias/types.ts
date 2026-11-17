@@ -48,4 +48,7 @@ export interface MinhasGuiasApi {
 
   /** POST /guias/{id}/envio — envia a guia pronta à OCS da pré-guia. */
   enviar(id: number): Promise<GuiaDoBeneficiario>
- }
+
+   /** POST /guias/{id}/sessoes/{sessaoId}/assinatura — assina uma sessão SOLICITADA. */
+  assinar(idGuia: number, idSessao: number): Promise<GuiaDoBeneficiario>
+}

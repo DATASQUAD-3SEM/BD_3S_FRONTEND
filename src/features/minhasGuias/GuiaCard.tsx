@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { formatarData } from '../../shared/utils/formatadores'
+import { ApiError } from '../../shared/api/http'
+import { obterBeneficiarioLogado } from '../beneficiario/dadosBeneficiario'
 import SituacaoGuiaBadge from './SituacaoGuiaBadge'
-import type { GuiaDoBeneficiario, MinhasGuiasApi } from './types'
+import type { GuiaDoBeneficiario, MinhasGuiasApi, SessaoDaGuia } from './types'
 
 interface Props {
   guia: GuiaDoBeneficiario
@@ -50,18 +52,36 @@ function textoPrincipal(guia: GuiaDoBeneficiario, c: Contadores): string {
   }
 }
 
+//Mensagem de erro padrão para o 422 "sem assinatura cadastrada" (mesma do backend)
+const MSG_SEM_ASSINATURA =
+  'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.'
+
+//Sessões ASSINADAS ordenadas por número, para a linha "Já assinadas: sessão N em ..."
+function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
+  return guia.sessoes
+    .filter((s) => s.status === 'ASSINADA')
+    .sort((a, b) => a.numero - b.numero)
+}
+
 export default function GuiaCard({ guia, api, onAtualizar }: Props) {
   const c = contarSessoes(guia)
   const sessoesAutorizadas = guia.procedimentos.reduce(
-  (total, p) => total + p.quantidade,
-  0,
-)
+    (total, p) => total + p.quantidade,
+    0,
+  )
+  const [assinaturaCadastrada, setAssinaturaCadastrada] = useState<boolean | null>(null)
 
   // Estado local do envio à OCS (T18-FE-2)
   const [confirmando, setConfirmando] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erroEnvio, setErroEnvio] = useState<string | null>(null)
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null)
+
+  // Estado local da assinatura de sessão (T18-FE-3)
+  const [painelSessoesAberto, setPainelSessoesAberto] = useState(false)
+  const [sessaoEmConfirmacao, setSessaoEmConfirmacao] = useState<number | null>(null)
+  const [assinando, setAssinando] = useState(false)
+  const [erroAssinatura, setErroAssinatura] = useState<string | null>(null)
 
   // Abre a confirmação, limpando resultado anterior
   function abrirConfirmacao() {
@@ -94,6 +114,90 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
       setEnviando(false)
     }
   }
+
+  // Abre o painel de sessões, limpando resultado anterior
+  function abrirPainelSessoes() {
+    setErroAssinatura(null)
+    setSessaoEmConfirmacao(null)
+    setMensagemSucesso(null)
+    setPainelSessoesAberto(true)
+  }
+
+  // Fecha o painel de sessões, limpando estado
+  function fecharPainelSessoes() {
+    setPainelSessoesAberto(false)
+    setSessaoEmConfirmacao(null)
+    setErroAssinatura(null)
+  }
+
+  // Abre a confirmação de uma sessão (uma por vez)
+  async function abrirConfirmacaoAssinatura(sessaoId: number) {
+    setErroAssinatura(null)
+    setMensagemSucesso(null)
+
+    // Client-side check: busca a assinatura cadastrada na 1ª abertura (cacheia no state).
+    // Se falhar a chamada, segue pro server-side (o backend devolve 422 se não tiver).
+    if (assinaturaCadastrada === null) {
+      try {
+        const b = await obterBeneficiarioLogado()
+        setAssinaturaCadastrada(b.assinaturaCadastrada === true)
+      } catch {
+        setAssinaturaCadastrada(true) // otimista: deixa tentar; o back responde 422 se não tiver
+      }
+    }
+
+    setSessaoEmConfirmacao(sessaoId)
+  }
+
+  function cancelarAssinatura() {
+    setSessaoEmConfirmacao(null)
+    setErroAssinatura(null)
+  }
+
+  // confirma a assinatura: chama POST /guias/{id}/sessoes/{sessaoId}/assinatura.
+  // Em sucesso, atualiza o cartão via onAtualizar, mostra a mensagem de quantas faltam
+  // e fecha o painel se não houver mais sessões SOLICITADA.
+  // 422 = sem assinatura cadastrada (fallback server-side); 409 = sessão já não está SOLICITADA.
+  async function confirmarAssinatura(sessaoId: number) {
+    if (assinando) return
+    setAssinando(true)
+    setErroAssinatura(null)
+
+    try {
+      const atualizada = await api.assinar(guia.id, sessaoId)
+      onAtualizar(atualizada)
+
+      const cAtualizado = contarSessoes(atualizada)
+      setSessaoEmConfirmacao(null)
+
+      if (cAtualizado.solicitadas === 0) {
+        // Não há mais nada para assinar nesta guia: fecha o painel
+        setPainelSessoesAberto(false)
+        setMensagemSucesso('Todas as sessões solicitadas foram assinadas.')
+      } else {
+        const faltam = cAtualizado.solicitadas
+        setMensagemSucesso(
+          `Sessão assinada. ${faltam === 1 ? 'Falta 1 sessão' : `Faltam ${faltam} sessões`}.`,
+        )
+      }
+    } catch (erro: unknown) {
+      if (erro instanceof ApiError && erro.status === 422) {
+        setErroAssinatura(MSG_SEM_ASSINATURA)
+      } else if (erro instanceof ApiError && erro.status === 409) {
+        setErroAssinatura(
+          'Não foi possível assinar esta sessão. Ela pode ter sido assinada em outra aba.',
+        )
+      } else {
+        setErroAssinatura('Não foi possível assinar a sessão. Tente novamente.')
+      }
+    } finally {
+      setAssinando(false)
+    }
+  }
+
+  const solicitadas = guia.sessoes.filter((s) => s.status === 'SOLICITADA')
+  const assinadas = sessoesAssinadas(guia)
+  const semAssinaturaCadastrada = assinaturaCadastrada === false
 
   return (
     <article className="mg-card" aria-label={`Guia nº ${guia.numero}`}>
@@ -190,11 +294,139 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         </div>
       )}
 
-      {/* mensagem de sucesso, depois do envio */}
-      {mensagemSucesso && (
+      {/* mensagem de sucesso do envio */}
+      {mensagemSucesso && !painelSessoesAberto && (
         <p className="mg-sucesso" role="status">
           {mensagemSucesso}
         </p>
+      )}
+
+      {/* botão "Assinar sessões (Z)": só em Em execução com Z > 0 (T18-FE-3) */}
+      {guia.situacao === 'EM_EXECUCAO' && c.solicitadas > 0 && !painelSessoesAberto && (
+        <button
+          type="button"
+          className="mg-card__acao-primaria"
+          onClick={abrirPainelSessoes}
+        >
+          Assinar sessões ({c.solicitadas})
+        </button>
+      )}
+
+      {/* painel de sessões SOLICITADAS, dentro do cartão (T18-FE-3) */}
+      {painelSessoesAberto && (
+        <div className="mg-assinar" role="region" aria-label="Sessões para assinar">
+          <header className="mg-assinar__topo">
+            <p className="mg-assinar__titulo">
+              <strong>Sessões solicitadas para assinatura</strong>
+            </p>
+            <button
+              type="button"
+              className="mg-botao"
+              onClick={fecharPainelSessoes}
+              disabled={assinando}
+            >
+              Fechar
+            </button>
+          </header>
+
+          {solicitadas.length === 0 ? (
+            <p className="mg-assinar__vazio">Nenhuma sessão aguardando assinatura.</p>
+          ) : (
+            <ul className="mg-assinar__lista">
+              {solicitadas.map((sessao) => {
+                const emConfirmacao = sessaoEmConfirmacao === sessao.id
+                const outraEmConfirmacao =
+                  sessaoEmConfirmacao !== null && sessaoEmConfirmacao !== sessao.id
+
+                return (
+                  <li key={sessao.id} className="mg-assinar__sessao">
+                    <div className="mg-assinar__sessao-cabecalho">
+                      <span>
+                        Sessão {sessao.numero} · {sessao.procedimento}
+                        {sessao.dataSolicitacao && (
+                          <> · solicitada em {formatarData(sessao.dataSolicitacao)}</>
+                        )}
+                      </span>
+                      {!emConfirmacao && (
+                        <button
+                          type="button"
+                          className="mg-botao"
+                          onClick={() => abrirConfirmacaoAssinatura(sessao.id)}
+                          disabled={outraEmConfirmacao || assinando}
+                        >
+                          Assinar
+                        </button>
+                      )}
+                    </div>
+
+                    {emConfirmacao && (
+                      <div
+                        className="mg-assinar__confirmacao"
+                        role="region"
+                        aria-label={`Confirmação da sessão ${sessao.numero}`}
+                      >
+                        <p className="mg-assinar__confirmacao-titulo">
+                          <strong>
+                            Assinar a sessão {sessao.numero} · {sessao.procedimento}?
+                          </strong>
+                        </p>
+
+                        {semAssinaturaCadastrada ? (
+                          <p className="mg-assinar__erro" role="alert">
+                            {MSG_SEM_ASSINATURA}
+                          </p>
+                        ) : (
+                          erroAssinatura && (
+                            <p className="mg-assinar__erro" role="alert">
+                              {erroAssinatura}
+                            </p>
+                          )
+                        )}
+
+                        <div className="mg-assinar__acoes">
+                          <button
+                            type="button"
+                            className="mg-botao mg-botao--primario"
+                            onClick={() => void confirmarAssinatura(sessao.id)}
+                            disabled={
+                              assinando || semAssinaturaCadastrada
+                            }
+                          >
+                            {assinando ? 'Assinando...' : 'Confirmar assinatura'}
+                          </button>
+                          <button
+                            type="button"
+                            className="mg-botao"
+                            onClick={cancelarAssinatura}
+                            disabled={assinando}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          {assinadas.length > 0 && (
+            <ul className="mg-assinar__ja-assinadas">
+              {assinadas.map((sessao) => (
+                <li key={sessao.id}>
+                  Já assinadas: sessão {sessao.numero} em {formatarData(sessao.dataAssinatura)}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {mensagemSucesso && (
+            <p className="mg-sucesso" role="status">
+              {mensagemSucesso}
+            </p>
+          )}
+        </div>
       )}
     </article>
   )
