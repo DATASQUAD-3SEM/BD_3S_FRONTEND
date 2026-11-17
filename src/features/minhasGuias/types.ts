@@ -43,12 +43,15 @@ export interface GuiaDoBeneficiario {
 }
 
 export interface MinhasGuiasApi {
-  /** GET /guias/minhas — o backend já devolve da mais recente para a mais antiga. */
-    listar(): Promise<GuiaDoBeneficiario[]>
+  /** GET /guias/minhas: o backend já devolve da mais recente para a mais antiga. */
+  listar(): Promise<GuiaDoBeneficiario[]>
 
-  /** POST /guias/{id}/envio — envia a guia pronta à OCS da pré-guia. */
+  /** POST /guias/{id}/envio: envia a guia pronta à OCS da pré-guia. */
   enviar(id: number): Promise<GuiaDoBeneficiario>
 
-   /** POST /guias/{id}/sessoes/{sessaoId}/assinatura — assina uma sessão SOLICITADA. */
+  /** POST /guias/{id}/sessoes/{sessaoId}/assinatura: assina uma sessão SOLICITADA. */
   assinar(idGuia: number, idSessao: number): Promise<GuiaDoBeneficiario>
+
+  /** GET /guias/{id}/pdf: PDF com as assinaturas, inline (T23-BE2). */
+  obterPdf(id: number): Promise<Blob>
 }

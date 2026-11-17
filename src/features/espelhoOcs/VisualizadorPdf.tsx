@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { guiasFinalizadasApi } from './api'
+import './guiasFinalizadas.css'
 
 interface Props {
   guiaId: number
   numero: string
   onFechar: () => void
+  /** Quem busca o PDF. Sem ele, usa a rota da OCS (guia finalizada). T23-FE1 passa a rota do beneficiario. */
+  obterPdf?: () => Promise<Blob>
 }
 
 const ZOOM_MINIMO = 0.5
 const ZOOM_MAXIMO = 2
 const PASSO_ZOOM = 0.25
 
-export default function VisualizadorPdf({ guiaId, numero, onFechar }: Props) {
+export default function VisualizadorPdf({ guiaId, numero, onFechar, obterPdf }: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [estado, setEstado] = useState<'carregando' | 'pronto' | 'erro'>('carregando')
   const [zoom, setZoom] = useState(1)
@@ -20,8 +23,8 @@ export default function VisualizadorPdf({ guiaId, numero, onFechar }: Props) {
   useEffect(() => {
     let ativo = true
     let url: string | null = null
-    guiasFinalizadasApi
-      .obterPdf(guiaId)
+    const buscar = obterPdf ?? (() => guiasFinalizadasApi.obterPdf(guiaId))
+    buscar()
       .then((pdf) => {
         if (!ativo) return
         url = URL.createObjectURL(pdf)
@@ -35,7 +38,7 @@ export default function VisualizadorPdf({ guiaId, numero, onFechar }: Props) {
       ativo = false
       if (url) URL.revokeObjectURL(url)
     }
-  }, [guiaId])
+  }, [guiaId, obterPdf])
 
   function alternarTelaCheia() {
     const elemento = containerRef.current

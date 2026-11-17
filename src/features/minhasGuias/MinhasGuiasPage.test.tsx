@@ -317,7 +317,7 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(screen.getByText('Nenhuma guia finalizada.')).toBeInTheDocument()
   })
 
-  it('só mostra "Assinar sessões" em guia Em execução; "Ver guia" segue fora (T18-FE-4)', async () => {
+  it('só mostra "Assinar sessões" em guia Em execução', async () => {
     render(<MinhasGuiasPage />)
     await screen.findByLabelText('Guia nº 202610706')
 
@@ -332,9 +332,6 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(
       within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (1)' }),
     ).toBeInTheDocument()
-
-    // "Ver guia" continua fora de escopo (T18-FE-4, ainda não existe)
-    expect(screen.queryByRole('button', { name: /Ver guia/i })).not.toBeInTheDocument()
   })
 })
 
