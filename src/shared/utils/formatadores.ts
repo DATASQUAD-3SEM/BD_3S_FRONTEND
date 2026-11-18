@@ -57,6 +57,15 @@ export function mascaraCpf(valor: string): string {
   return r
 }
 
+/** Mascara de digitacao da data: dd/mm/aaaa. */
+export function mascaraData(valor: string): string {
+  const d = somenteDigitos(valor).slice(0, 8)
+  let r = d.slice(0, 2)
+  if (d.length > 2) r += `/${d.slice(2, 4)}`
+  if (d.length > 4) r += `/${d.slice(4, 8)}`
+  return r
+}
+
 /** Mascara de digitacao do Prec CP: 000000000-00. */
 export function mascaraPrecCp(valor: string): string {
   const d = somenteDigitos(valor).slice(0, 11)
