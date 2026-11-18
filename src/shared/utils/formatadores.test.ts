@@ -6,6 +6,7 @@ import {
   formatarPrecCp,
   formatarTelefone,
   mascaraCpf,
+  mascaraData,
   mascaraPrecCp,
   mascaraTelefone,
 } from './formatadores'
@@ -62,6 +63,19 @@ describe('máscaras de digitação', () => {
     expect(mascaraCpf('5299822')).toBe('529.982.2')
     expect(mascaraPrecCp('4587221330099')).toBe('458722133-00')
     expect(mascaraTelefone('1298765')).toBe('(12) 98765')
+  })
+})
+
+describe('mascaraData', () => {
+  it('aplica dd/mm/aaaa enquanto o usuário digita e ignora o que não é dígito', () => {
+    expect(mascaraData('')).toBe('')
+    expect(mascaraData('0')).toBe('0')
+    expect(mascaraData('010')).toBe('01/0')
+    expect(mascaraData('01012')).toBe('01/01/2')
+    expect(mascaraData('01012027')).toBe('01/01/2027')
+    expect(mascaraData('01/01/2027')).toBe('01/01/2027')
+    expect(mascaraData('0101202799')).toBe('01/01/2027')
+    expect(mascaraData('ab01')).toBe('01')
   })
 })
 
