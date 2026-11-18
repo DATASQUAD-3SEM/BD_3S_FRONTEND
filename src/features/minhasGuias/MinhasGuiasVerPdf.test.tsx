@@ -42,7 +42,7 @@ function stubbearComPdf(modoPdf: 'ok' | 'erro' | 'pendente' = 'ok') {
       if (modoPdf === 'pendente') return new Promise<Response>(() => {})
       if (modoPdf === 'erro') return Promise.resolve(new Response('', { status: 500 }))
       return Promise.resolve(
-        new Response(new Blob(['%PDF-1.4 mock'], { type: 'application/pdf' }), { status: 200 }),
+        new Response('%PDF-1.4 mock', { status: 200, headers: { 'Content-Type': 'application/pdf' } }),
       )
     }
     return Promise.resolve(new Response('', { status: 404 }))

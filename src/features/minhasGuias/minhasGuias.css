@@ -231,3 +231,111 @@
   color: #1d3d30;
   font-size: 14px;
 }
+
+/* Painel "Assinar sessões", abaixo do botão primário do cartão */
+.mg-assinar {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #eef5f0;
+  border: 1px solid #b9c4bd;
+  border-radius: 10px;
+}
+
+/* Cabeçalho: título + botão Fechar */
+.mg-assinar__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.mg-assinar__titulo {
+  margin: 0;
+  color: #1f3d2b;
+  font-size: 15px;
+}
+
+/* Lista de sessões SOLICITADAS */
+.mg-assinar__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mg-assinar__sessao {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.mg-assinar__sessao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: #1f2a24;
+}
+
+/* Confirmação inline de uma sessão (uma por vez) */
+.mg-assinar__confirmacao {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f6faf7;
+  border: 1px dashed #b9c4bd;
+  border-radius: 8px;
+}
+
+.mg-assinar__confirmacao-titulo {
+  margin: 0 0 8px;
+  color: #1f3d2b;
+  font-size: 14px;
+}
+
+.mg-assinar__erro {
+  margin: 0 0 8px;
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.mg-assinar__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Estado vazio (raro: painel aberto e todas já assinadas em outra aba) */
+.mg-assinar__vazio {
+  margin: 0 0 10px;
+  color: #5b6b62;
+  font-size: 14px;
+}
+
+/* "Já assinadas: sessão N em dd/mm/aaaa" (uma linha por sessão) */
+.mg-assinar__ja-assinadas {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid #dfe5e1;
+  font-size: 14px;
+  color: #1f5e37;
+}
+
+.mg-assinar__ja-assinadas li + li {
+  margin-top: 4px;
+}
+
+/* Empilha o cabeçalho da sessão no celular */
+@media (max-width: 600px) {
+  .mg-assinar__sessao-cabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -11,6 +11,14 @@ export const minhasGuiasApi: MinhasGuiasApi = {
     return post<GuiaDoBeneficiario>(`/guias/${id}/envio`, undefined)
   },
 
+  // POST: a sessão precisa estar SOLICITADA (validação no backend, T18-BE-3).
+  assinar(idGuia: number, idSessao: number): Promise<GuiaDoBeneficiario> {
+    return post<GuiaDoBeneficiario>(
+      `/guias/${idGuia}/sessoes/${idSessao}/assinatura`,
+      undefined,
+    )
+  },
+
   // T23-FE1: PDF da guia do beneficiario, inline, para o visualizador (T23-BE2).
   obterPdf(id: number): Promise<Blob> {
     return getBlob(`/guias/${id}/pdf`)
