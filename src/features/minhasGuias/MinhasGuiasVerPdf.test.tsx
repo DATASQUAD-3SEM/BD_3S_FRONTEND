@@ -116,6 +116,43 @@ describe('T23-FE1 · Ver guia (PDF) em Minhas guias', () => {
     await userEvent.click(within(cartaoDe('202610706')).getByRole('button', { name: 'Ver guia (PDF)' }))
 
     expect(await screen.findByText('Não foi possível carregar a guia.')).toBeInTheDocument()
+    
+  })
+
+  it('após falha, "Tentar novamente" refaz a busca e exibe o PDF', async () => {
+    let tentativas = 0
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/guias/minhas') {
+        return Promise.resolve(respostaJson(guias))
+      }
+      if (url === URL_PDF_NAO_ENVIADA) {
+        tentativas += 1
+        if (tentativas === 1) return Promise.resolve(new Response('', { status: 500 }))
+        return Promise.resolve(
+          new Response('%PDF-1.4 mock', {
+            status: 200,
+            headers: { 'Content-Type': 'application/pdf' },
+          }),
+        )
+      }
+      return Promise.resolve(new Response('', { status: 404 }))
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610706')
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Ver guia (PDF)' }),
+    )
+    expect(await screen.findByText('Não foi possível carregar a guia.')).toBeInTheDocument()
+
+    await userEvent.click(
+      within(cartaoDe('202610706')).getByRole('button', { name: 'Tentar novamente' }),
+    )
+
+    expect(await screen.findByTitle('PDF da guia 202610706')).toBeInTheDocument()
+    expect(chamadasPdf(fetchMock, URL_PDF_NAO_ENVIADA)).toHaveLength(2)
   })
 
   it('fechar e abrir de novo busca o PDF outra vez (sem cache)', async () => {
