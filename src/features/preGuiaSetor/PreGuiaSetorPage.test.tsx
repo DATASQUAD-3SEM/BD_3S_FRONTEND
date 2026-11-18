@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import PreGuiaSetorPage from './PreGuiaSetorPage';
 import { criarMockPreGuiaSetor } from './api.mock';
+import { hojeIso } from './conferenciaGuia';
 import { ApiError } from '../../shared/api/http';
 
 beforeAll(() => {
@@ -20,6 +21,25 @@ const EXAMES_EXEMPLO = [
   { codDgp: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 },
   { codDgp: '41001110', descricao: 'Ultrassonografia de abdome total', quantidade: 2 },
 ];
+
+const UG_FUSEX = 'Cmdo Bda Inf Amv';
+
+/** Hoje + 1 ano em yyyy-mm-dd: a validade futura que a leitura de exemplo devolve. */
+const umAnoDepois = () => {
+  const data = new Date();
+  data.setFullYear(data.getFullYear() + 1);
+  return hojeIso(data);
+};
+
+/** Conferencia valida para semear um rascunho direto no mock (T16-BE2). */
+const CONFERENCIA_VALIDA = { ug: UG_FUSEX, ugOrigem: UG_FUSEX, validadeAte: umAnoDepois() };
+
+/** O que o PUT leva depois de ler um PDF de exemplo e concluir sem mexer nos campos. */
+const CONFERENCIA_ENVIADA = {
+  ug: UG_FUSEX,
+  ugOrigem: UG_FUSEX,
+  validadeAte: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+};
 
 describe('T4-FE · Tela Pré-guia {número}', () => {
   it('mostra o título, o badge e os dados do beneficiário', async () => {
@@ -107,24 +127,36 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await screen.findByText('Número extraído automaticamente. Você pode editar se necessário.');
     expect(anexar).not.toHaveBeenCalled();
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
-    expect(anexar).toHaveBeenCalledWith(11, '202610678', expect.any(File), EXAMES_EXEMPLO);
+    expect(anexar).toHaveBeenCalledWith(11, '202610678', expect.any(File), EXAMES_EXEMPLO, CONFERENCIA_ENVIADA);
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
   });
 
-  it('durante a leitura, o botão mostra "Lendo arquivo..." e Concluir fica desabilitado', async () => {
+  it('durante a leitura, número, UG e validade ficam bloqueados e vazios, o anexo mantém o texto e Concluir fica desabilitado', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
     let liberar: () => void = () => {};
-    vi.spyOn(api, 'extrairNumeroGuia').mockImplementationOnce(() => new Promise((resolve) => (liberar = () => resolve({ numeroGuia: '202610678' }))));
+    vi.spyOn(api, 'extrairNumeroGuia').mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          liberar = () =>
+            resolve({ numeroGuia: '202610678', ug: UG_FUSEX, ugOrigem: UG_FUSEX, validadeAte: umAnoDepois() });
+        }),
+    );
     renderizar(11, api);
     await screen.findByRole('button', { name: 'Concluir' });
     await usuario.upload(screen.getByLabelText('Escolher PDF da Guia'), pdf('Guia_12.pdf'));
-    expect(await screen.findByRole('button', { name: 'Lendo arquivo...' })).toBeDisabled();
+    expect(await screen.findByText('Lendo o PDF da Guia...')).toBeInTheDocument();
+    // o texto do botão de anexo não muda; ele só fica desabilitado
+    expect(screen.getByRole('button', { name: 'Anexar Guia' })).toBeDisabled();
     expect(screen.getByLabelText('Número da Guia')).toBeDisabled();
-    expect(screen.getByText('Lendo o número da Guia...')).toBeInTheDocument();
+    expect(screen.getByLabelText('UG da Guia')).toBeDisabled();
+    expect(screen.getByLabelText('UG da Guia')).toHaveValue('');
+    expect(screen.getByLabelText('Validade (NÃO RECEBER APÓS)')).toBeDisabled();
+    expect(screen.getByLabelText('Validade (NÃO RECEBER APÓS)')).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
     liberar();
     expect(await screen.findByRole('button', { name: 'Trocar arquivo' })).toBeEnabled();
+    expect(screen.queryByText('Lendo o PDF da Guia...')).not.toBeInTheDocument();
   });
 
   it('PDF sem número legível (422) libera o campo e mantém Concluir desabilitado até digitar', async () => {
@@ -144,6 +176,11 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     await usuario.type(screen.getByLabelText('Cod DGP do exame 1'), '41001109');
     await usuario.type(screen.getByLabelText('Descrição do exame 1'), 'TC - Abdome superior');
     await usuario.type(screen.getByLabelText('Quantidade do exame 1'), '1');
+    // a leitura que falhou não trouxe UG nem validade: o setor também digita esses campos (T16-FE)
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+
+    await usuario.type(screen.getByLabelText('UG da Guia'), UG_FUSEX);
+    await usuario.type(screen.getByLabelText('Validade (NÃO RECEBER APÓS)'), '01012099');
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
   });
 
@@ -213,7 +250,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
     await usuario.type(campo, '202699999');
     await usuario.click(screen.getByRole('button', { name: 'Concluir' }));
-    expect(anexar).toHaveBeenCalledWith(11, '202699999', expect.any(File), EXAMES_EXEMPLO);
+    expect(anexar).toHaveBeenCalledWith(11, '202699999', expect.any(File), EXAMES_EXEMPLO, CONFERENCIA_ENVIADA);
   });
 
   it('429 mostra "Tentar novamente" e mantém o arquivo anexado', async () => {
@@ -241,7 +278,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
 
   it('com rascunho salvo, mostra o anexo e o número salvos com Concluir habilitado', async () => {
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
     renderizar(11, api);
     expect(await screen.findByText('PDF anexado')).toBeInTheDocument();
     expect(screen.getByText('Guia_202610701.pdf')).toBeInTheDocument();
@@ -253,7 +290,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('com rascunho salvo, editar o número mantém o anexo salvo visível', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
     const campo = screen.getByLabelText('Número da Guia');
@@ -267,7 +304,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('com rascunho salvo, remover o anexo esconde o rascunho e desabilita Concluir mesmo com o número salvo', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
     renderizar(11, api);
     await screen.findByText('Guia_202610701.pdf');
     await usuario.click(screen.getByRole('button', { name: 'Remover anexo' }));
@@ -281,7 +318,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
   it('concluir a Guia mostra que ela foi enviada para assinatura', async () => {
     const usuario = userEvent.setup();
     const api = mockApi();
-    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+    await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
     renderizar(11, api);
     await usuario.click(await screen.findByRole('button', { name: 'Concluir' }));
     expect(await screen.findByText('Guia já enviada para assinatura')).toBeInTheDocument();
@@ -415,7 +452,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     it('com rascunho salvo, editar um exame sem anexar o PDF de novo desabilita Concluir e explica o motivo', async () => {
       const usuario = userEvent.setup();
       const api = mockApi();
-      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
       renderizar(11, api);
       await screen.findByText('Guia_202610701.pdf');
 
@@ -430,7 +467,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
 
     it('com rascunho salvo, os exames gravados voltam na tabela', async () => {
       const api = mockApi();
-      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO);
+      await api.anexarGuia(11, '202610701', pdf('Guia_202610701.pdf'), EXAMES_EXEMPLO, CONFERENCIA_VALIDA);
       renderizar(11, api);
       await screen.findByText('Guia_202610701.pdf');
 
