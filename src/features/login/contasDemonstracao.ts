@@ -21,6 +21,7 @@ export const CONTAS_DEMONSTRACAO: ContaDemonstracao[] = [
   { perfil: 'MEDICO', login: '11144477735', descricao: 'Cria pré-guias, corrige as devolvidas e assina Guias.' },
   { perfil: 'CHEFE_FUSEX', login: 'chefe.fusex', descricao: 'Assina Guias e gerencia beneficiários e médicos.' },
   { perfil: 'SETOR_GUIAS', login: 'setor.guias', descricao: 'Analisa as pré-guias e anexa as Guias do SIRE.' },
+  { perfil: 'SETOR_FATURAS', login: 'setor.faturas', descricao: 'Recebe os espelhos das OCS, protocola e acompanha as faturas.' },
   { perfil: 'RECEPCAO', login: 'recepcao', descricao: 'Imprime Guias concluídas.' },
   { perfil: 'OCS', login: 'ocs.laboratorio', descricao: 'Monta o espelho com as guias finalizadas e envia ao FUSEX.' },
 ]

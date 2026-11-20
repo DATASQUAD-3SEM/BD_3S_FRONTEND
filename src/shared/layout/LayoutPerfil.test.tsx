@@ -34,6 +34,7 @@ describe('LayoutPerfil (T0-FE)', () => {
       MEDICO: ['Início', 'Nova pré-guia', 'Corrigir pré-guias', 'Guias para assinar', 'Minhas informações'],
       CHEFE_FUSEX: ['Guias para assinar', 'Beneficiários', 'Médicos', 'Minhas informações'],
       SETOR_GUIAS: ['Fila de pré-guias'],
+      SETOR_FATURAS: ['Espelhos recebidos', 'Faturas Auditadas'],
       RECEPCAO: ['Guias para impressão'],
     }
     for (const perfil of Object.keys(esperado) as Perfil[]) {

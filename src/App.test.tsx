@@ -35,6 +35,7 @@ const LOGINS: Record<Perfil, string> = {
   MEDICO: '11144477735',
   CHEFE_FUSEX: 'chefe.fusex',
   SETOR_GUIAS: 'setor.guias',
+  SETOR_FATURAS: 'setor.faturas',
   RECEPCAO: 'recepcao',
   OCS: 'ocs.laboratorio',
 }
