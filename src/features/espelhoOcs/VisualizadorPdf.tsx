@@ -18,6 +18,8 @@ export default function VisualizadorPdf({ guiaId, numero, onFechar, obterPdf }: 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [estado, setEstado] = useState<'carregando' | 'pronto' | 'erro'>('carregando')
   const [zoom, setZoom] = useState(1)
+  // T18-FE-4: reexecuta o efeito de busca após falha, sem recarregar a lista.
+  const [tentativa, setTentativa] = useState(0)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -38,7 +40,14 @@ export default function VisualizadorPdf({ guiaId, numero, onFechar, obterPdf }: 
       ativo = false
       if (url) URL.revokeObjectURL(url)
     }
-  }, [guiaId, obterPdf])
+  }, [guiaId, obterPdf, tentativa])
+
+  // O setState do retry fica no handler, nao no efeito (react-hooks/set-state-in-effect).
+  function tentarNovamente() {
+    setEstado('carregando')
+    setPdfUrl(null)
+    setTentativa((n) => n + 1)
+  }
 
   function alternarTelaCheia() {
     const elemento = containerRef.current
@@ -85,9 +94,14 @@ export default function VisualizadorPdf({ guiaId, numero, onFechar, obterPdf }: 
 
       {estado === 'carregando' && <p aria-busy="true">Carregando guia…</p>}
       {estado === 'erro' && (
-        <p role="alert" className="estado-erro">
-          Não foi possível carregar a guia.
-        </p>
+        <div>
+          <p role="alert" className="estado-erro">
+            Não foi possível carregar a guia.
+          </p>
+          <button type="button" className="botao" onClick={tentarNovamente}>
+            Tentar novamente
+          </button>
+        </div>
       )}
       {estado === 'pronto' && pdfUrl && (
         <div className="ge-visualizador-area">
