@@ -4,6 +4,16 @@ import { preGuiaSetorApi } from './api';
 import ColunaCorrecao from './components/ColunaCorrecao';
 import ColunaGerarGuia from './components/ColunaGerarGuia';
 import ViewerEncaminhamento from './components/ViewerEncaminhamento';
+import {
+  brParaIso,
+  conferirGuia,
+  errosDeConferenciaDoServidor,
+  isoParaBr,
+  mensagemDoCampoUg,
+  temErroDeConferencia,
+  UG_FUSEX,
+  type ErrosServidorConferencia,
+} from './conferenciaGuia';
 import { formatarExame, textoCriadaPor } from './formatadores';
 import { formatarPrecCp, formatarCpf } from '../../shared/utils/formatadores'; // T17-FE
 import {
@@ -33,10 +43,19 @@ interface Props {
 type Carga = 'carregando' | 'pronto' | 'nao-encontrada' | 'erro';
 type Acao = 'correcao' | 'conclusao';
 
-/** PDF escolhido nesta sessao (ainda nao enviado) e o numero que esta no campo. `null` = so o rascunho salvo. */
+/**
+ * PDF escolhido nesta sessao (ainda nao enviado) e o que esta nos campos de numero, UG e validade (T16-FE).
+ * `null` = so o rascunho salvo.
+ */
 interface AnexoSessao {
   arquivo: File | null;
   numero: string;
+  /** Valor do campo "UG da Guia". */
+  ug: string;
+  /** UG Origem lida do PDF: sem campo e nao editavel, nao muda quando a UG do campo e corrigida. */
+  ugOrigem: string | null;
+  /** Valor do campo de validade, em dd/mm/aaaa. */
+  validade: string;
   /** Usuario removeu o anexo nesta sessao: esconde tambem o rascunho salvo. */
   removido: boolean;
 }
@@ -54,6 +73,8 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   // Tabela de exames (T22-FE1): so e preenchida na primeira carga, para nao perder edicoes em recargas.
   const [linhas, setLinhas] = useState<LinhaExame[]>([]);
   const [erroExames, setErroExames] = useState<string | null>(null);
+  // T16-BE2: o servidor recusou UG, UG Origem ou validade (422); a mensagem aparece abaixo do campo.
+  const [errosServidor, setErrosServidor] = useState<ErrosServidorConferencia | null>(null);
   const examesIniciados = useRef(false);
 
   const idAtual = detalhe?.id;
@@ -169,6 +190,33 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const nomeArquivo = anexo?.removido ? null : (arquivoNovo?.name ?? rascunho?.nomeArquivo ?? null);
   // Com o anexo escondido, o rascunho não pode ser concluído.
   const rascunhoVisivel = nomeArquivo ? rascunho : null;
+
+  // T16-FE: UG e validade. Com um rascunho salvo, a UG vem preenchida com a do FUSEX (a unica aceita: o rascunho so
+  // existe se passou na conferencia) e a validade e a gravada. A UG Origem so existe depois de ler um PDF.
+  const ugGuia = anexo ? anexo.ug : rascunho ? UG_FUSEX : '';
+  const validadeGuia = anexo ? anexo.validade : isoParaBr(rascunho?.validadeAte);
+  const ugOrigemLida = anexo ? anexo.ugOrigem : null;
+  // Sem PDF anexado, os campos estao vazios de proposito: nao ha o que conferir.
+  const erros = nomeArquivo
+    ? conferirGuia({ ug: ugGuia, ugOrigemLida, validade: validadeGuia })
+    : { ug: null, ugOrigem: null, validade: null };
+  const conferenciaPendente = temErroDeConferencia(erros);
+  const erroUg = mensagemDoCampoUg(erros) ?? errosServidor?.ug ?? errosServidor?.ugOrigem ?? null;
+  const erroValidade = erros.validade ?? errosServidor?.validadeAte ?? null;
+
+  // Edita um campo sem perder o resto do que esta na tela; com so o rascunho salvo, parte dos valores dele.
+  const editarAnexo = (mudancas: Partial<AnexoSessao>) => {
+    setErrosServidor(null);
+    setAnexo({
+      arquivo: arquivoNovo,
+      numero: numeroGuia,
+      ug: ugGuia,
+      ugOrigem: ugOrigemLida,
+      validade: validadeGuia,
+      removido: anexo?.removido ?? false,
+      ...mudancas,
+    });
+  };
   const situacao = situacaoDecisao(detalhe);
   const ativa = situacao === 'ativa';
   const origemMedico = detalhe.origem === 'MEDICO';
@@ -195,15 +243,28 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   // Envia o PDF escolhido (se houver) com o numero do campo e depois conclui a Guia.
   // Com PDF novo, envia o PDF, o numero e os exames (T22-BE1) e depois conclui a Guia (T22-BE2).
   // Um 422 sobre os exames aparece abaixo da tabela e a Guia nao e concluida.
+  // T16-FE: o PUT leva tambem ug (campo), ugOrigem (lida do PDF; se nao foi lida, o valor do campo UG) e validadeAte
+  // (yyyy-mm-dd). ug e ugOrigem so servem para o servidor conferir. Um 422 sobre UG, UG Origem ou validade aparece
+  // abaixo do campo e a Guia nao e concluida.
   const concluirGuia = () => {
     setErroExames(null);
+    setErrosServidor(null);
     return executar(
       'conclusao',
       async () => {
         if (arquivoNovo) {
           try {
-            await api.anexarGuia(detalhe.id, numeroGuia.trim(), arquivoNovo, paraExamesGuia(linhas));
+            await api.anexarGuia(detalhe.id, numeroGuia.trim(), arquivoNovo, paraExamesGuia(linhas), {
+              ug: ugGuia.trim(),
+              ugOrigem: (ugOrigemLida ?? ugGuia).trim(),
+              validadeAte: brParaIso(validadeGuia) ?? '',
+            });
           } catch (erro) {
+            const errosConferencia = errosDeConferenciaDoServidor(erro);
+            if (errosConferencia) {
+              setErrosServidor(errosConferencia);
+              return;
+            }
             if (erroDeExames(erro)) {
               setErroExames(mensagemDeErro(erro, { padrao: 'Confira os exames da Guia.' }));
               return;
@@ -225,9 +286,19 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const examesOk = examesValidos(linhas);
   const examesMudaramSemArquivo =
     arquivoNovo === null && rascunhoVisivel !== null && !examesIguaisAoSalvo(linhas, rascunhoVisivel.exames);
-  const avisoConclusao = examesMudaramSemArquivo
-    ? 'Para salvar as alterações dos exames, anexe o PDF da Guia de novo.'
-    : null;
+  // T16-FE: o mesmo vale para a validade (a UG nao e gravada, entao corrigi-la nao exige o PDF de novo).
+  const validadeMudouSemArquivo =
+    arquivoNovo === null &&
+    rascunhoVisivel !== null &&
+    brParaIso(validadeGuia) !== (rascunhoVisivel.validadeAte ?? null);
+  const avisoConclusao =
+    examesMudaramSemArquivo && validadeMudouSemArquivo
+      ? 'Para salvar as alterações, anexe o PDF da Guia de novo.'
+      : examesMudaramSemArquivo
+        ? 'Para salvar as alterações dos exames, anexe o PDF da Guia de novo.'
+        : validadeMudouSemArquivo
+          ? 'Para salvar a alteração da validade, anexe o PDF da Guia de novo.'
+          : null;
 
   // T17-FE: Tratamento seguro para o CPF
   const cpfLimpo = detalhe.beneficiario.cpf?.replace(/\D/g, '');
@@ -320,6 +391,11 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 numero={numeroGuia}
                 nomeArquivo={nomeArquivo}
                 arquivoNovo={arquivoNovo}
+                ug={ugGuia}
+                validade={validadeGuia}
+                erroUg={erroUg}
+                erroValidade={erroValidade}
+                conferenciaPendente={conferenciaPendente}
                 linhasExames={linhas}
                 onExamesChange={(novas) => {
                   setErroExames(null);
@@ -334,19 +410,32 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                     rascunho: rascunhoVisivel,
                   }) &&
                   examesOk &&
-                  !examesMudaramSemArquivo
+                  !conferenciaPendente &&
+                  !examesMudaramSemArquivo &&
+                  !validadeMudouSemArquivo
                 }
                 enviandoConclusao={acao === 'conclusao'}
                 extrairNumeroGuia={api.extrairNumeroGuia}
-                onNumeroChange={(numero) => setAnexo({ arquivo: arquivoNovo, numero, removido: anexo?.removido ?? false })}
-                onAnexar={(pdf, numero, exames) => {
-                  setAnexo({ arquivo: pdf, numero, removido: false });
-                  setLinhas(linhasDeExames(exames));
+                onNumeroChange={(numero) => editarAnexo({ numero })}
+                onUgChange={(ug) => editarAnexo({ ug })}
+                onValidadeChange={(validade) => editarAnexo({ validade })}
+                onAnexar={(pdf, leitura) => {
+                  setAnexo({
+                    arquivo: pdf,
+                    numero: leitura.numero,
+                    ug: leitura.ug,
+                    ugOrigem: leitura.ugOrigem,
+                    validade: isoParaBr(leitura.validadeAte),
+                    removido: false,
+                  });
+                  setLinhas(linhasDeExames(leitura.exames));
                   setErroExames(null);
+                  setErrosServidor(null);
                 }}
                 onRemover={() => {
-                  setAnexo({ arquivo: null, numero: '', removido: true });
+                  setAnexo({ arquivo: null, numero: '', ug: '', ugOrigem: null, validade: '', removido: true });
                   setLinhas([]);
+                  setErrosServidor(null);
                 }}
                 onConcluir={concluirGuia}
               />

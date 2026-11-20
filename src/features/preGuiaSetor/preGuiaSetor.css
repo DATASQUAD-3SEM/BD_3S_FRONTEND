@@ -38,6 +38,9 @@
 }
 .pgs__contador { margin: 0; font-size: 12px; color: #6b7a71; text-align: right; }
 .pgs__erro { margin: 0; font-size: 13px; color: #8a1c12; }
+.pgs__erro-campo { margin: 0; font-size: 13px; color: #8a1c12; }
+.pgs__campo[aria-invalid='true'] { border-color: #8a1c12; }
+.pgs__campo:disabled { background: #eef3ef; color: #6b7a71; }
 .pgs__anexo {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px;
   border: 1px solid #b9c4bd; border-radius: 10px; background: #eef3ef;

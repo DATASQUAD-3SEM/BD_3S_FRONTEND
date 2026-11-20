@@ -1,12 +1,17 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { ApiError } from '../../../shared/api/http';
-import { somenteDigitos } from '../../../shared/utils/formatadores';
+import { mascaraData, somenteDigitos } from '../../../shared/utils/formatadores';
+import { MSG_CONFERENCIA_PENDENTE } from '../conferenciaGuia';
 import type { LinhaExame } from '../examesGuia';
 import { validarPdfGuia } from '../regras';
-import type { ExameGuia, ExtracaoNumeroGuia } from '../types';
+import type { ExtracaoNumeroGuia, LeituraDaGuia } from '../types';
 import TabelaExamesGuia from './TabelaExamesGuia';
 
 const TAMANHO_MAXIMO_NUMERO = 20;
+const TAMANHO_MAXIMO_UG = 100;
+
+/** Resultado de uma leitura que nao trouxe nada: o setor digita tudo. */
+const LEITURA_VAZIA: LeituraDaGuia = { numero: '', exames: [], ug: '', ugOrigem: null, validadeAte: null };
 
 interface Mensagem {
   tipo: 'ok' | 'aviso' | 'erro';
@@ -20,6 +25,15 @@ interface Props {
   nomeArquivo: string | null;
   /** PDF escolhido nesta sessao e ainda nao enviado. */
   arquivoNovo: File | null;
+  /** UG da Guia (T16-FE): editavel depois da leitura. */
+  ug: string;
+  /** Validade em dd/mm/aaaa (T16-FE): editavel depois da leitura. */
+  validade: string;
+  /** Erro da conferencia da UG ou da UG Origem (que nao tem campo), mostrado abaixo da UG. */
+  erroUg: string | null;
+  erroValidade: string | null;
+  /** Ha erro de UG, UG Origem ou validade no navegador: o texto abaixo do Concluir explica. */
+  conferenciaPendente: boolean;
   /** Exames da Guia, editaveis na tabela (T22-FE1). */
   linhasExames: LinhaExame[];
   onExamesChange: (linhas: LinhaExame[]) => void;
@@ -31,16 +45,23 @@ interface Props {
   enviandoConclusao: boolean;
   extrairNumeroGuia: (pdf: File) => Promise<ExtracaoNumeroGuia>;
   onNumeroChange: (numero: string) => void;
-  onAnexar: (pdf: File, numero: string, exames: ExameGuia[]) => void;
+  onUgChange: (ug: string) => void;
+  onValidadeChange: (validade: string) => void;
+  onAnexar: (pdf: File, leitura: LeituraDaGuia) => void;
   onRemover: () => void;
   onConcluir: () => void;
 }
 
-/** Coluna "Gerar a Guia" (T4-FE, ajustada em T11-FE e T22-FE1). */
+/** Coluna "Gerar a Guia" (T4-FE, ajustada em T11-FE, T22-FE1 e T16-FE). */
 export default function ColunaGerarGuia({
                                           numero,
                                           nomeArquivo,
                                           arquivoNovo,
+                                          ug,
+                                          validade,
+                                          erroUg,
+                                          erroValidade,
+                                          conferenciaPendente,
                                           linhasExames,
                                           onExamesChange,
                                           erroExames,
@@ -49,6 +70,8 @@ export default function ColunaGerarGuia({
                                           enviandoConclusao,
                                           extrairNumeroGuia,
                                           onNumeroChange,
+                                          onUgChange,
+                                          onValidadeChange,
                                           onAnexar,
                                           onRemover,
                                           onConcluir,
@@ -58,13 +81,20 @@ export default function ColunaGerarGuia({
   const [mensagem, setMensagem] = useState<Mensagem | null>(null);
   const ocupado = lendo || enviandoConclusao;
 
-  // Le o numero do PDF. A leitura nao grava nada; o arquivo so fica anexado nesta tela.
+  // Le o numero, a UG, a UG Origem, a validade e os exames do PDF. A leitura nao grava nada; o arquivo so fica
+  // anexado nesta tela.
   const lerArquivo = async (pdf: File) => {
     setLendo(true);
     setMensagem(null);
     try {
-      const { numeroGuia, exames } = await extrairNumeroGuia(pdf);
-      onAnexar(pdf, numeroGuia, exames ?? []);
+      const leitura = await extrairNumeroGuia(pdf);
+      onAnexar(pdf, {
+        numero: leitura.numeroGuia,
+        exames: leitura.exames ?? [],
+        ug: leitura.ug ?? '',
+        ugOrigem: leitura.ugOrigem ?? null,
+        validadeAte: leitura.validadeAte ?? null,
+      });
       setMensagem({ tipo: 'ok', texto: 'Número extraído automaticamente. Você pode editar se necessário.' });
     } catch (erro) {
       const status = erro instanceof ApiError ? erro.status : 500;
@@ -73,7 +103,7 @@ export default function ColunaGerarGuia({
         setMensagem({ tipo: 'erro', texto: 'Arquivo inválido. Envie um PDF válido e tente novamente.' });
         return;
       }
-      onAnexar(pdf, '', []);
+      onAnexar(pdf, LEITURA_VAZIA);
       if (status === 422) {
         setMensagem({ tipo: 'aviso', texto: 'Não foi possível ler o número automaticamente. Digite o número da Guia.' });
       } else if (status === 429) {
@@ -109,6 +139,10 @@ export default function ColunaGerarGuia({
     onRemover();
   };
 
+  // Durante a leitura os erros ficam escondidos: os campos estao vazios so porque a leitura ainda nao terminou.
+  const mostrarErroUg = !lendo && erroUg !== null;
+  const mostrarErroValidade = !lendo && erroValidade !== null;
+
   return (
     <div className="pgs__coluna">
       <h3>Gerar a Guia</h3>
@@ -119,7 +153,7 @@ export default function ColunaGerarGuia({
           <span className="pgs__pill">PDF anexado</span>
           <span className="pgs__nome-arquivo">{nomeArquivo}</span>
           <button type="button" className="botao" disabled={ocupado} onClick={abrirSeletor}>
-            {lendo ? 'Lendo arquivo...' : 'Trocar arquivo'}
+            Trocar arquivo
           </button>
           <button
             type="button"
@@ -137,7 +171,7 @@ export default function ColunaGerarGuia({
       ) : (
         <div>
           <button type="button" className="botao" disabled={ocupado} onClick={abrirSeletor}>
-            {lendo ? 'Lendo arquivo...' : 'Anexar Guia'}
+            Anexar Guia
           </button>
         </div>
       )}
@@ -176,7 +210,41 @@ export default function ColunaGerarGuia({
         value={lendo ? '' : numero}
         onChange={(e) => onNumeroChange(somenteDigitos(e.target.value).slice(0, TAMANHO_MAXIMO_NUMERO))}
       />
-      {lendo && <p className="pgs__pequeno">Lendo o número da Guia...</p>}
+
+      <label htmlFor="pgs-ug-guia">UG da Guia</label>
+      <input
+        id="pgs-ug-guia"
+        className="pgs__campo"
+        type="text"
+        autoComplete="off"
+        maxLength={TAMANHO_MAXIMO_UG}
+        disabled={lendo}
+        value={lendo ? '' : ug}
+        aria-invalid={mostrarErroUg}
+        aria-describedby={mostrarErroUg ? 'pgs-ug-guia-erro' : undefined}
+        onChange={(e) => onUgChange(e.target.value)}
+      />
+      {mostrarErroUg && <p id="pgs-ug-guia-erro" role="alert" className="pgs__erro-campo">{erroUg}</p>}
+
+      <label htmlFor="pgs-validade-guia">Validade (NÃO RECEBER APÓS)</label>
+      <input
+        id="pgs-validade-guia"
+        className="pgs__campo"
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        placeholder="dd/mm/aaaa"
+        disabled={lendo}
+        value={lendo ? '' : validade}
+        aria-invalid={mostrarErroValidade}
+        aria-describedby={mostrarErroValidade ? 'pgs-validade-guia-erro' : undefined}
+        onChange={(e) => onValidadeChange(mascaraData(e.target.value))}
+      />
+      {mostrarErroValidade && (
+        <p id="pgs-validade-guia-erro" role="alert" className="pgs__erro-campo">{erroValidade}</p>
+      )}
+
+      {lendo && <p role="status" className="pgs__pequeno">Lendo o PDF da Guia...</p>}
 
       {nomeArquivo && !lendo && (
         <div>
@@ -197,7 +265,9 @@ export default function ColunaGerarGuia({
       <p className="pgs__pequeno">
         {podeConcluir
           ? 'Ao concluir, a Guia segue para a assinatura do médico e do chefe.'
-          : 'Disponível depois de anexar a Guia.'}
+          : nomeArquivo && !lendo && conferenciaPendente
+            ? MSG_CONFERENCIA_PENDENTE
+            : 'Disponível depois de anexar a Guia.'}
       </p>
       {avisoConclusao && <p role="status" className="pgs__aviso">{avisoConclusao}</p>}
     </div>
