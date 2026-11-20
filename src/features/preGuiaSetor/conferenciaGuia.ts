@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http';
-import { formatarData } from '../../shared/utils/formatadores';
+import { formatarData, somenteDigitos } from '../../shared/utils/formatadores';
 
 /**
  * Conferencia da UG, da UG Origem e da validade da Guia no navegador (T16-FE). O servidor confere de novo
@@ -117,4 +117,37 @@ export function errosDeConferenciaDoServidor(erro: unknown): ErrosServidorConfer
     if (achado) erros[achado[1] as keyof ErrosServidorConferencia] = achado[2];
   }
   return Object.keys(erros).length > 0 ? erros : null;
+}
+
+/**
+ * Conferencia do Prec CP do paciente (T21-FE / T21-BE1). O Prec CP lido do PDF e comparado (so digitos) com o
+ * da pre-guia. `precCpConfere` true/false vem da leitura 200; null quando o Prec CP nao foi lido (ou a pre-guia
+ * nao tem Prec CP) ou quando a leitura respondeu 422 (PDF sem numero). Nao bloqueia o Concluir quando null.
+ */
+export const MSG_PREC_CP_NAO_LIDO =
+  'Não foi possível ler o Prec CP do paciente nesta Guia. Confira se ela é do paciente desta pré-guia antes de concluir.';
+
+export interface MensagemConferenciaPaciente {
+  estilo: 'ok' | 'erro' | 'aviso';
+  texto: string;
+}
+
+/** Monta a mensagem do bloco do paciente conforme o resultado da conferencia do Prec CP. */
+export function mensagemConferenciaPaciente(
+  precCpConfere: boolean | null,
+  precCpLido: string | null,
+  precCpCadastrado: string,
+): MensagemConferenciaPaciente {
+  const cadastrado = somenteDigitos(precCpCadastrado);
+  if (precCpConfere === true) {
+    return { estilo: 'ok', texto: `O Prec CP do paciente confere com a pré-guia (${cadastrado}).` };
+  }
+  if (precCpConfere === false) {
+    const lido = somenteDigitos(precCpLido ?? '');
+    return {
+      estilo: 'erro',
+      texto: `O Prec CP do paciente nesta Guia (${lido}) é diferente do Prec CP da pré-guia (${cadastrado}). Esta Guia pode ser de outro paciente. Troque o arquivo.`,
+    };
+  }
+  return { estilo: 'aviso', texto: MSG_PREC_CP_NAO_LIDO };
 }

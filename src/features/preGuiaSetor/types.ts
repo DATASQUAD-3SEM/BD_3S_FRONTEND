@@ -86,6 +86,8 @@ export interface GuiaConcluidaResposta {
 /**
  * Contrato T11-BE1, estendido pela T21-BE1 e T16-BE1: POST /setor-guias/extrair-numero-guia. Nao grava nada.
  * `ug`, `ugOrigem` e `validadeAte` (yyyy-mm-dd) vem nulos quando o PDF nao os traz (nao e erro).
+ * T21-BE1: `precCpLido` (so digitos, ou null quando nao foi lido) e `precCpConfere` (true/false, ou null quando
+ * o Prec CP nao foi lido ou a pre-guia nao tem Prec CP cadastrado; sem preGuiaId a comparacao nao e feita).
  */
 export interface ExtracaoNumeroGuia {
   numeroGuia: string;
@@ -93,6 +95,8 @@ export interface ExtracaoNumeroGuia {
   ug?: string | null;
   ugOrigem?: string | null;
   validadeAte?: string | null;
+  precCpLido?: string | null;
+  precCpConfere?: boolean | null;
 }
 
 /** O que a tela guarda depois de ler o PDF (ou de uma leitura que falhou: tudo vazio). */
@@ -104,6 +108,10 @@ export interface LeituraDaGuia {
   ugOrigem: string | null;
   /** yyyy-mm-dd; nula se nao foi lida. */
   validadeAte: string | null;
+  /** Prec CP do paciente lido do PDF (T21-BE1); null quando nao foi lido. Ausente quando a leitura falhou (429/500). */
+  precCpLido?: string | null;
+  /** Resultado da conferencia do Prec CP (T21-BE1): true/false, ou null quando nao foi lido. Ausente quando a leitura falhou. */
+  precCpConfere?: boolean | null;
 }
 
 /**
@@ -120,7 +128,7 @@ export interface PreGuiaSetorApi {
   detalhar(id: number): Promise<DetalhePreGuia>;
   abrir(id: number): Promise<AberturaResposta>;
   requererCorrecao(id: number, observacao: string): Promise<CorrecaoResposta>;
-  extrairNumeroGuia(pdf: File): Promise<ExtracaoNumeroGuia>;
+  extrairNumeroGuia(pdf: File, preGuiaId?: number): Promise<ExtracaoNumeroGuia>;
   anexarGuia(
     id: number,
     numeroGuia: string,

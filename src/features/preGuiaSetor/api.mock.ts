@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http';
-import { formatarData } from '../../shared/utils/formatadores';
+import { formatarData, somenteDigitos } from '../../shared/utils/formatadores';
 import { hojeIso, UG_FUSEX, ugEhDoFusex } from './conferenciaGuia';
 import type {
   DetalhePreGuia,
@@ -46,6 +46,28 @@ function conferenciaDoNome(nome: string): LeituraConferencia {
   if (nome.includes('guia-202610678-exemplo')) return { ug: UG_FUSEX, ugOrigem: UG_FUSEX, validadeAte: '2026-10-20' };
   if (nome.includes('guia-ok')) return { ug: UG_FUSEX, ugOrigem: UG_FUSEX, validadeAte: '2027-01-01' };
   return { ug: UG_FUSEX, ugOrigem: UG_FUSEX, validadeAte: validadeFutura() };
+}
+
+/**
+ * Prec CP do paciente lido do PDF e resultado da conferencia com a pre-guia (T21-BE1). A comparacao ignora
+ * pontos e tracos. Cenarios pelo nome do PDF (prototipo T21-FE): "guia-outro-paciente" (Prec CP de outra
+ * pessoa), "guia-sem-prec-cp" (Prec CP nao lido) e "guia-dependente" (le o Prec CP do dependente, que e o
+ * paciente). Sem preGuiaId (ou pre-guia sem Prec CP), a comparacao nao e feita e precCpConfere vem null.
+ */
+function precCpDaLeitura(
+  nome: string,
+  cadastrado: string | undefined,
+): { precCpLido: string | null; precCpConfere: boolean | null } {
+  if (nome.includes('guia-sem-prec-cp')) return { precCpLido: null, precCpConfere: null };
+  if (nome.includes('guia-outro-paciente')) {
+    const lido = '99999999999';
+    return { precCpLido: lido, precCpConfere: cadastrado ? somenteDigitos(cadastrado) === lido : null };
+  }
+  if (cadastrado) {
+    // guia-ok, guia-dependente (le o dependente, que e o paciente) e demais: confere.
+    return { precCpLido: somenteDigitos(cadastrado), precCpConfere: true };
+  }
+  return { precCpLido: null, precCpConfere: null };
 }
 
 interface OpcoesMock {
@@ -149,7 +171,7 @@ export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreG
       detalhe.status = 'ATENCAO';
       return { status: detalhe.status, dataDecisao: new Date().toISOString() };
     },
-    async extrairNumeroGuia(pdf) {
+    async extrairNumeroGuia(pdf, preGuiaId) {
       await espera();
       const nome = pdf.name.toLowerCase();
       if (nome.includes('sem-numero')) throw new ApiError(422, 'Número não encontrado');
@@ -157,8 +179,19 @@ export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreG
       if (nome.includes('limite')) throw new ApiError(429, 'Excesso de requisições');
       if (nome.includes('falha')) throw new ApiError(500, 'Falha inesperada');
       const conferencia = conferenciaDoNome(nome);
-      if (nome.includes('sem-exames')) return { numeroGuia: '202610678', exames: [], ...conferencia };
-      return { numeroGuia: '202610678', exames: EXAMES_EXEMPLO.map((e) => ({ ...e })), ...conferencia };
+      // T21-BE1: Prec CP do paciente e conferencia com o da pre-guia (quando ha preGuiaId).
+      const cadastrado = preGuiaId !== undefined ? registros.get(preGuiaId)?.beneficiario.precCp : undefined;
+      const precCp = precCpDaLeitura(nome, cadastrado);
+      let exames: ExameGuia[];
+      if (nome.includes('guia-dependente')) {
+        // PDF de dependente: uma consulta ao pediatra (codigo da Guia, nao TUSS).
+        exames = [{ codDgp: '50011015', descricao: 'Consulta ao pediatra', quantidade: 1 }];
+      } else if (nome.includes('sem-exames')) {
+        exames = [];
+      } else {
+        exames = EXAMES_EXEMPLO.map((e) => ({ ...e }));
+      }
+      return { numeroGuia: '202610678', exames, ...conferencia, ...precCp };
     },
 
     // Confere como o servidor (T16-BE2): UG, UG Origem e validade valem 422 e nada e gravado. So a validade e gravada.

@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { ApiError } from '../../../shared/api/http';
 import { mascaraData, somenteDigitos } from '../../../shared/utils/formatadores';
-import { MSG_CONFERENCIA_PENDENTE } from '../conferenciaGuia';
+import { MSG_CONFERENCIA_PENDENTE, mensagemConferenciaPaciente } from '../conferenciaGuia';
 import type { LinhaExame } from '../examesGuia';
 import { validarPdfGuia } from '../regras';
 import type { ExtracaoNumeroGuia, LeituraDaGuia } from '../types';
@@ -34,6 +34,12 @@ interface Props {
   erroValidade: string | null;
   /** Ha erro de UG, UG Origem ou validade no navegador: o texto abaixo do Concluir explica. */
   conferenciaPendente: boolean;
+  /** Prec CP do paciente cadastrado na pre-guia (para a mensagem de conferencia - T21-FE). */
+  precCpCadastrado: string;
+  /** Prec CP do paciente lido do PDF (T21-BE1); null quando nao foi lido. */
+  precCpLido: string | null;
+  /** Resultado da conferencia do Prec CP: true/false, null quando nao foi lido; undefined quando a leitura falhou (429/500) ou nao ha anexo novo. */
+  precCpConfere: boolean | null | undefined;
   /** Exames da Guia, editaveis na tabela (T22-FE1). */
   linhasExames: LinhaExame[];
   onExamesChange: (linhas: LinhaExame[]) => void;
@@ -62,6 +68,9 @@ export default function ColunaGerarGuia({
                                           erroUg,
                                           erroValidade,
                                           conferenciaPendente,
+                                          precCpCadastrado,
+                                          precCpLido,
+                                          precCpConfere,
                                           linhasExames,
                                           onExamesChange,
                                           erroExames,
@@ -81,8 +90,8 @@ export default function ColunaGerarGuia({
   const [mensagem, setMensagem] = useState<Mensagem | null>(null);
   const ocupado = lendo || enviandoConclusao;
 
-  // Le o numero, a UG, a UG Origem, a validade e os exames do PDF. A leitura nao grava nada; o arquivo so fica
-  // anexado nesta tela.
+  // Le o numero, a UG, a UG Origem, a validade, os exames e o Prec CP do paciente do PDF (T21-BE1). A leitura
+  // nao grava nada; o arquivo so fica anexado nesta tela.
   const lerArquivo = async (pdf: File) => {
     setLendo(true);
     setMensagem(null);
@@ -94,6 +103,9 @@ export default function ColunaGerarGuia({
         ug: leitura.ug ?? '',
         ugOrigem: leitura.ugOrigem ?? null,
         validadeAte: leitura.validadeAte ?? null,
+        // T21-BE1: precCpConfere null = nao lido ou sem Prec CP na pre-guia (mostra aviso, nao bloqueia).
+        precCpLido: leitura.precCpLido ?? null,
+        precCpConfere: leitura.precCpConfere ?? null,
       });
       setMensagem({ tipo: 'ok', texto: 'Número extraído automaticamente. Você pode editar se necessário.' });
     } catch (erro) {
@@ -103,16 +115,20 @@ export default function ColunaGerarGuia({
         setMensagem({ tipo: 'erro', texto: 'Arquivo inválido. Envie um PDF válido e tente novamente.' });
         return;
       }
-      onAnexar(pdf, LEITURA_VAZIA);
       if (status === 422) {
+        // PDF sem numero: o Prec CP tambem nao foi lido - mostra o aviso de Prec CP nao lido e o de exames.
+        onAnexar(pdf, { ...LEITURA_VAZIA, precCpLido: null, precCpConfere: null });
         setMensagem({ tipo: 'aviso', texto: 'Não foi possível ler o número automaticamente. Digite o número da Guia.' });
       } else if (status === 429) {
+        // 429/500: valem as mensagens da T11-FE, sem mensagem nova do bloco do paciente.
+        onAnexar(pdf, LEITURA_VAZIA);
         setMensagem({
           tipo: 'erro',
           texto: 'Muitas tentativas de leitura. Aguarde um instante e tente novamente.',
           tentarNovamente: true,
         });
       } else {
+        onAnexar(pdf, LEITURA_VAZIA);
         setMensagem({ tipo: 'erro', texto: 'Não foi possível ler o PDF agora. Tente novamente.', tentarNovamente: true });
       }
     } finally {
@@ -142,6 +158,13 @@ export default function ColunaGerarGuia({
   // Durante a leitura os erros ficam escondidos: os campos estao vazios so porque a leitura ainda nao terminou.
   const mostrarErroUg = !lendo && erroUg !== null;
   const mostrarErroValidade = !lendo && erroValidade !== null;
+
+  // T21-FE: o bloco de conferencia do paciente so aparece depois de uma leitura 200 ou 422 (precCpConfere
+  // definido). Em 429/500, com so o rascunho salvo ou durante a leitura, nada do bloco aparece.
+  const mostrarConferencia = !!nomeArquivo && !lendo && precCpConfere !== undefined;
+  const mensagemPaciente = mostrarConferencia
+    ? mensagemConferenciaPaciente(precCpConfere ?? null, precCpLido, precCpCadastrado)
+    : null;
 
   return (
     <div className="pgs__coluna">
@@ -245,6 +268,16 @@ export default function ColunaGerarGuia({
       )}
 
       {lendo && <p role="status" className="pgs__pequeno">Lendo o PDF da Guia...</p>}
+
+      {/* T21-FE: conferencia do Prec CP do paciente (abaixo dos campos de UG e validade, antes dos exames). */}
+      {mensagemPaciente && (
+        <p
+          role={mensagemPaciente.estilo === 'erro' ? 'alert' : 'status'}
+          className={`pgs__conferencia pgs__conferencia--${mensagemPaciente.estilo}`}
+        >
+          {mensagemPaciente.texto}
+        </p>
+      )}
 
       {nomeArquivo && !lendo && (
         <div>

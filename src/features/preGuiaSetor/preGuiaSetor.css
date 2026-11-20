@@ -56,6 +56,12 @@
 .pgs__leitura--ok { color: #1c6b34; }
 .pgs__leitura--aviso { color: #8a5a00; }
 .pgs__leitura--erro { color: #8a1c12; }
+
+/* T21-FE: bloco de conferencia do Prec CP do paciente (sucesso/erro/alerta) e aviso dos exames. */
+.pgs__conferencia { margin: 0; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.45; }
+.pgs__conferencia--ok { background: #e8f5ec; border: 1px solid #b6dcc4; color: #1c6b34; }
+.pgs__conferencia--erro { background: #fdecea; border: 1px solid #f5c6c0; color: #8a1c12; }
+.pgs__conferencia--aviso { background: #fff6e5; border: 1px solid #f0d28a; color: #8a5a00; }
 .pgs__concluir { align-self: flex-start; }
 
 .pgs-dialogo-fundo {
