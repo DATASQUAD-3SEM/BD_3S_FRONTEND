@@ -58,6 +58,10 @@ interface AnexoSessao {
   validade: string;
   /** Usuario removeu o anexo nesta sessao: esconde tambem o rascunho salvo. */
   removido: boolean;
+  /** Prec CP do paciente lido do PDF (T21-BE1); null quando nao foi lido. Ausente quando a leitura falhou (429/500). */
+  precCpLido?: string | null;
+  /** Resultado da conferencia do Prec CP (T21-BE1): true/false, ou null quando nao foi lido. Ausente quando a leitura falhou. */
+  precCpConfere?: boolean | null;
 }
 
 /** Tela "Pré-guia {número}" do Setor de Guias (T4-FE). */
@@ -200,7 +204,11 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const erros = nomeArquivo
     ? conferirGuia({ ug: ugGuia, ugOrigemLida, validade: validadeGuia })
     : { ug: null, ugOrigem: null, validade: null };
-  const conferenciaPendente = temErroDeConferencia(erros);
+  // T21-FE: Prec CP do paciente diferente do da pre-guia tambem bloqueia o Concluir (o aviso de nao lido nao bloqueia).
+  const precCpConfere = anexo?.precCpConfere;
+  const precCpLido = anexo?.precCpLido ?? null;
+  const erroPrecCp = precCpConfere === false;
+  const conferenciaPendente = temErroDeConferencia(erros) || erroPrecCp;
   const erroUg = mensagemDoCampoUg(erros) ?? errosServidor?.ug ?? errosServidor?.ugOrigem ?? null;
   const erroValidade = erros.validade ?? errosServidor?.validadeAte ?? null;
 
@@ -396,6 +404,9 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 erroUg={erroUg}
                 erroValidade={erroValidade}
                 conferenciaPendente={conferenciaPendente}
+                precCpCadastrado={detalhe.beneficiario.precCp}
+                precCpLido={precCpLido}
+                precCpConfere={precCpConfere}
                 linhasExames={linhas}
                 onExamesChange={(novas) => {
                   setErroExames(null);
@@ -415,7 +426,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                   !validadeMudouSemArquivo
                 }
                 enviandoConclusao={acao === 'conclusao'}
-                extrairNumeroGuia={api.extrairNumeroGuia}
+                extrairNumeroGuia={(pdf) => api.extrairNumeroGuia(pdf, id)}
                 onNumeroChange={(numero) => editarAnexo({ numero })}
                 onUgChange={(ug) => editarAnexo({ ug })}
                 onValidadeChange={(validade) => editarAnexo({ validade })}
@@ -427,6 +438,8 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                     ugOrigem: leitura.ugOrigem,
                     validade: isoParaBr(leitura.validadeAte),
                     removido: false,
+                    precCpLido: leitura.precCpLido,
+                    precCpConfere: leitura.precCpConfere,
                   });
                   setLinhas(linhasDeExames(leitura.exames));
                   setErroExames(null);

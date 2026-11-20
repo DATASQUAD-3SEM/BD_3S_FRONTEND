@@ -20,9 +20,11 @@ export const preGuiaSetorApi: PreGuiaSetorApi = {
   requererCorrecao: (id, observacao) =>
     post<CorrecaoResposta>(`${base(id)}/correcao`, { observacao }),
 
-  extrairNumeroGuia: (pdf) => {
+  extrairNumeroGuia: (pdf, preGuiaId) => {
     const formulario = new FormData();
     formulario.append('pdf', pdf);
+    // T21-BE1: sem preGuiaId, o servidor nao compara o Prec CP (precCpConfere vem null).
+    if (preGuiaId !== undefined) formulario.append('preGuiaId', String(preGuiaId));
     return postForm<ExtracaoNumeroGuia>('/setor-guias/extrair-numero-guia', formulario);
   },
 
