@@ -37,6 +37,13 @@ describe('FaturasAnalisadasPage (T26-FE4)', () => {
     expect(screen.getByText(/Final: R\$\s?880,00/)).toBeInTheDocument()
   })
 
+  it('o selo da fatura analisada é "Concluída" (regra 11.2)', async () => {
+    renderizar(apiCom(vi.fn().mockResolvedValue([analisada])))
+
+    expect(await screen.findByText('Concluída')).toBeInTheDocument()
+    expect(screen.queryByText('Auditada')).not.toBeInTheDocument()
+  })
+
   it('o cartão leva à visualização informando a origem analisadas', async () => {
     renderizar(apiCom(vi.fn().mockResolvedValue([analisada])))
 
