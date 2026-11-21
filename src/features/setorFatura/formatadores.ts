@@ -27,7 +27,7 @@ export const ROTULO_SITUACAO: Record<SituacaoFatura, string> = {
   EM_LISURA: 'Em lisura',
   AGUARDANDO_OCS: 'Aguardando a OCS',
   EM_AUDITORIA: 'Em auditoria',
-  AUDITADA: 'Auditada',
+  AUDITADA: 'Concluída',
 }
 
 export function rotuloSituacao(situacao: SituacaoFatura): string {
