@@ -43,6 +43,16 @@ describe('GlosaDetalhePage (T27-FE2)', () => {
     expect(screen.getByText('Faltam 2 guia(s) sem decisão.')).toBeInTheDocument()
   })
 
+  it('guia com duas linhas glosadas tem um único Ok/Contestar e conta como uma guia', async () => {
+    const segundaLinha: GuiaGlosada = { ...pendente, itemId: 3, codigo: '40302', procedimento: 'Hemograma' }
+    renderizar(apiCom(detalhe({ guiasGlosadas: [pendente, segundaLinha] })))
+
+    expect(await screen.findAllByRole('group', { name: 'Decisão da guia G-1' })).toHaveLength(1)
+    expect(screen.getByText('40301 · Glicose')).toBeInTheDocument()
+    expect(screen.getByText('40302 · Hemograma')).toBeInTheDocument()
+    expect(screen.getByText('Faltam 1 guia(s) sem decisão.')).toBeInTheDocument()
+  })
+
   it('confirmar fica desabilitado enquanto faltar decisão', async () => {
     const user = userEvent.setup()
     renderizar(apiCom(detalhe()))
