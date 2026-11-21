@@ -2,6 +2,7 @@
 import { get, post } from '../../shared/api/http'
 import type {
   EnviarLisuraRequest,
+  FaturaAuditada,
   EspelhoDetalhe,
   EspelhoResumo,
   ProtocolarFaturaRequest,
@@ -9,6 +10,8 @@ import type {
 } from './types'
 
 export const setorFaturasApi: SetorFaturasApi = {
+  listarAuditadas: () => get<FaturaAuditada[]>('/setor-fatura/faturas-auditadas'),
+
   listarEspelhosRecebidos: () => get<EspelhoResumo[]>('/setor-fatura/faturas'),
 
   detalharEspelho: (id) => get<EspelhoDetalhe>(`/setor-fatura/faturas/${id}`),
