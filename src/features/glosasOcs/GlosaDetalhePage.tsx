@@ -172,10 +172,11 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
     setErroDecisao(null)
     try {
       await api.decidir(glosaId, {
-        decisoes: pendentes.map((g) => {
-          const r = rascunhos[g.guiaId]
+        // Uma decisão por Guia (o backend recusa Guia repetida): as linhas da mesma Guia não se repetem aqui.
+        decisoes: guiasPendentes.map((guiaId) => {
+          const r = rascunhos[guiaId]
           const contestada = r?.escolha === 'CONTESTADA'
-          return { guiaId: g.guiaId, decisao: contestada ? 'CONTESTADA' : 'OK', motivo: contestada ? r.motivo.trim() : null }
+          return { guiaId, decisao: contestada ? 'CONTESTADA' : 'OK', motivo: contestada ? r.motivo.trim() : null }
         }),
         responsavel: nome,
       })

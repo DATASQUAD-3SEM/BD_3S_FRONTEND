@@ -141,6 +141,23 @@ describe('GlosaDetalhePage (T27-FE2)', () => {
     expect(await screen.findByText('LISTA DE GLOSAS')).toBeInTheDocument()
   })
 
+  it('guia com duas linhas glosadas é enviada uma única vez', async () => {
+    const user = userEvent.setup()
+    const segundaLinha: GuiaGlosada = { ...pendente, itemId: 3, codigo: '40302', procedimento: 'Hemograma' }
+    const api = apiCom(detalhe({ guiasGlosadas: [pendente, segundaLinha] }))
+    renderizar(api)
+    const g1 = await screen.findByRole('group', { name: 'Decisão da guia G-1' })
+    await user.click(within(g1).getByRole('button', { name: 'Ok' }))
+    await user.click(screen.getByRole('button', { name: 'Confirmar decisão' }))
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Ana Silva')
+    await user.click(screen.getByRole('button', { name: 'Sim, confirmar decisão' }))
+
+    expect(api.decidir).toHaveBeenCalledWith(3, {
+      decisoes: [{ guiaId: 10, decisao: 'OK', motivo: null }],
+      responsavel: 'Ana Silva',
+    })
+  })
+
   it('sem contestação, o painel diz que a fatura fica liberada para a auditoria', async () => {
     const user = userEvent.setup()
     renderizar(apiCom(detalhe()))
