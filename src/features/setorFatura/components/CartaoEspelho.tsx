@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { avisoPrazoOcs, formatarDataCurta, formatarMoeda, tituloDoEspelho } from '../formatadores'
 import type { EspelhoDetalhe, EspelhoResumo } from '../types'
 import ControleFluxoFatura from './ControleFluxoFatura'
+import ProtocolarFatura from './ProtocolarFatura'
 import SeloSituacao from './SeloSituacao'
 import TabelaGuiasEspelho from './TabelaGuiasEspelho'
 
@@ -11,10 +13,44 @@ interface Props {
   carregando: boolean
   erro: string | null
   onToggle: (id: number) => void
+  /** Sugestao do proximo nº (T24-BE3). Sem ela, o formulário abre sem sugestão. */
+  sugerirNumero?: (id: number) => Promise<string>
+  /** Protocola o espelho (T24-FE2). Sem ela, o botão "Inserir nº da fatura" não aparece. */
+  onProtocolar?: (id: number, numeroFatura: string, responsavel: string) => Promise<void>
 }
 
 /** Cartão de um espelho/fatura recebido. Clicar no cabeçalho abre e fecha o detalhe, dentro do próprio cartão. */
-export default function CartaoEspelho({ espelho, aberto, detalhe, carregando, erro, onToggle }: Props) {
+export default function CartaoEspelho({
+  espelho,
+  aberto,
+  detalhe,
+  carregando,
+  erro,
+  onToggle,
+  sugerirNumero,
+  onProtocolar,
+}: Props) {
+  const [formularioAberto, setFormularioAberto] = useState(false)
+  const [numeroSugerido, setNumeroSugerido] = useState<string | null>(null)
+  const [buscandoSugestao, setBuscandoSugestao] = useState(false)
+
+  const podeProtocolar = espelho.situacao === 'RECEBIDO' && !!onProtocolar && !!detalhe
+
+  /* O formulário só monta depois da sugestão: ele lê o nº sugerido uma única vez, na montagem. */
+  async function abrirFormulario() {
+    setBuscandoSugestao(true)
+    let sugestao: string | null = null
+    if (sugerirNumero) {
+      try {
+        sugestao = await sugerirNumero(espelho.id)
+      } catch {
+        sugestao = null
+      }
+    }
+    setNumeroSugerido(sugestao)
+    setBuscandoSugestao(false)
+    setFormularioAberto(true)
+  }
   // O detalhe traz também quem deu a ciência; sem ele, o aviso usa os dados da lista.
   const aviso = avisoPrazoOcs(detalhe ?? espelho)
 
@@ -61,8 +97,24 @@ export default function CartaoEspelho({ espelho, aberto, detalhe, carregando, er
                 </p>
               )}
 
-              {/* Ações da situação (T24-FE2 "Inserir nº da fatura" e T24-FE3 "Enviar para a rastreabilidade"):
-                  implementadas nas próximas subtasks. */}
+              {podeProtocolar && !formularioAberto && (
+                <button type="button" className="sf-botao" onClick={abrirFormulario} disabled={buscandoSugestao}>
+                  {buscandoSugestao ? 'Buscando sugestão…' : 'Inserir nº da fatura'}
+                </button>
+              )}
+
+              {podeProtocolar && formularioAberto && (
+                <ProtocolarFatura
+                  dataEntrada={detalhe.dataEntrada}
+                  ocs={detalhe.ocs}
+                  numeroSugerido={numeroSugerido}
+                  onSalvar={async (numero, responsavel) => {
+                    await onProtocolar!(espelho.id, numero, responsavel)
+                    setFormularioAberto(false)
+                  }}
+                  onCancelar={() => setFormularioAberto(false)}
+                />
+              )}
 
               <ControleFluxoFatura etapas={detalhe.controleFluxo} />
             </>

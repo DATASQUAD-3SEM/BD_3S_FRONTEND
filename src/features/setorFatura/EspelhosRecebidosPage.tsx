@@ -77,6 +77,13 @@ export default function EspelhosRecebidosPage({ api = setorFaturasApi }: Props) 
     }
   }
 
+  /** Protocola o espelho (T24-FE2): atualiza o detalhe e recarrega a lista. Erros vão para o formulário. */
+  async function protocolar(id: number, numeroFatura: string, responsavel: string) {
+    const atualizado = await api.protocolarFatura(id, { numeroFatura, responsavel })
+    setDetalhes((atuais) => ({ ...atuais, [id]: atualizado }))
+    setEspelhos(await api.listarEspelhosRecebidos())
+  }
+
   return (
     <section className="sf">
       <header className="sf-cabecalho">
@@ -124,6 +131,8 @@ export default function EspelhosRecebidosPage({ api = setorFaturasApi }: Props) 
                 carregando={abertoId === espelho.id && carregandoDetalhe}
                 erro={abertoId === espelho.id ? erroDetalhe : null}
                 onToggle={alternarCartao}
+                sugerirNumero={(id) => api.proximoNumeroFatura(id)}
+                onProtocolar={protocolar}
               />
             </li>
           ))}
