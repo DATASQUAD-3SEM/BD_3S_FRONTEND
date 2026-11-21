@@ -19,6 +19,7 @@ import LisuraFaturaPage from './features/rastreabilidade/LisuraFaturaPage'
 import AuditoriaLayout from './features/auditoria/AuditoriaLayout'
 import FaturasRecebidasAuditoriaPage from './features/auditoria/FaturasRecebidasAuditoriaPage'
 import AuditoriaFaturaPage from './features/auditoria/AuditoriaFaturaPage'
+import FaturasAnalisadasPage from './features/auditoria/FaturasAnalisadasPage'
 import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
 import AuditadasPage from './features/setorFatura/AuditadasPage'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
@@ -119,7 +120,7 @@ export default function App() {
         {/* T26-FE1 (Faturas Recebidas) e T26-FE4 (Faturas Analisadas): telas a implementar */}
         <Route path="faturas-recebidas" element={<FaturasRecebidasAuditoriaPage />} />
         <Route path="faturas/:id" element={<AuditoriaFaturaPage />} />
-        <Route path="faturas-analisadas" element={<EmConstrucao nome="Faturas Analisadas" task="T26-FE4" />} />
+        <Route path="faturas-analisadas" element={<FaturasAnalisadasPage />} />
       </Route>
 
       <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>

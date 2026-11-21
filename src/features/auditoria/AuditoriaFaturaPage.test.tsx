@@ -44,7 +44,7 @@ const comAndamento: FaturaAuditoriaDetalhe = {
 }
 
 function apiCom(detalhar: AuditoriaApi['detalhar']): AuditoriaApi {
-  return { listarFaturas: vi.fn(), detalhar, obterPdfGuia: vi.fn(), visualizar: vi.fn() }
+  return { listarFaturas: vi.fn(), detalhar, obterPdfGuia: vi.fn(), visualizar: vi.fn(), listarAnalisadas: vi.fn() }
 }
 
 function renderizar(api: AuditoriaApi) {
