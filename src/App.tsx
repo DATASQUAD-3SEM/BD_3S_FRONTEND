@@ -35,6 +35,7 @@ import EmConstrucao from './shared/components/EmConstrucao'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
 import BeneficiariosRota from './features/chefeBeneficiarios/BeneficiariosRota'
 import DependentesTitularRota from './features/chefeDependentes/DependentesTitularRota'
+import DependenteFormRota from './features/chefeDependentes/DependenteFormRota'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
@@ -93,9 +94,8 @@ export default function App() {
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
         <Route path="beneficiarios" element={<BeneficiariosRota />} />
         <Route path="beneficiarios/:id/dependentes" element={<DependentesTitularRota />} />
-        {/* T31-FE3 (Adicionar e editar dependente): tela a implementar na SCRUM-267 */}
-        <Route path="beneficiarios/:id/dependentes/novo" element={<EmConstrucao nome="Adicionar dependente" task="T31-FE3 (SCRUM-267)" />} />
-        <Route path="beneficiarios/:id/dependentes/:dependenteId/editar" element={<EmConstrucao nome="Editar dependente" task="T31-FE3 (SCRUM-267)" />} />
+        <Route path="beneficiarios/:id/dependentes/novo" element={<DependenteFormRota />} />
+        <Route path="beneficiarios/:id/dependentes/:dependenteId/editar" element={<DependenteFormRota />} />
         <Route path="medicos" element={<MedicosPage />} />
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>
