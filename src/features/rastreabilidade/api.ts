@@ -1,4 +1,4 @@
-import { get, getBlob, put } from '../../shared/api/http'
+import { get, getBlob, post, put } from '../../shared/api/http'
 import type { FaturaLisuraDetalhe, FaturaLisuraResumo, ItemLisuraPedido, LisuraApi, RastreabilidadeApi } from './types'
 
 export const rastreabilidadeApi: RastreabilidadeApi = {
@@ -14,4 +14,10 @@ export const lisuraApi: LisuraApi = {
   },
 
   obterPdfGuia: (guiaId) => getBlob(`/rastreabilidade/guias/${guiaId}/pdf`),
+
+  enviarOcs: (id, responsavel) =>
+    post<FaturaLisuraDetalhe>(`/rastreabilidade/faturas/${id}/enviar-ocs`, { responsavel }),
+
+  enviarAuditoria: (id, responsavel) =>
+    post<FaturaLisuraDetalhe>(`/rastreabilidade/faturas/${id}/enviar-auditoria`, { responsavel }),
 }

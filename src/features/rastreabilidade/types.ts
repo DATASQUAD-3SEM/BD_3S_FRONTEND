@@ -85,4 +85,8 @@ export interface LisuraApi {
   salvarLisura(id: number, responsavel: string | null, itens: ItemLisuraPedido[]): Promise<FaturaLisuraDetalhe>;
   /** PDF da Guia, só para consulta (T25-FE-2, botão "Ver guia (PDF)"). */
   obterPdfGuia(guiaId: number): Promise<Blob>;
+  /** Envia a fatura lisurada à OCS (há glosa). Só depois de salvar a lisura. */
+  enviarOcs(id: number, responsavel: string): Promise<FaturaLisuraDetalhe>;
+  /** Envia a fatura à auditoria (sem glosa, ou depois da OCS liberar). */
+  enviarAuditoria(id: number, responsavel: string): Promise<FaturaLisuraDetalhe>;
 }

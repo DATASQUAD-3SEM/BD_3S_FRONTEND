@@ -13,6 +13,8 @@ import {
   errosDoRascunho,
   glosaDaLinha,
   gravaPreco,
+  linhasSemDecisao,
+  temGlosa,
   pedidosDeLisura,
   OBSERVACAO_MAXIMO,
   resumoLisura,
@@ -46,6 +48,11 @@ export default function LisuraFaturaPage({ api = lisuraApi }: Props) {
   const [erroSalvar, setErroSalvar] = useState<string | null>(null)
   const [salvoOk, setSalvoOk] = useState(false)
   const [pdf, setPdf] = useState<{ guiaId: number; numero: string } | null>(null)
+  const [envio, setEnvio] = useState<'ocs' | 'auditoria' | null>(null)
+  const [responsavelEnvio, setResponsavelEnvio] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erroEnvio, setErroEnvio] = useState<string | null>(null)
+  const [mensagemEnvio, setMensagemEnvio] = useState<string | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -123,6 +130,49 @@ export default function LisuraFaturaPage({ api = lisuraApi }: Props) {
       setErroSalvar(e instanceof Error ? e.message : 'Não foi possível salvar a lisura.')
     } finally {
       setSalvando(false)
+    }
+  }
+
+  // Envio (T25-FE-3): decide o botão pela glosa e pelo que falta decidir. Aguardando a OCS só vai à auditoria liberada.
+  const semDecisao = linhasSemDecisao(fatura.linhas, rascunhos)
+  const comGlosa = temGlosa(fatura.linhas, rascunhos)
+  const podeEnviarLisura = editavel && semDecisao === 0
+  const podeEnviarAuditoria = fatura.situacao === 'AGUARDANDO_OCS' && fatura.liberadaParaAuditoria
+
+  function abrirEnvio(modo: 'ocs' | 'auditoria') {
+    setErroEnvio(null)
+    setMensagemEnvio(null)
+    setResponsavelEnvio('')
+    setEnvio(modo)
+  }
+
+  async function confirmarEnvio() {
+    if (!fatura || !envio) return
+    const nome = responsavelEnvio.trim()
+    const erros = editavel ? errosDoRascunho(fatura.linhas, rascunhos) : []
+    if (nome.length < RESPONSAVEL_MINIMO || nome.length > RESPONSAVEL_MAXIMO) {
+      erros.push('Informe o seu nome (3 a 100 caracteres).')
+    }
+    if (erros.length > 0) {
+      setErroEnvio(erros.join(' '))
+      return
+    }
+    setEnviando(true)
+    setErroEnvio(null)
+    try {
+      // A lisura é salva antes do envio: o envio não recebe as decisões (a Jira diz que o envio salva a lisura).
+      if (editavel) {
+        await api.salvarLisura(faturaId, gravaPreco(fatura.linhas, rascunhos) ? nome : null, pedidosDeLisura(fatura.linhas, rascunhos))
+      }
+      const enviada = envio === 'ocs' ? await api.enviarOcs(faturaId, nome) : await api.enviarAuditoria(faturaId, nome)
+      setFatura(enviada)
+      setRascunhos(rascunhosIniciais(enviada))
+      setEnvio(null)
+      setMensagemEnvio(envio === 'ocs' ? 'Fatura enviada para a OCS.' : 'Fatura enviada para a auditoria.')
+    } catch (e) {
+      setErroEnvio(e instanceof Error ? e.message : 'Não foi possível enviar a fatura.')
+    } finally {
+      setEnviando(false)
     }
   }
 
@@ -219,6 +269,71 @@ export default function LisuraFaturaPage({ api = lisuraApi }: Props) {
           </button>
         </div>
       )}
+
+      {editavel && (
+        <div className="sf-acoes">
+          {semDecisao > 0 && <p className="sf-pequeno">Faltam {semDecisao} linha(s) sem decisão.</p>}
+          <button
+            type="button"
+            className="sf-botao"
+            disabled={!podeEnviarLisura || enviando}
+            onClick={() => abrirEnvio(comGlosa ? 'ocs' : 'auditoria')}
+          >
+            {comGlosa ? 'Enviar glosas à OCS' : 'Enviar para a auditoria'}
+          </button>
+        </div>
+      )}
+
+      {fatura.situacao === 'AGUARDANDO_OCS' && (
+        <div className="sf-acoes">
+          {!podeEnviarAuditoria && (
+            <p className="sf-pequeno">Aguardando a decisão da OCS ou o fim do prazo de 3 dias úteis.</p>
+          )}
+          <button
+            type="button"
+            className="sf-botao"
+            disabled={!podeEnviarAuditoria || enviando}
+            onClick={() => abrirEnvio('auditoria')}
+          >
+            Enviar para a auditoria
+          </button>
+        </div>
+      )}
+
+      {envio && (
+        <div className="sf-painel" role="dialog" aria-label={envio === 'ocs' ? 'Confirmar envio das glosas à OCS' : 'Confirmar envio para a auditoria'}>
+          <h3>{envio === 'ocs' ? 'Confirmar envio das glosas à OCS' : 'Confirmar envio para a auditoria'}</h3>
+          <p>
+            {envio === 'ocs'
+              ? 'Esta fatura tem glosa. As guias glosadas serão enviadas para a OCS decidir, Guia por Guia, se está de acordo ou se contesta o valor do contrato; a lisura desta fatura não poderá mais ser alterada enquanto a OCS não responder.'
+              : 'Esta fatura não tem glosa e segue direto para a auditoria; a lisura não poderá mais ser alterada.'}
+          </p>
+          <label>
+            Responsável (seu nome)
+            <input value={responsavelEnvio} onChange={(e) => setResponsavelEnvio(e.target.value)} maxLength={RESPONSAVEL_MAXIMO} />
+          </label>
+          {erroEnvio && (
+            <p className="sf-erro" role="alert">
+              {erroEnvio}
+            </p>
+          )}
+          <div className="sf-acoes">
+            <button
+              type="button"
+              className="sf-botao"
+              disabled={enviando || responsavelEnvio.trim().length < RESPONSAVEL_MINIMO}
+              onClick={confirmarEnvio}
+            >
+              {envio === 'ocs' ? 'Sim, enviar glosas à OCS' : 'Sim, enviar para a auditoria'}
+            </button>
+            <button type="button" className="sf-botao sf-botao--secundario" onClick={() => setEnvio(null)} disabled={enviando}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {mensagemEnvio && <p role="status">{mensagemEnvio}</p>}
 
       <ControleFluxoFatura etapas={fatura.controleFluxo} />
 

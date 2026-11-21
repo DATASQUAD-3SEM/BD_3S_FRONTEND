@@ -39,6 +39,8 @@ function apiCom(detalhe: FaturaLisuraDetalhe): LisuraApi & { salvarLisura: Retur
     detalhar: vi.fn().mockResolvedValue(detalhe),
     salvarLisura: vi.fn().mockResolvedValue(detalhe),
     obterPdfGuia: vi.fn(),
+    enviarOcs: vi.fn(),
+    enviarAuditoria: vi.fn(),
   }
 }
 
@@ -109,6 +111,8 @@ describe('LisuraFaturaPage (T25-FE-2)', () => {
       detalhar: vi.fn().mockRejectedValue(new Error('falhou')),
       salvarLisura: vi.fn(),
       obterPdfGuia: vi.fn(),
+      enviarOcs: vi.fn(),
+      enviarAuditoria: vi.fn(),
     }
     renderizar(api)
 
@@ -156,5 +160,53 @@ describe('LisuraFaturaPage (T25-FE-2)', () => {
     renderizar(apiCom(fatura('AGUARDANDO_OCS', [tabela], { prazoOcs: '2099-11-16T23:59:59' })))
 
     expect(await screen.findByText(/Aguardando a decisão da OCS \(Ok ou contestação\)\. Prazo: até/)).toBeInTheDocument()
+  })
+
+  it('envio fica desabilitado enquanto há linha sem decisão', async () => {
+    renderizar(apiCom(fatura('EM_LISURA')))
+
+    expect(await screen.findByText('Faltam 1 linha(s) sem decisão.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Enviar glosas à OCS' })).toBeDisabled()
+  })
+
+  it('sem glosa, envio para a auditoria salva a lisura antes de enviar', async () => {
+    const user = userEvent.setup()
+    const tabelaCorrigida: LinhaLisura = { ...tabela, origemContrato: 'TABELA_CORRIGIDA', valorContrato: 60, valorSessao: 60, valorTotal: 60 }
+    const conferida: LinhaLisura = { ...semPreco, origemContrato: 'CONFERIDO', valorContrato: 100 }
+    const api = apiCom(fatura('EM_LISURA', [tabelaCorrigida, conferida]))
+    const enviada = fatura('EM_AUDITORIA', [tabelaCorrigida, conferida])
+    api.enviarAuditoria = vi.fn().mockResolvedValue(enviada)
+    renderizar(api)
+
+    await user.click(await screen.findByRole('button', { name: 'Enviar para a auditoria' }))
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Sd Almeida')
+    await user.click(screen.getByRole('button', { name: 'Sim, enviar para a auditoria' }))
+
+    await waitFor(() => expect(api.enviarAuditoria).toHaveBeenCalledWith(2, 'Sd Almeida'))
+    expect(api.salvarLisura.mock.invocationCallOrder[0]).toBeLessThan(
+      (api.enviarAuditoria as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0],
+    )
+    expect(await screen.findByText('Fatura enviada para a auditoria.')).toBeInTheDocument()
+  })
+
+  it('aguardando a OCS sem liberação não permite enviar para a auditoria', async () => {
+    renderizar(apiCom(fatura('AGUARDANDO_OCS', [tabela], { prazoOcs: '2099-11-16T23:59:59' })))
+
+    expect(await screen.findByRole('button', { name: 'Enviar para a auditoria' })).toBeDisabled()
+    expect(screen.getByText('Aguardando a decisão da OCS ou o fim do prazo de 3 dias úteis.')).toBeInTheDocument()
+  })
+
+  it('aguardando a OCS liberada envia para a auditoria sem salvar a lisura', async () => {
+    const user = userEvent.setup()
+    const api = apiCom(fatura('AGUARDANDO_OCS', [tabela], { prazoOcs: '2000-01-05T23:59:59', liberadaParaAuditoria: true }))
+    api.enviarAuditoria = vi.fn().mockResolvedValue(fatura('EM_AUDITORIA', [tabela]))
+    renderizar(api)
+
+    await user.click(await screen.findByRole('button', { name: 'Enviar para a auditoria' }))
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Sd Almeida')
+    await user.click(screen.getByRole('button', { name: 'Sim, enviar para a auditoria' }))
+
+    await waitFor(() => expect(api.enviarAuditoria).toHaveBeenCalledWith(2, 'Sd Almeida'))
+    expect(api.salvarLisura).not.toHaveBeenCalled()
   })
 })

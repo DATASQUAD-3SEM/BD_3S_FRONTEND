@@ -172,3 +172,17 @@ export function rascunhosIniciais(fatura: FaturaLisuraDetalhe): Record<number, R
 function round2(valor: number): number {
   return Math.round((valor + Number.EPSILON) * 100) / 100
 }
+
+/** Linha decidida com glosa: a fatura precisa ir à OCS antes da auditoria. */
+export function temGlosa(linhas: LinhaLisura[], rascunhos: Record<number, RascunhoLinha>): boolean {
+  return linhas.some((linha) => {
+    const contrato = contratoDaLinha(linha, rascunhos[linha.itemId])
+    const glosa = glosaDaLinha(linha, contrato)
+    return glosa !== null && glosa !== 0
+  })
+}
+
+/** Quantas linhas ainda não têm decisão (sem contrato). */
+export function linhasSemDecisao(linhas: LinhaLisura[], rascunhos: Record<number, RascunhoLinha>): number {
+  return linhas.filter((linha) => contratoDaLinha(linha, rascunhos[linha.itemId]) === null).length
+}
