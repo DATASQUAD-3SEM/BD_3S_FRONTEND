@@ -31,7 +31,7 @@ import {
   situacaoDecisao,
   type OpcoesMensagemErro,
 } from './regras';
-import type { DetalhePreGuia, PreGuiaSetorApi } from './types';
+import type { DetalhePreGuia, PacienteDaLeitura, PreGuiaSetorApi } from './types';
 import './preGuiaSetor.css';
 
 interface Props {
@@ -62,6 +62,8 @@ interface AnexoSessao {
   precCpLido?: string | null;
   /** Resultado da conferencia do Prec CP (T21-BE1): true/false, ou null quando nao foi lido. Ausente quando a leitura falhou. */
   precCpConfere?: boolean | null;
+  /** Paciente da pré-guia segundo a leitura (T30-BE4). */
+  paciente?: PacienteDaLeitura | null;
 }
 
 /** Tela "Pré-guia {número}" do Setor de Guias (T4-FE). */
@@ -407,6 +409,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 precCpCadastrado={detalhe.beneficiario.precCp}
                 precCpLido={precCpLido}
                 precCpConfere={precCpConfere}
+                pacienteDaLeitura={anexo?.paciente ?? null}
                 linhasExames={linhas}
                 onExamesChange={(novas) => {
                   setErroExames(null);
@@ -440,6 +443,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                     removido: false,
                     precCpLido: leitura.precCpLido,
                     precCpConfere: leitura.precCpConfere,
+                    paciente: leitura.paciente ?? null,
                   });
                   setLinhas(linhasDeExames(leitura.exames));
                   setErroExames(null);

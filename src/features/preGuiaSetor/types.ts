@@ -97,6 +97,19 @@ export interface ExtracaoNumeroGuia {
   validadeAte?: string | null;
   precCpLido?: string | null;
   precCpConfere?: boolean | null;
+  /** T30-BE4: nome do paciente da pré-guia (o dependente, quando houver). */
+  pacienteNome?: string | null;
+  /** T30-BE4: Prec CP esperado (o do dependente quando a pré-guia tem dependente). */
+  precCpPaciente?: string | null;
+  /** T30-BE4: o paciente da pré-guia é um dependente. */
+  pacienteDependente?: boolean | null;
+}
+
+/** Paciente da pré-guia segundo a leitura (T30-BE4): quem é e qual Prec CP a Guia deve ter. */
+export interface PacienteDaLeitura {
+  dependente: boolean;
+  nome: string | null;
+  precCp: string | null;
 }
 
 /** O que a tela guarda depois de ler o PDF (ou de uma leitura que falhou: tudo vazio). */
@@ -112,6 +125,8 @@ export interface LeituraDaGuia {
   precCpLido?: string | null;
   /** Resultado da conferencia do Prec CP (T21-BE1): true/false, ou null quando nao foi lido. Ausente quando a leitura falhou. */
   precCpConfere?: boolean | null;
+  /** Paciente da pré-guia (T30-BE4); ausente quando a leitura falhou ou o servidor não informou. */
+  paciente?: PacienteDaLeitura | null;
 }
 
 /**
