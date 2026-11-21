@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import type { FaturaLisuraDetalhe, LinhaLisura } from '../rastreabilidade/types'
@@ -43,7 +44,7 @@ const comAndamento: FaturaAuditoriaDetalhe = {
 }
 
 function apiCom(detalhar: AuditoriaApi['detalhar']): AuditoriaApi {
-  return { listarFaturas: vi.fn(), detalhar, obterPdfGuia: vi.fn() }
+  return { listarFaturas: vi.fn(), detalhar, obterPdfGuia: vi.fn(), visualizar: vi.fn() }
 }
 
 function renderizar(api: AuditoriaApi) {
@@ -62,7 +63,7 @@ describe('AuditoriaFaturaPage (T26-FE2)', () => {
 
     expect(await screen.findByText('Fatura nº 005/2026')).toBeInTheDocument()
     expect(container.querySelectorAll('input, textarea, select')).toHaveLength(0)
-    expect(screen.queryByRole('button', { name: /Salvar|Enviar|Sim|Não|O valor mudou|Marcar/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^(Salvar|Enviar|Sim|Não|O valor mudou)/ })).not.toBeInTheDocument()
     expect(screen.getByText('Conferir com a OCS')).toBeInTheDocument()
     expect(screen.getByText('Glosada')).toBeInTheDocument()
     expect(screen.getByText('Sem glosa')).toBeInTheDocument()
@@ -120,5 +121,35 @@ describe('AuditoriaFaturaPage (T26-FE2)', () => {
     renderizar(apiCom(vi.fn().mockRejectedValue(new Error('falhou'))))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar a fatura.')
+  })
+
+  it('o botão de marcar como visualizada aparece só em fatura em auditoria', async () => {
+    renderizar(apiCom(vi.fn().mockResolvedValue(fatura({ situacao: 'AUDITADA' }))))
+
+    expect(await screen.findByText('Fatura nº 005/2026')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Marcar como visualizada' })).not.toBeInTheDocument()
+  })
+
+  it('confirmar exige responsável de 3 caracteres e depois volta para a lista', async () => {
+    const user = userEvent.setup()
+    const api = apiCom(vi.fn().mockResolvedValue(fatura()))
+    api.visualizar = vi.fn().mockResolvedValue(fatura({ situacao: 'AUDITADA' }))
+    render(
+      <MemoryRouter initialEntries={['/auditoria/faturas/5']}>
+        <Routes>
+          <Route path="/auditoria/faturas/:id" element={<AuditoriaFaturaPage api={api} />} />
+          <Route path="/auditoria/faturas-recebidas" element={<p>LISTA DE FATURAS</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await user.click(await screen.findByRole('button', { name: 'Marcar como visualizada' }))
+    const confirmar = screen.getByRole('button', { name: 'Sim, marcar como visualizada' })
+    expect(confirmar).toBeDisabled()
+
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Sd Almeida')
+    await user.click(confirmar)
+
+    await waitFor(() => expect(api.visualizar).toHaveBeenCalledWith(5, 'Sd Almeida'))
+    expect(await screen.findByText('LISTA DE FATURAS')).toBeInTheDocument()
   })
 })

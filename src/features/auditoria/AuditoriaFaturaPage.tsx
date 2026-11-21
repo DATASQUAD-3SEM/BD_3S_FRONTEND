@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { FaturaLisuraDetalhe, LinhaLisura } from '../rastreabilidade/types'
 import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf'
 import ControleFluxoFatura from '../setorFatura/components/ControleFluxoFatura'
@@ -32,6 +32,11 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
   const [fatura, setFatura] = useState<FaturaAuditoriaDetalhe | null>(null)
   const [carga, setCarga] = useState<Carga>('carregando')
   const [pdf, setPdf] = useState<{ guiaId: number; numero: string } | null>(null)
+  const navegar = useNavigate()
+  const [painelAberto, setPainelAberto] = useState(false)
+  const [responsavel, setResponsavel] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -77,6 +82,23 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
   }
 
   const temGlosa = resumo.glosa !== 0
+
+  async function confirmarVisualizacao() {
+    const nome = responsavel.trim()
+    if (nome.length < 3 || nome.length > 100) {
+      setErro('Informe o seu nome (3 a 100 caracteres).')
+      return
+    }
+    setEnviando(true)
+    setErro(null)
+    try {
+      await api.visualizar(faturaId, nome)
+      navegar('/auditoria/faturas-recebidas')
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Não foi possível marcar a fatura como visualizada.')
+      setEnviando(false)
+    }
+  }
 
   return (
     <section className="sf">
@@ -167,6 +189,50 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
       {(fatura.andamentoGlosa ?? []).map((andamento) => (
         <AndamentoDaGuia key={andamento.guiaId} andamento={andamento} />
       ))}
+      {fatura.situacao === 'EM_AUDITORIA' && (
+        <div className="sf-acoes">
+          <button type="button" className="sf-botao" onClick={() => setPainelAberto(true)}>
+            Marcar como visualizada
+          </button>
+        </div>
+      )}
+
+      {painelAberto && (
+        <div className="sf-painel" role="dialog" aria-label="Confirmar visualização">
+          <h3>Confirmar visualização</h3>
+          <p>
+            Marcar a fatura nº {fatura.numeroFatura ?? '—'} como visualizada? Ela volta para o setor de Faturas como
+            concluída e encerra o fluxo no Nexus.
+          </p>
+          <label>
+            Responsável (seu nome)
+            <input value={responsavel} onChange={(e) => setResponsavel(e.target.value)} maxLength={100} />
+          </label>
+          {erro && (
+            <p className="sf-erro" role="alert">
+              {erro}
+            </p>
+          )}
+          <div className="sf-acoes">
+            <button
+              type="button"
+              className="sf-botao"
+              disabled={enviando || responsavel.trim().length < 3}
+              onClick={confirmarVisualizacao}
+            >
+              Sim, marcar como visualizada
+            </button>
+            <button
+              type="button"
+              className="sf-botao sf-botao--secundario"
+              onClick={() => setPainelAberto(false)}
+              disabled={enviando}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       <ControleFluxoFatura etapas={fatura.controleFluxo} />
 
