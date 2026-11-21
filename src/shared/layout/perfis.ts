@@ -3,7 +3,7 @@
  *
  * O login fica em shared/auth (tela /login e RotaProtegida): cada area so abre para o perfil dono dela.
  */
-export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'SETOR_FATURAS' | 'RECEPCAO' | 'OCS'
+export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'SETOR_FATURA' | 'RASTREABILIDADE' | 'AUDITORIA' | 'RECEPCAO' | 'OCS'
 
 export interface ItemMenu {
   to: string
@@ -19,7 +19,9 @@ export const LOGIN_PADRAO: Record<Perfil, string> = {
   MEDICO: '11144477735',
   CHEFE_FUSEX: 'chefe.fusex',
   SETOR_GUIAS: 'setor.guias',
-  SETOR_FATURAS: 'setor.faturas',
+  SETOR_FATURA: 'setor.fatura',
+  RASTREABILIDADE: 'rastreabilidade',
+  AUDITORIA: 'auditoria',
   RECEPCAO: 'recepcao',
   OCS: 'ocs.laboratorio',
 }
@@ -30,7 +32,9 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
   MEDICO: 'Médico FUSEX',
   CHEFE_FUSEX: 'Chefe do FUSEX',
   SETOR_GUIAS: 'Setor de Guias',
-  SETOR_FATURAS: 'Setor de Faturas',
+  SETOR_FATURA: 'Setor de Faturas',
+  RASTREABILIDADE: 'Rastreabilidade',
+  AUDITORIA: 'Auditoria',
   RECEPCAO: 'Recepção',
   OCS: 'OCS',
 }
@@ -41,7 +45,9 @@ export const INICIO_PERFIL: Record<Perfil, string> = {
   MEDICO: '/medico/inicio',
   CHEFE_FUSEX: '/chefe/guias-para-assinar',
   SETOR_GUIAS: '/setor-guias/fila',
-  SETOR_FATURAS: '/setor-fatura/espelhos-recebidos',
+  SETOR_FATURA: '/setor-fatura/espelhos-recebidos',
+  RASTREABILIDADE: '/rastreabilidade/faturas-recebidas',
+  AUDITORIA: '/auditoria/faturas-recebidas',
   RECEPCAO: '/recepcao/guias-para-impressao',
   OCS: '/ocs/espelho',
 }
@@ -69,9 +75,14 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
     { to: '/chefe/minhas-informacoes', label: 'Minhas informações' },
   ],
   SETOR_GUIAS: [{ to: '/setor-guias/fila', label: 'Fila de pré-guias' }],
-  SETOR_FATURAS: [
+  SETOR_FATURA: [
     { to: '/setor-fatura/espelhos-recebidos', label: 'Espelhos recebidos' },
     { to: '/setor-fatura/faturas-auditadas', label: 'Faturas Auditadas' },
+  ],
+  RASTREABILIDADE: [{ to: '/rastreabilidade/faturas-recebidas', label: 'Faturas Recebidas' }],
+  AUDITORIA: [
+    { to: '/auditoria/faturas-recebidas', label: 'Faturas Recebidas' },
+    { to: '/auditoria/faturas-analisadas', label: 'Faturas Analisadas' },
   ],
   RECEPCAO: [{ to: '/recepcao/guias-para-impressao', label: 'Guias para impressão' }],
   OCS: [

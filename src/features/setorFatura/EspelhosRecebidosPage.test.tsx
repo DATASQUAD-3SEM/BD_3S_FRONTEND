@@ -107,7 +107,7 @@ describe('T24-FE1 · Espelhos Recebidos', () => {
     expect(within(fluxo).getByText('Lisura / Glosa')).toBeInTheDocument()
     expect(within(fluxo).getByText('Glosa / OCS')).toBeInTheDocument()
     expect(within(fluxo).getByText('Em andamento')).toBeInTheDocument()
-    expect(within(fluxo).getByText('setor.faturas')).toBeInTheDocument()
+    expect(within(fluxo).getByText('setor.fatura')).toBeInTheDocument()
 
     // 005/2026 (Em auditoria) não teve glosa: sem a linha Glosa / OCS
     await usuario.click(cabecalhoDoCartao(/Fatura nº 005\/2026/))
