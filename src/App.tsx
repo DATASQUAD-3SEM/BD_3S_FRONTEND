@@ -18,6 +18,7 @@ import FaturasRecebidasPage from './features/rastreabilidade/FaturasRecebidasPag
 import LisuraFaturaPage from './features/rastreabilidade/LisuraFaturaPage'
 import AuditoriaLayout from './features/auditoria/AuditoriaLayout'
 import FaturasRecebidasAuditoriaPage from './features/auditoria/FaturasRecebidasAuditoriaPage'
+import AuditoriaFaturaPage from './features/auditoria/AuditoriaFaturaPage'
 import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
 import AuditadasPage from './features/setorFatura/AuditadasPage'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
@@ -117,7 +118,7 @@ export default function App() {
         <Route index element={<Navigate to="faturas-recebidas" replace />} />
         {/* T26-FE1 (Faturas Recebidas) e T26-FE4 (Faturas Analisadas): telas a implementar */}
         <Route path="faturas-recebidas" element={<FaturasRecebidasAuditoriaPage />} />
-        <Route path="faturas/:id" element={<EmConstrucao nome="Visualização da fatura" task="T26-FE2" />} />
+        <Route path="faturas/:id" element={<AuditoriaFaturaPage />} />
         <Route path="faturas-analisadas" element={<EmConstrucao nome="Faturas Analisadas" task="T26-FE4" />} />
       </Route>
 
