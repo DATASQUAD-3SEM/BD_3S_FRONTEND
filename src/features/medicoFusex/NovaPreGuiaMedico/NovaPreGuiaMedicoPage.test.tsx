@@ -11,7 +11,6 @@ const medicoMock = { nome: 'Ribeiro', patente: 'Cap Méd', crm: '000.000-SP' }
 const beneficiarioMock = {
   id: 7,
   nome: 'Antonio Carlos Ferreira',
-  grupo: 'Exército Brasileiro · FUSEX',
   faixaEtaria: '51 a 60',
   idade: 58,
   cpf: '52998224725',

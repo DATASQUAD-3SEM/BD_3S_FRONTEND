@@ -376,11 +376,6 @@ function MinhasInformacoesBeneficiario() {
           </div>
 
           <div className="info-dado">
-            <span>Grupo</span>
-            <p>{beneficiario.grupo ?? '—'}</p>
-          </div>
-
-          <div className="info-dado">
             <span>CPF</span>
             <p>{beneficiario.cpf}</p>
           </div>

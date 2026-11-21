@@ -47,7 +47,6 @@ function montarBeneficiarioMock(): Beneficiario {
     precCp: '45872213300',
     telefone: estadoMock.telefone,
     dataNascimento: '1978-05-10',
-    grupo: 'Exército Brasileiro · FUSEX',
     assinaturaCadastrada: estadoMock.assinaturaCadastrada,
   }
 }

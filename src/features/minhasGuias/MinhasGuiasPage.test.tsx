@@ -753,7 +753,6 @@ describe('T18-FE-3 · Assinar sessão', () => {
             precCp: '45872213300',
             telefone: '11987654321',
             dataNascimento: '1978-05-10',
-            grupo: 'Exército Brasileiro · FUSEX',
             assinaturaCadastrada: false,
           }),
         )

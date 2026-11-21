@@ -74,7 +74,6 @@ export default function DadosBeneficiario({ value }: Props) {
 
   const linhas: Array<{ rotulo: string; valor: string }> = [
     { rotulo: 'Beneficiário', valor: value.nome },
-    { rotulo: 'Grupo', valor: value.grupo ?? '' },
     {
       rotulo: 'Data de nascimento',
       valor: formatarDataNascimento(value.dataNascimento),

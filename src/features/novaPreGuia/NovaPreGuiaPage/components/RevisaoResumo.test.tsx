@@ -15,7 +15,6 @@ const beneficiarioTeste: Beneficiario = {
   cpf: '11122233344',
   telefone: '11999999999',
   dataNascimento: `${new Date().getFullYear() - 40}-01-01`,
-  grupo: 'Exército Brasileiro · FUSEX',
 }
 
 const ocs = { id: 1, nome: 'OCS Exemplo', contrato: 'EXEMPLO-001', tipo: 'OCS' }
