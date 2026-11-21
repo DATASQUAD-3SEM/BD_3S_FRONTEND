@@ -59,6 +59,13 @@ const MSG_SEM_ASSINATURA =
   'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.'
 
 //Sessões ASSINADAS ordenadas por número, para a linha "Já assinadas: sessão N em ..."
+/** Guia de dependente cujo acesso ao FUSEX ja foi encerrado (vigencia vencida), T30-FE2. */
+function dependenteEncerrado(guia: GuiaDoBeneficiario): boolean {
+  const p = guia.paciente
+  if (!p || p.dependenteId === null || !p.vigenciaFim) return false
+  return p.vigenciaFim < new Date().toISOString().slice(0, 10)
+}
+
 function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
   return guia.sessoes
     .filter((s) => s.status === 'ASSINADA')
@@ -231,9 +238,15 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         </ul>
       )}
 
-      <p className="mg-card__texto">{textoPrincipal(guia, c)}</p>
+      {dependenteEncerrado(guia) ? (
+        <p className="mg-card__texto">
+          O acesso de {guia.paciente?.nome} ao FUSEX foi encerrado em {formatarData(guia.paciente?.vigenciaFim ?? null)}. As sessões que faltavam não podem mais ser assinadas.
+        </p>
+      ) : (
+        <p className="mg-card__texto">{textoPrincipal(guia, c)}</p>
+      )}
 
-      {guia.situacao === 'ENCERRADA' && (
+      {(guia.situacao === 'ENCERRADA' || (dependenteEncerrado(guia) && c.assinadas > 0)) && (
         <p className="mg-card__contadores">
           Sessões assinadas: {c.assinadas}. Sessões expiradas (não cobráveis): {c.expiradas}.
         </p>
@@ -356,6 +369,12 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
             </button>
           </header>
 
+          {guia.paciente?.voceResponsavel && guia.paciente.dependenteId !== null && (
+            <p className="mg-assinar__vazio">
+              Você assina pelo paciente {guia.paciente.nome}, como responsável legal, com a sua assinatura cadastrada. Assine uma sessão por vez.
+            </p>
+          )}
+
           {solicitadas.length === 0 ? (
             <p className="mg-assinar__vazio">Nenhuma sessão aguardando assinatura.</p>
           ) : (
@@ -394,7 +413,9 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
                       >
                         <p className="mg-assinar__confirmacao-titulo">
                           <strong>
-                            Assinar a sessão {sessao.numero} · {sessao.procedimento}?
+                            {guia.paciente?.voceResponsavel && guia.paciente.dependenteId !== null
+                              ? `Assinar esta sessão de ${guia.paciente.nome} com a sua assinatura cadastrada, como responsável legal?`
+                              : `Assinar a sessão ${sessao.numero} · ${sessao.procedimento}?`}
                           </strong>
                         </p>
 
