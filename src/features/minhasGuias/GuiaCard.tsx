@@ -59,12 +59,6 @@ const MSG_SEM_ASSINATURA =
   'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.'
 
 //Sessões ASSINADAS ordenadas por número, para a linha "Já assinadas: sessão N em ..."
-/** Guia de dependente cujo acesso ao FUSEX ja foi encerrado (vigencia vencida), T30-FE2. */
-function dependenteEncerrado(guia: GuiaDoBeneficiario): boolean {
-  const p = guia.paciente
-  if (!p || p.dependenteId === null || !p.vigenciaFim) return false
-  return p.vigenciaFim < new Date().toISOString().slice(0, 10)
-}
 
 function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
   return guia.sessoes
@@ -238,15 +232,10 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         </ul>
       )}
 
-      {dependenteEncerrado(guia) ? (
-        <p className="mg-card__texto">
-          O acesso de {guia.paciente?.nome} ao FUSEX foi encerrado em {formatarData(guia.paciente?.vigenciaFim ?? null)}. As sessões que faltavam não podem mais ser assinadas.
-        </p>
-      ) : (
-        <p className="mg-card__texto">{textoPrincipal(guia, c)}</p>
-      )}
+      {/* Vigência vencida do dependente não muda a Guia: ela segue a própria validade (regra 13, T30-BE6). */}
+      <p className="mg-card__texto">{textoPrincipal(guia, c)}</p>
 
-      {(guia.situacao === 'ENCERRADA' || (dependenteEncerrado(guia) && c.assinadas > 0)) && (
+      {guia.situacao === 'ENCERRADA' && (
         <p className="mg-card__contadores">
           Sessões assinadas: {c.assinadas}. Sessões expiradas (não cobráveis): {c.expiradas}.
         </p>
