@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import type { FaturaLisuraDetalhe, LinhaLisura } from '../rastreabilidade/types'
 import AuditoriaFaturaPage from './AuditoriaFaturaPage'
-import type { AuditoriaApi } from './types'
+import type { AuditoriaApi, FaturaAuditoriaDetalhe } from './types'
 
 const comGlosa: LinhaLisura = {
   itemId: 1, guiaId: 10, guiaNumero: 'G-1', paciente: 'Ana', codigo: '40301', procedimento: 'Glicose',
@@ -24,6 +24,22 @@ function fatura(extras: Partial<FaturaLisuraDetalhe> = {}): FaturaLisuraDetalhe 
     dataEnvioOcs: null, prazoOcs: null, dataCiencia: null, responsavelCiencia: null, liberadaParaAuditoria: true,
     ...extras,
   }
+}
+
+const comAndamento: FaturaAuditoriaDetalhe = {
+  ...fatura(),
+  andamentoGlosa: [
+    {
+      guiaId: 10,
+      guiaNumero: 'G-1',
+      situacaoFinal: 'ACEITA_PELA_OCS',
+      seloFinal: 'Aceita pela OCS',
+      itens: [
+        { data: '2026-11-11T09:00:00', texto: 'Lisura concluída e glosa enviada à OCS pela rastreabilidade — responsável: Ana Silva. Prazo de 3 dias úteis, até 16/11/2026.' },
+        { data: '2026-11-12T09:00:00', texto: 'OCS de acordo (Ok) — responsável: Bruno Lima.' },
+      ],
+    },
+  ],
 }
 
 function apiCom(detalhar: AuditoriaApi['detalhar']): AuditoriaApi {
@@ -81,6 +97,23 @@ describe('AuditoriaFaturaPage (T26-FE2)', () => {
 
     expect(await screen.findByText('Fatura nº 005/2026')).toBeInTheDocument()
     expect(screen.queryByText(/A OCS deu ciência/)).not.toBeInTheDocument()
+  })
+
+  it('mostra o andamento da glosa de cada Guia que foi à OCS, com o selo final', async () => {
+    renderizar(apiCom(vi.fn().mockResolvedValue(comAndamento)))
+
+    const secao = await screen.findByRole('region', { name: 'Andamento da glosa · Guia nº G-1' })
+    expect(secao).toHaveTextContent('Aceita pela OCS')
+    expect(secao).toHaveTextContent('11/11/2026 — Lisura concluída e glosa enviada à OCS pela rastreabilidade')
+    expect(secao).toHaveTextContent('12/11/2026 — OCS de acordo (Ok) — responsável: Bruno Lima.')
+  })
+
+  it('fatura sem glosa não tem seção de andamento; origem TABELA_CORRIGIDA mostra "Tabela (corrigida)"', async () => {
+    const corrigida = { ...comGlosa, origemContrato: 'TABELA_CORRIGIDA' as const }
+    renderizar(apiCom(vi.fn().mockResolvedValue({ ...fatura({ linhas: [corrigida, semGlosa] }), andamentoGlosa: [] })))
+
+    expect(await screen.findByText('Tabela (corrigida)')).toBeInTheDocument()
+    expect(screen.queryByText(/Andamento da glosa/)).not.toBeInTheDocument()
   })
 
   it('erro ao carregar mostra a mensagem', async () => {

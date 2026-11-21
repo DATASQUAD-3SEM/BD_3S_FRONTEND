@@ -7,7 +7,7 @@ import SeloSituacao from '../setorFatura/components/SeloSituacao'
 import { formatarDataCurta, formatarMoeda } from '../setorFatura/formatadores'
 import '../setorFatura/setorFatura.css'
 import { auditoriaApi } from './api'
-import type { AuditoriaApi } from './types'
+import type { AndamentoGlosa, AuditoriaApi, FaturaAuditoriaDetalhe } from './types'
 
 interface Props {
   api?: AuditoriaApi
@@ -29,7 +29,7 @@ const ROTULO_ORIGEM: Record<NonNullable<LinhaLisura['origemContrato']>, string> 
 export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
   const { id } = useParams()
   const faturaId = Number(id)
-  const [fatura, setFatura] = useState<FaturaLisuraDetalhe | null>(null)
+  const [fatura, setFatura] = useState<FaturaAuditoriaDetalhe | null>(null)
   const [carga, setCarga] = useState<Carga>('carregando')
   const [pdf, setPdf] = useState<{ guiaId: number; numero: string } | null>(null)
 
@@ -164,6 +164,10 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
         </table>
       </div>
 
+      {(fatura.andamentoGlosa ?? []).map((andamento) => (
+        <AndamentoDaGuia key={andamento.guiaId} andamento={andamento} />
+      ))}
+
       <ControleFluxoFatura etapas={fatura.controleFluxo} />
 
       {pdf && (
@@ -189,7 +193,7 @@ function FaixaGlosaOcs({ fatura }: { fatura: FaturaLisuraDetalhe }) {
       </p>
     )
   }
-  if (fatura.prazoOcs && new Date(fatura.prazoOcs).getTime() < Date.now()) {
+  if (fatura.prazoOcs && prazoVencido(fatura.prazoOcs)) {
     return (
       <p className="sf-faixa sf-faixa--alerta" role="status">
         Prazo de 3 dias úteis vencido em {formatarDataCurta(fatura.prazoOcs)}, sem decisão da OCS.
@@ -197,6 +201,29 @@ function FaixaGlosaOcs({ fatura }: { fatura: FaturaLisuraDetalhe }) {
     )
   }
   return null
+}
+
+/** Andamento da glosa de uma Guia que foi à OCS (regra 13.2): selo final e os itens em ordem de data. */
+function AndamentoDaGuia({ andamento }: { andamento: AndamentoGlosa }) {
+  return (
+    <section className="sf-andamento" aria-label={`Andamento da glosa · Guia nº ${andamento.guiaNumero}`}>
+      <h2>
+        Andamento da glosa · Guia nº {andamento.guiaNumero} <span className="sf-selo">{andamento.seloFinal}</span>
+      </h2>
+      <ol>
+        {andamento.itens.map((item, indice) => (
+          <li key={indice}>
+            <strong>{formatarDataCurta(item.data)}</strong> — {item.texto}
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+/** O prazo da OCS (23:59:59 do 3º dia útil) já passou. */
+function prazoVencido(prazoIso: string, agora: Date = new Date()): boolean {
+  return new Date(prazoIso).getTime() < agora.getTime()
 }
 
 function textoComparacao(comparacao: LinhaLisura['comparacao']): string {

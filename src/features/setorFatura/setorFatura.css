@@ -45,6 +45,9 @@
   font: inherit;
 }
 .sf-cartao-titulo { font-size: 16px; font-weight: 600; color: #1f3d2b; }
+.sf-andamento { margin: 16px 0; }
+.sf-andamento h2 { font-size: 15px; margin: 0 0 6px; }
+.sf-andamento ol { margin: 0; padding-left: 18px; font-size: 13px; }
 .sf-cartao-resumo { margin: 8px 0 0; font-size: 13px; color: #5b6b62; }
 .sf-cartao-prazo { margin: 4px 0 0; font-size: 13px; font-weight: 600; color: #8a5a00; }
 

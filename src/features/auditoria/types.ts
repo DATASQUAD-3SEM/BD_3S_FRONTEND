@@ -15,11 +15,29 @@ export interface FaturaAuditoriaResumo {
   valorFinal: number | null;
 }
 
+/** Item do andamento da glosa de uma Guia (T26-BE4): data e texto fixo. */
+export interface ItemAndamentoGlosa {
+  data: string;
+  texto: string;
+}
+
+/** Andamento da glosa por Guia que foi à OCS em alguma rodada (T26-BE4, regra 13.2). */
+export interface AndamentoGlosa {
+  guiaId: number;
+  guiaNumero: string;
+  situacaoFinal: 'ACEITA_PELA_OCS' | 'PRAZO_VENCIDO' | 'CONTESTACAO_ACATADA' | 'EM_ANDAMENTO';
+  seloFinal: string;
+  itens: ItemAndamentoGlosa[];
+}
+
+/** Detalhe da fatura para a auditoria (T26-BE1): o detalhe da lisura e o andamento da glosa por Guia. */
+export type FaturaAuditoriaDetalhe = FaturaLisuraDetalhe & { andamentoGlosa?: AndamentoGlosa[] };
+
 /** Cliente HTTP da tela de Faturas Recebidas da auditoria (T26-FE1). */
 export interface AuditoriaApi {
   listarFaturas(): Promise<FaturaAuditoriaResumo[]>;
   /** Detalhe da fatura em auditoria (só leitura, T26-FE2). */
-  detalhar(id: number): Promise<FaturaLisuraDetalhe>;
+  detalhar(id: number): Promise<FaturaAuditoriaDetalhe>;
   /** PDF da Guia para a auditoria (só consulta). */
   obterPdfGuia(guiaId: number): Promise<Blob>;
 }
