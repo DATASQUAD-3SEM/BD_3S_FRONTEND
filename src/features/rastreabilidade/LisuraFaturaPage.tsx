@@ -137,6 +137,7 @@ export default function LisuraFaturaPage({ api = lisuraApi }: Props) {
         <p className="sf-subtitulo">
           {fatura.ocs} · Entrada em {formatarDataCurta(fatura.dataEntrada)} <SeloSituacao situacao={fatura.situacao} />
         </p>
+        <FaixaDecisaoOcs fatura={fatura} />
       </header>
 
       <div className="sf-resumo">
@@ -247,13 +248,20 @@ function LinhaDaLisura({ linha, ocs, rascunho, editavel, onMudar, onVerPdf }: Li
   const contrato = contratoDaLinha(linha, rascunho)
   const glosa = glosaDaLinha(linha, contrato)
   const comparacao = comparacaoDaLinha(linha, contrato)
-  const abrirPanel = editavel && (tabela ? rascunho.corrigir : rascunho.decisao === 'nao')
+  // Ok da OCS trava o contrato da linha: a rastreabilidade não pode mais alterá-lo.
+  const travada = linha.decisaoOcs === 'OK'
+  const abrirPanel = editavel && !travada && (tabela ? rascunho.corrigir : rascunho.decisao === 'nao')
 
   return (
     <>
       <tr>
         <td>
           {linha.guiaNumero} · {linha.paciente}
+          {linha.decisaoOcs === 'CONTESTADA' && (
+            <p className="sf-erro" role="note">
+              Contestada pela OCS: {linha.motivoContestacaoOcs}
+            </p>
+          )}
           <div>
             <button type="button" className="sf-link" onClick={onVerPdf}>
               Ver guia (PDF)
@@ -266,7 +274,9 @@ function LinhaDaLisura({ linha, ocs, rascunho, editavel, onMudar, onVerPdf }: Li
         <td>{linha.quantidadeSessoes}</td>
         <td>{formatarMoeda(linha.valorSessao)}</td>
         <td>
-          {tabela ? (
+          {travada ? (
+            <span className="sf-selo">Ok pela OCS</span>
+          ) : tabela ? (
             <>
               <span>Comparado pelo sistema</span>
               {editavel && (
@@ -365,6 +375,36 @@ function LinhaDaLisura({ linha, ocs, rascunho, editavel, onMudar, onVerPdf }: Li
         </tr>
       )}
     </>
+  )
+}
+
+/**
+ * Faixa da decisão da OCS (T25-FE-2): só para fatura Aguardando a OCS. Ciência dada aparece em verde; sem ciência,
+ * amarela com o prazo, e "vencido" depois do prazo de 3 dias úteis.
+ */
+function FaixaDecisaoOcs({ fatura }: { fatura: FaturaLisuraDetalhe }) {
+  if (fatura.situacao !== 'AGUARDANDO_OCS' || !fatura.prazoOcs) return null
+  const prazo = formatarDataCurta(fatura.prazoOcs)
+  if (fatura.dataCiencia) {
+    const responsavel = fatura.responsavelCiencia ? ` (${fatura.responsavelCiencia})` : ''
+    return (
+      <p className="sf-faixa sf-faixa--ok" role="status">
+        A OCS deu ciência das glosas em {formatarDataCurta(fatura.dataCiencia)}
+        {responsavel}.
+      </p>
+    )
+  }
+  if (new Date(fatura.prazoOcs).getTime() < Date.now()) {
+    return (
+      <p className="sf-faixa sf-faixa--alerta" role="status">
+        Prazo de 3 dias úteis vencido em {prazo}, sem decisão da OCS. Já pode seguir para a auditoria.
+      </p>
+    )
+  }
+  return (
+    <p className="sf-faixa sf-faixa--alerta" role="status">
+      Aguardando a decisão da OCS (Ok ou contestação). Prazo: até {prazo}.
+    </p>
   )
 }
 

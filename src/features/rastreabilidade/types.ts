@@ -62,6 +62,13 @@ export interface FaturaLisuraDetalhe {
   linhas: LinhaLisura[];
   totais: { informado: number; glosa: number | null; final: number | null };
   controleFluxo: EtapaFluxoFatura[];
+  /** Envio mais recente à OCS e o prazo de 3 dias úteis (SCRUM-230). */
+  dataEnvioOcs: string | null;
+  prazoOcs: string | null;
+  /** Ciência da OCS no envio mais recente (só quando nenhuma Guia foi contestada). */
+  dataCiencia: string | null;
+  responsavelCiencia: string | null;
+  liberadaParaAuditoria: boolean;
 }
 
 /** Item enviado no PUT de lisura (ItemLisuraRequest). */

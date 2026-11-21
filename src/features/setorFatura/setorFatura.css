@@ -111,3 +111,7 @@
   .sf-cartao-cabecalho { flex-direction: column; align-items: flex-start; gap: 6px; }
   .sf-select { min-width: 0; width: 100%; }
 }
+
+.sf-faixa { margin: 0.75rem 0; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid; }
+.sf-faixa--ok { border-color: #2e7d32; background: #e8f5e9; }
+.sf-faixa--alerta { border-color: #b26a00; background: #fff4e0; }

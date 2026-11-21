@@ -16,8 +16,18 @@ const semPreco: LinhaLisura = {
   quantidadeSessoes: 2, valorSessao: 100, valorTotal: 200, valorContrato: null, origemContrato: null, comparacao: 'SEM_CONTRATO',
 }
 
-function fatura(situacao: SituacaoFatura, linhas = [tabela, semPreco]): FaturaLisuraDetalhe {
+function fatura(
+  situacao: SituacaoFatura,
+  linhas: LinhaLisura[] = [tabela, semPreco],
+  extras: Partial<FaturaLisuraDetalhe> = {},
+): FaturaLisuraDetalhe {
   return {
+    dataEnvioOcs: null,
+    prazoOcs: null,
+    dataCiencia: null,
+    responsavelCiencia: null,
+    liberadaParaAuditoria: false,
+    ...extras,
     id: 2, ocs: 'Centro Diagnóstico Sul', dataInicio: '2026-10-03T00:00:00', dataEnvio: '2026-11-02T09:00:00',
     dataEntrada: '2026-11-02T09:00:00', situacao, numeroFatura: '002/2026', valorTotal: 260,
     linhas, totais: { informado: 260, glosa: null, final: null }, controleFluxo: [],
@@ -103,5 +113,48 @@ describe('LisuraFaturaPage (T25-FE-2)', () => {
     renderizar(api)
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar a fatura.')
+  })
+
+  it('linha aceita pela OCS fica travada com o selo, sem Sim/Não', async () => {
+    const aceita: LinhaLisura = { ...semPreco, origemContrato: 'CONFERIDO', valorContrato: 100, decisaoOcs: 'OK' }
+    renderizar(apiCom(fatura('EM_LISURA', [tabela, aceita])))
+
+    expect(await screen.findByText('Ok pela OCS')).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Valor de acordo com o contrato, guia G-2' })).not.toBeInTheDocument()
+  })
+
+  it('linha contestada mostra o motivo e volta para decisão', async () => {
+    const contestada: LinhaLisura = { ...semPreco, decisaoOcs: 'CONTESTADA', motivoContestacaoOcs: 'Valor do contrato atual' }
+    renderizar(apiCom(fatura('EM_LISURA', [tabela, contestada])))
+
+    expect(await screen.findByText('Contestada pela OCS: Valor do contrato atual')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Valor de acordo com o contrato, guia G-2' })).toBeInTheDocument()
+  })
+
+  it('faixa mostra a ciência da OCS quando não houve contestação', async () => {
+    renderizar(
+      apiCom(
+        fatura('AGUARDANDO_OCS', [tabela], {
+          dataCiencia: '2026-11-12T10:00:00',
+          responsavelCiencia: 'Ana Silva',
+          prazoOcs: '2099-11-16T23:59:59',
+          liberadaParaAuditoria: true,
+        }),
+      ),
+    )
+
+    expect(await screen.findByText(/A OCS deu ciência das glosas em .* \(Ana Silva\)\./)).toBeInTheDocument()
+  })
+
+  it('faixa mostra prazo vencido sem decisão da OCS', async () => {
+    renderizar(apiCom(fatura('AGUARDANDO_OCS', [tabela], { prazoOcs: '2000-01-05T23:59:59', liberadaParaAuditoria: true })))
+
+    expect(await screen.findByText(/Prazo de 3 dias úteis vencido em .*, sem decisão da OCS/)).toBeInTheDocument()
+  })
+
+  it('faixa mostra aguardando a decisão dentro do prazo', async () => {
+    renderizar(apiCom(fatura('AGUARDANDO_OCS', [tabela], { prazoOcs: '2099-11-16T23:59:59' })))
+
+    expect(await screen.findByText(/Aguardando a decisão da OCS \(Ok ou contestação\)\. Prazo: até/)).toBeInTheDocument()
   })
 })
