@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { avisoPrazoOcs, formatarDataCurta, formatarMoeda, tituloDoEspelho } from '../formatadores'
 import type { EspelhoDetalhe, EspelhoResumo } from '../types'
 import ControleFluxoFatura from './ControleFluxoFatura'
+import EnviarRastreabilidade from './EnviarRastreabilidade'
 import ProtocolarFatura from './ProtocolarFatura'
 import SeloSituacao from './SeloSituacao'
 import TabelaGuiasEspelho from './TabelaGuiasEspelho'
@@ -17,6 +18,8 @@ interface Props {
   sugerirNumero?: (id: number) => Promise<string>
   /** Protocola o espelho (T24-FE2). Sem ela, o botão "Inserir nº da fatura" não aparece. */
   onProtocolar?: (id: number, numeroFatura: string, responsavel: string) => Promise<void>
+  /** Envia a fatura Protocolada para a rastreabilidade (T24-FE3). Sem ela, a ação não aparece. */
+  onEnviarLisura?: (id: number, responsavel: string) => Promise<void>
 }
 
 /** Cartão de um espelho/fatura recebido. Clicar no cabeçalho abre e fecha o detalhe, dentro do próprio cartão. */
@@ -29,6 +32,7 @@ export default function CartaoEspelho({
   onToggle,
   sugerirNumero,
   onProtocolar,
+  onEnviarLisura,
 }: Props) {
   const [formularioAberto, setFormularioAberto] = useState(false)
   const [numeroSugerido, setNumeroSugerido] = useState<string | null>(null)
@@ -114,6 +118,10 @@ export default function CartaoEspelho({
                   }}
                   onCancelar={() => setFormularioAberto(false)}
                 />
+              )}
+
+              {espelho.situacao === 'PROTOCOLADA' && !!onEnviarLisura && (
+                <EnviarRastreabilidade onEnviar={(responsavel) => onEnviarLisura(espelho.id, responsavel)} />
               )}
 
               <ControleFluxoFatura etapas={detalhe.controleFluxo} />

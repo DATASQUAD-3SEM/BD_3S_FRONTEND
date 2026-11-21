@@ -195,6 +195,17 @@ export function criarMockSetorFaturas({ atrasoMs = 0 }: OpcoesMock = {}): SetorF
       return this.detalharEspelho(id)
     },
 
+    async enviarParaLisura(id: number): Promise<EspelhoDetalhe> {
+      await espera()
+      const semente = sementesFixas.find((s) => s.resumo.id === id)
+      if (!semente) throw new ApiError(404, 'Espelho não encontrado')
+      if (semente.resumo.situacao !== 'PROTOCOLADA') {
+        throw new ApiError(409, 'Esta acao nao e permitida na situacao atual da fatura')
+      }
+      semente.resumo.situacao = 'EM_LISURA'
+      return this.detalharEspelho(id)
+    },
+
     async detalharEspelho(id: number): Promise<EspelhoDetalhe> {
       await espera()
       const semente = sementesFixas.find((s) => s.resumo.id === id)

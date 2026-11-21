@@ -84,6 +84,13 @@ export default function EspelhosRecebidosPage({ api = setorFaturasApi }: Props) 
     setEspelhos(await api.listarEspelhosRecebidos())
   }
 
+  /** Envia para a rastreabilidade (T24-FE3): atualiza o detalhe e recarrega a lista; a fatura sai de Protocolada. */
+  async function enviarLisura(id: number, responsavel: string) {
+    const atualizado = await api.enviarParaLisura(id, { responsavel })
+    setDetalhes((atuais) => ({ ...atuais, [id]: atualizado }))
+    setEspelhos(await api.listarEspelhosRecebidos())
+  }
+
   return (
     <section className="sf">
       <header className="sf-cabecalho">
@@ -133,6 +140,7 @@ export default function EspelhosRecebidosPage({ api = setorFaturasApi }: Props) 
                 onToggle={alternarCartao}
                 sugerirNumero={(id) => api.proximoNumeroFatura(id)}
                 onProtocolar={protocolar}
+                onEnviarLisura={enviarLisura}
               />
             </li>
           ))}
