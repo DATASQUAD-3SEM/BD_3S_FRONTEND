@@ -394,7 +394,7 @@ function FaixaDecisaoOcs({ fatura }: { fatura: FaturaLisuraDetalhe }) {
       </p>
     )
   }
-  if (new Date(fatura.prazoOcs).getTime() < Date.now()) {
+  if (prazoVencido(fatura.prazoOcs)) {
     return (
       <p className="sf-faixa sf-faixa--alerta" role="status">
         Prazo de 3 dias úteis vencido em {prazo}, sem decisão da OCS. Já pode seguir para a auditoria.
@@ -406,6 +406,11 @@ function FaixaDecisaoOcs({ fatura }: { fatura: FaturaLisuraDetalhe }) {
       Aguardando a decisão da OCS (Ok ou contestação). Prazo: até {prazo}.
     </p>
   )
+}
+
+/** O prazo da OCS (23:59:59 do 3º dia útil) já passou. Fora do render, para não chamar o relógio durante ele. */
+function prazoVencido(prazoIso: string, agora: Date = new Date()): boolean {
+  return new Date(prazoIso).getTime() < agora.getTime()
 }
 
 function textoSituacao(comparacao: LinhaLisura['comparacao']): string {
