@@ -3,6 +3,7 @@ import { formatarData } from '../../shared/utils/formatadores'
 import { ApiError } from '../../shared/api/http'
 import { obterBeneficiarioLogado } from '../beneficiario/dadosBeneficiario'
 import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf'
+import { textoPaciente } from '../minhasPreGuias/paciente'
 import SituacaoGuiaBadge from './SituacaoGuiaBadge'
 import type { GuiaDoBeneficiario, MinhasGuiasApi, SessaoDaGuia } from './types'
 
@@ -212,6 +213,8 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         </h2>
         <SituacaoGuiaBadge situacao={guia.situacao} />
       </header>
+
+      {guia.paciente && <p className="mg-card__meta">Paciente: {textoPaciente(guia.paciente)}</p>}
 
       <p className="mg-card__meta">
         Válida até {formatarData(guia.validadeAte) || '—'}
