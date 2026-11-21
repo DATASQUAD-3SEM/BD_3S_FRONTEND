@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { get } from '../../../shared/api/http'
 import { mensagemDeErro } from '../../../shared/api/erros'
@@ -31,19 +31,27 @@ export default function NovaPreGuiaPage() {
   // Pacientes possiveis (T30-FE1). Se a lista nao carregar, a tela segue como antes: o proprio titular.
   const [pacientes, setPacientes] = useState<PacienteOpcao[] | null>(null)
   const [maioresNomes, setMaioresNomes] = useState<string[]>([])
+  // T31-FE4: "Criar pré-guia" do dependente abre esta tela com o menor já escolhido (?paciente=<dependenteId>).
+  const [parametros] = useSearchParams()
+  const pacienteInicial = Number(parametros.get('paciente')) || null
 
   useEffect(() => {
     let ativo = true
     listarPacientes()
       .then((lista) => {
-        if (ativo) setPacientes(lista)
+        if (!ativo) return
+        setPacientes(lista)
+        if (pacienteInicial !== null && lista.some((p) => p.dependenteId === pacienteInicial)) {
+          setForm((atual) => ({ ...atual, dependenteId: pacienteInicial }))
+        }
       })
       .catch(() => {
         if (ativo) setPacientes([{ dependenteId: null, nome: '', relacao: 'Titular' }])
       })
-    get<{ nome: string; podeCriarPreGuia: boolean }[]>('/beneficiario/dependentes')
+    get<{ nome: string; tipo?: string; podeCriarPreGuia: boolean }[]>('/beneficiario/dependentes')
       .then((dependentes) => {
-        if (ativo) setMaioresNomes(dependentes.filter((d) => !d.podeCriarPreGuia).map((d) => d.nome))
+        // Só os maiores entram no aviso "Dependentes maiores de idade (como ...)"; o menor sob responsável não.
+        if (ativo) setMaioresNomes(dependentes.filter((d) => d.tipo === 'MAIOR').map((d) => d.nome))
       })
       .catch(() => {
         if (ativo) setMaioresNomes([])
@@ -51,7 +59,7 @@ export default function NovaPreGuiaPage() {
     return () => {
       ativo = false
     }
-  }, [])
+  }, [pacienteInicial])
 
   // Com um so paciente possivel, o passo nao aparece e o paciente e esse.
   const passoPaciente = pacientes !== null && pacientes.length > 1

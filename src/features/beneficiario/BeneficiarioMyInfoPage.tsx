@@ -7,6 +7,7 @@ import {
 } from './calculosBeneficiario'
 import { alterarSenha, salvarAssinatura, salvarTelefone } from './beneficiarioApi'
 import AssinaturaDigital from './components/AssinaturaDigital'
+import DependentesAba from './DependentesAba'
 import { ApiError } from '../../shared/api/http'
 
 const TAMANHO_MINIMO_SENHA = 8
@@ -322,6 +323,8 @@ export default function MinhasInformacoesPage() {
     erro,
     atualizarBeneficiario,
   } = useBeneficiario()
+  // T31-FE4: aba "Dependentes", só para o titular (a tela carrega o titular em /beneficiarios/me).
+  const [aba, setAba] = useState<'dados' | 'dependentes'>('dados')
 
   if (carregando) {
     return <p>Carregando beneficiário...</p>
@@ -341,6 +344,19 @@ export default function MinhasInformacoesPage() {
     <div className="minhas-info-page">
       <h1>Minhas informações</h1>
 
+      <div role="tablist" aria-label="Minhas informações" className="info-abas">
+        <button type="button" role="tab" aria-selected={aba === 'dados'} onClick={() => setAba('dados')}>
+          Meus dados
+        </button>
+        <button type="button" role="tab" aria-selected={aba === 'dependentes'} onClick={() => setAba('dependentes')}>
+          Dependentes
+        </button>
+      </div>
+
+      {aba === 'dependentes' && <DependentesAba titularNome={beneficiario.nome} />}
+
+      {aba === 'dados' && (
+      <>
       {/* Dados pessoais (somente leitura) */}
       <section className="info-card">
         <h2>Dados pessoais</h2>
@@ -407,6 +423,8 @@ export default function MinhasInformacoesPage() {
           atualizarBeneficiario({ assinaturaCadastrada: true })
         }}
       />
+      </>
+      )}
     </div>
   )
 }
