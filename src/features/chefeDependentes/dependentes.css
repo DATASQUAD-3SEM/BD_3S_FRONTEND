@@ -1,0 +1,19 @@
+.dep-pagina { display: flex; flex-direction: column; gap: 12px; max-width: 960px; }
+.dep-trilha { font-size: 13px; color: #5b6b62; }
+.dep-link { background: none; border: 0; padding: 0; color: #1f5f3f; text-decoration: underline; cursor: pointer; font: inherit; }
+.dep-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dep-cabecalho h1 { margin: 0; font-size: 22px; }
+.dep-frase { margin: 0; color: #5b6b62; font-size: 14px; }
+.dep-vazio { padding: 16px; border: 1px dashed #c8d3cc; border-radius: 8px; color: #5b6b62; }
+.dep-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.dep-cartao { border: 1px solid #d8e0db; border-radius: 8px; padding: 12px 14px; background: #fff; }
+.dep-cartao-cabecalho { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dep-selo { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #e7f0ea; color: #1f5f3f; }
+.dep-selo--vencida { background: #fdecea; color: #9b1c1c; }
+.dep-dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px 16px; margin: 10px 0 0; }
+.dep-dados dt { font-size: 12px; color: #5b6b62; }
+.dep-dados dd { margin: 0; font-size: 14px; }
+.dep-acoes { margin-top: 10px; display: flex; gap: 8px; }
+.dep-botao { padding: 6px 12px; border-radius: 6px; border: 1px solid #1f5f3f; background: #1f5f3f; color: #fff; cursor: pointer; }
+.dep-botao--secundario { background: #fff; color: #1f5f3f; }
+.dep-botao:disabled { opacity: 0.5; cursor: not-allowed; }
