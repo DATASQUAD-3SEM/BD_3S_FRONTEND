@@ -36,6 +36,7 @@ import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasP
 import BeneficiariosRota from './features/chefeBeneficiarios/BeneficiariosRota'
 import DependentesTitularRota from './features/chefeDependentes/DependentesTitularRota'
 import DependenteFormRota from './features/chefeDependentes/DependenteFormRota'
+import VersosFaturasPage from './features/versosGuias/VersosFaturasPage'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
@@ -120,6 +121,9 @@ export default function App() {
         {/* T25-FE-1 (Faturas Recebidas, SCRUM-225) e T25-FE2 (lisura da fatura, SCRUM-226): telas a implementar */}
         <Route path="faturas-recebidas" element={<FaturasRecebidasPage />} />
         <Route path="faturas/:id" element={<LisuraFaturaPage />} />
+        <Route path="versos" element={<VersosFaturasPage />} />
+        {/* T32-FE2 (Guias da fatura e impressão): tela a implementar na SCRUM-277 */}
+        <Route path="versos/:id" element={<EmConstrucao nome="Versos da fatura" task="T32-FE2 (SCRUM-277)" />} />
       </Route>
 
       <Route path="/auditoria" element={<RotaProtegida perfil="AUDITORIA"><AuditoriaLayout /></RotaProtegida>}>

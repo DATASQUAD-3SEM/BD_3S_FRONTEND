@@ -35,7 +35,7 @@ describe('LayoutPerfil (T0-FE)', () => {
       CHEFE_FUSEX: ['Guias para assinar', 'Beneficiários', 'Médicos', 'Minhas informações'],
       SETOR_GUIAS: ['Fila de pré-guias'],
       SETOR_FATURA: ['Espelhos recebidos', 'Faturas Auditadas'],
-      RASTREABILIDADE: ['Faturas Recebidas'],
+      RASTREABILIDADE: ['Faturas Recebidas', 'Versos das Guias'],
       AUDITORIA: ['Faturas Recebidas', 'Faturas Analisadas'],
       RECEPCAO: ['Guias para impressão'],
       RESPONSAVEL_EXTERNO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas guias', 'Minhas informações'],
