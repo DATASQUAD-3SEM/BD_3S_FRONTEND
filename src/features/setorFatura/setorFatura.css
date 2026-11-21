@@ -46,6 +46,7 @@
 }
 .sf-cartao-titulo { font-size: 16px; font-weight: 600; color: #1f3d2b; }
 .sf-cartao-resumo { margin: 8px 0 0; font-size: 13px; color: #5b6b62; }
+.sf-cartao-prazo { margin: 4px 0 0; font-size: 13px; font-weight: 600; color: #8a5a00; }
 
 .sf-cartao-detalhe {
   margin-top: 14px;

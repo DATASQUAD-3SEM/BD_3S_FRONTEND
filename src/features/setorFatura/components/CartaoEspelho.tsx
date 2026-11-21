@@ -1,4 +1,4 @@
-import { formatarDataCurta, formatarMoeda, tituloDoEspelho } from '../formatadores'
+import { avisoPrazoOcs, formatarDataCurta, formatarMoeda, tituloDoEspelho } from '../formatadores'
 import type { EspelhoDetalhe, EspelhoResumo } from '../types'
 import ControleFluxoFatura from './ControleFluxoFatura'
 import SeloSituacao from './SeloSituacao'
@@ -15,6 +15,9 @@ interface Props {
 
 /** Cartão de um espelho/fatura recebido. Clicar no cabeçalho abre e fecha o detalhe, dentro do próprio cartão. */
 export default function CartaoEspelho({ espelho, aberto, detalhe, carregando, erro, onToggle }: Props) {
+  // O detalhe traz também quem deu a ciência; sem ele, o aviso usa os dados da lista.
+  const aviso = avisoPrazoOcs(detalhe ?? espelho)
+
   return (
     <article className={`sf-cartao${aberto ? ' sf-cartao--aberto' : ''}`}>
       <button
@@ -34,6 +37,8 @@ export default function CartaoEspelho({ espelho, aberto, detalhe, carregando, er
         Período: {formatarDataCurta(espelho.dataInicio)} a {formatarDataCurta(espelho.dataEnvio)} · Valor total:{' '}
         {formatarMoeda(espelho.valorTotal)} · Entrada em {formatarDataCurta(espelho.dataEntrada)}
       </p>
+
+      {aviso && <p className="sf-cartao-prazo">{aviso}</p>}
 
       {aberto && (
         <div id={`sf-detalhe-${espelho.id}`} className="sf-cartao-detalhe">

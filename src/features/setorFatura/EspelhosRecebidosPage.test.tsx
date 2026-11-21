@@ -22,6 +22,15 @@ const titulosDosCartoes = () =>
 const cabecalhoDoCartao = (texto: RegExp) => screen.getByRole('button', { name: texto })
 
 describe('T24-FE1 · Espelhos Recebidos', () => {
+  it('fatura Aguardando a OCS mostra o aviso do prazo; as outras não', async () => {
+    renderizar()
+    await screen.findByRole('button', { name: /Espelho nº 1/ })
+
+    expect(screen.getByText(/^Prazo da OCS: até /)).toBeInTheDocument()
+    expect(screen.getByText('Prazo da OCS vencido em 05/11/2026')).toBeInTheDocument()
+    expect(screen.getAllByText(/Prazo da OCS/)).toHaveLength(2)
+  })
+
   it('lista só espelhos recebidos, do mais recente para o mais antigo, sem as Auditadas', async () => {
     renderizar()
     await screen.findByRole('button', { name: /Espelho nº 1/ })

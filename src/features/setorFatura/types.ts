@@ -31,6 +31,12 @@ export interface EspelhoResumo {
   /** Nº da fatura "XXX/XXXX" quando protocolada+; null enquanto for só espelho. */
   numeroFatura: string | null;
   valorTotal: number;
+  /** Envio mais recente à OCS, ISO; null se não houve envio (regra 12.8, aviso de prazo). */
+  dataEnvioOcs?: string | null;
+  /** Prazo da OCS: 23:59:59 do 3º dia útil após o envio, ISO. */
+  prazoOcs?: string | null;
+  /** Ciência da OCS depois do envio mais recente, ISO. */
+  dataCiencia?: string | null;
 }
 
 /** Linha da tabela do detalhe (LinhaResponse): uma guia/procedimento do espelho. */
@@ -95,6 +101,10 @@ export interface EspelhoDetalhe {
   totais: TotaisEspelho;
   eventos: EventoFatura[];
   controleFluxo: EtapaFluxoFatura[];
+  dataEnvioOcs?: string | null;
+  prazoOcs?: string | null;
+  dataCiencia?: string | null;
+  responsavelCiencia?: string | null;
 }
 
 /** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1). */
