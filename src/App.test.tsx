@@ -38,6 +38,7 @@ const LOGINS: Record<Perfil, string> = {
   SETOR_FATURA: 'setor.fatura',
   RASTREABILIDADE: 'rastreabilidade',
   AUDITORIA: 'auditoria',
+  RESPONSAVEL_EXTERNO: '',
   RECEPCAO: 'recepcao',
   OCS: 'ocs.laboratorio',
 }

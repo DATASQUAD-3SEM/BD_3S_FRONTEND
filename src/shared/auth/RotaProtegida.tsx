@@ -5,7 +5,7 @@ import { lerSessao } from './sessao'
 
 interface Props {
   /** Perfil dono da area (ex.: MEDICO para as rotas /medico/...). */
-  perfil: Perfil
+  perfil: Perfil | Perfil[]
   children: ReactNode
 }
 
@@ -26,7 +26,8 @@ export default function RotaProtegida({ perfil, children }: Props) {
     return <Navigate to="/login" replace state={{ de: location.pathname }} />
   }
 
-  if (sessao.perfil !== perfil) {
+  const permitidos = Array.isArray(perfil) ? perfil : [perfil]
+  if (!permitidos.includes(sessao.perfil)) {
     return <Navigate to={INICIO_PERFIL[sessao.perfil]} replace />
   }
 

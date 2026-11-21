@@ -38,6 +38,7 @@ describe('LayoutPerfil (T0-FE)', () => {
       RASTREABILIDADE: ['Faturas Recebidas'],
       AUDITORIA: ['Faturas Recebidas', 'Faturas Analisadas'],
       RECEPCAO: ['Guias para impressão'],
+      RESPONSAVEL_EXTERNO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas guias', 'Minhas informações'],
     }
     for (const perfil of Object.keys(esperado) as Perfil[]) {
       const { unmount } = renderizar(perfil, MENUS[perfil][0].to)
