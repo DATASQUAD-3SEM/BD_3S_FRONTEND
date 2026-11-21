@@ -30,7 +30,7 @@ function renderizar(api: GlosaDetalheApi) {
 }
 
 function apiCom(d: GlosaDetalhe): GlosaDetalheApi {
-  return { detalhar: vi.fn().mockResolvedValue(d) }
+  return { detalhar: vi.fn().mockResolvedValue(d), decidir: vi.fn().mockResolvedValue({}) }
 }
 
 describe('GlosaDetalhePage (T27-FE2)', () => {
@@ -103,8 +103,70 @@ describe('GlosaDetalhePage (T27-FE2)', () => {
   })
 
   it('erro ao carregar mostra a mensagem', async () => {
-    renderizar({ detalhar: vi.fn().mockRejectedValue(new Error('falhou')) })
+    renderizar({ detalhar: vi.fn().mockRejectedValue(new Error("falhou")), decidir: vi.fn() })
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar a fatura.')
+  })
+
+  it('confirmar com contestação envia o motivo e o responsável, e volta para a lista', async () => {
+    const user = userEvent.setup()
+    const api = apiCom(detalhe())
+    render(
+      <MemoryRouter initialEntries={['/ocs/glosas/3']}>
+        <Routes>
+          <Route path="/ocs/glosas/:id" element={<GlosaDetalhePage api={api} />} />
+          <Route path="/ocs/glosas" element={<p>LISTA DE GLOSAS</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    const g1 = await screen.findByRole('group', { name: 'Decisão da guia G-1' })
+    const g2 = screen.getByRole('group', { name: 'Decisão da guia G-2' })
+    await user.click(within(g1).getByRole('button', { name: 'Ok' }))
+    await user.click(within(g2).getByRole('button', { name: 'Contestar' }))
+    await user.type(screen.getByLabelText('Motivo da contestação da guia G-2'), 'Valor do contrato correto')
+    await user.click(screen.getByRole('button', { name: 'Confirmar decisão' }))
+
+    expect(screen.getByText(/Pelo menos uma guia foi contestada/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sim, confirmar decisão' })).toBeDisabled()
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Ana Silva')
+    await user.click(screen.getByRole('button', { name: 'Sim, confirmar decisão' }))
+
+    expect(api.decidir).toHaveBeenCalledWith(3, {
+      decisoes: [
+        { guiaId: 10, decisao: 'OK', motivo: null },
+        { guiaId: 11, decisao: 'CONTESTADA', motivo: 'Valor do contrato correto' },
+      ],
+      responsavel: 'Ana Silva',
+    })
+    expect(await screen.findByText('LISTA DE GLOSAS')).toBeInTheDocument()
+  })
+
+  it('sem contestação, o painel diz que a fatura fica liberada para a auditoria', async () => {
+    const user = userEvent.setup()
+    renderizar(apiCom(detalhe()))
+    const g1 = await screen.findByRole('group', { name: 'Decisão da guia G-1' })
+    const g2 = screen.getByRole('group', { name: 'Decisão da guia G-2' })
+    await user.click(within(g1).getByRole('button', { name: 'Ok' }))
+    await user.click(within(g2).getByRole('button', { name: 'Ok' }))
+    await user.click(screen.getByRole('button', { name: 'Confirmar decisão' }))
+
+    expect(screen.getByText(/Todas as guias ficaram com 'Ok': a fatura fica liberada para a auditoria\./)).toBeInTheDocument()
+  })
+
+  it('erro do servidor aparece no painel e a decisão continua pendente', async () => {
+    const user = userEvent.setup()
+    const api = apiCom(detalhe())
+    api.decidir = vi.fn().mockRejectedValue(new Error('Prazo de 3 dias uteis ja venceu'))
+    renderizar(api)
+    const g1 = await screen.findByRole('group', { name: 'Decisão da guia G-1' })
+    const g2 = screen.getByRole('group', { name: 'Decisão da guia G-2' })
+    await user.click(within(g1).getByRole('button', { name: 'Ok' }))
+    await user.click(within(g2).getByRole('button', { name: 'Ok' }))
+    await user.click(screen.getByRole('button', { name: 'Confirmar decisão' }))
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Ana Silva')
+    await user.click(screen.getByRole('button', { name: 'Sim, confirmar decisão' }))
+
+    expect(await screen.findByText('Prazo de 3 dias uteis ja venceu')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Confirmar decisão sobre as glosas' })).toBeInTheDocument()
   })
 })

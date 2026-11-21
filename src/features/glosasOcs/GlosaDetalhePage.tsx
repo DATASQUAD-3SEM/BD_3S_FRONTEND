@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { get } from '../../shared/api/http'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { get, post } from '../../shared/api/http'
 import ControleFluxoFatura from '../setorFatura/components/ControleFluxoFatura'
 import { formatarDataCurta, formatarMoeda } from '../setorFatura/formatadores'
 import type { EtapaFluxoFatura } from '../setorFatura/types'
@@ -42,10 +42,13 @@ export interface GlosaDetalhe {
 
 export interface GlosaDetalheApi {
   detalhar(id: number): Promise<GlosaDetalhe>;
+  /** Registra a decisão da OCS sobre as guias glosadas (uma só ação). */
+  decidir(id: number, corpo: { decisoes: { guiaId: number; decisao: 'OK' | 'CONTESTADA'; motivo: string | null }[]; responsavel: string }): Promise<unknown>;
 }
 
 export const glosaDetalheApi: GlosaDetalheApi = {
   detalhar: (id) => get<GlosaDetalhe>(`/ocs/glosas/${id}`),
+  decidir: (id, corpo) => post(`/ocs/glosas/${id}/decisao`, corpo),
 }
 
 /** Decisão escolhida na tela para cada guia ainda sem decisão. */
@@ -102,6 +105,11 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
   const [detalhe, setDetalhe] = useState<GlosaDetalhe | null>(null)
   const [carga, setCarga] = useState<Carga>('carregando')
   const [rascunhos, setRascunhos] = useState<Record<number, Rascunho>>({})
+  const navegar = useNavigate()
+  const [painelAberto, setPainelAberto] = useState(false)
+  const [responsavel, setResponsavel] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erroDecisao, setErroDecisao] = useState<string | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -151,6 +159,32 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
   const motivoCurto = guiasPendentes.some(
     (guiaId) => rascunhos[guiaId]?.escolha === 'CONTESTADA' && rascunhos[guiaId].motivo.trim().length < MOTIVO_MINIMO,
   )
+
+  const algumaContestada = pendentes.some((g) => rascunhos[g.guiaId]?.escolha === 'CONTESTADA')
+
+  async function confirmarDecisao() {
+    const nome = responsavel.trim()
+    if (nome.length < 3 || nome.length > 100) {
+      setErroDecisao('Informe o seu nome (3 a 100 caracteres).')
+      return
+    }
+    setEnviando(true)
+    setErroDecisao(null)
+    try {
+      await api.decidir(glosaId, {
+        decisoes: pendentes.map((g) => {
+          const r = rascunhos[g.guiaId]
+          const contestada = r?.escolha === 'CONTESTADA'
+          return { guiaId: g.guiaId, decisao: contestada ? 'CONTESTADA' : 'OK', motivo: contestada ? r.motivo.trim() : null }
+        }),
+        responsavel: nome,
+      })
+      navegar('/ocs/glosas')
+    } catch (e) {
+      setErroDecisao(e instanceof Error ? e.message : 'Não foi possível registrar a decisão.')
+      setEnviando(false)
+    }
+  }
 
   function escolher(guiaId: number, escolha: Escolha) {
     setRascunhos((atuais) => ({ ...atuais, [guiaId]: { motivo: atuais[guiaId]?.motivo ?? '', escolha } }))
@@ -288,9 +322,53 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
           {semDecisao === 0 && motivoCurto && (
             <p className="sf-pequeno">O motivo da contestação precisa ter pelo menos {MOTIVO_MINIMO} caracteres.</p>
           )}
-          <button type="button" className="sf-botao" disabled={semDecisao > 0 || motivoCurto}>
+          <button
+            type="button"
+            className="sf-botao"
+            disabled={semDecisao > 0 || motivoCurto}
+            onClick={() => setPainelAberto(true)}
+          >
             Confirmar decisão
           </button>
+        </div>
+      )}
+
+      {painelAberto && (
+        <div className="sf-painel" role="dialog" aria-label="Confirmar decisão sobre as glosas">
+          <h3>Confirmar decisão sobre as glosas</h3>
+          <p>
+            {algumaContestada
+              ? "Pelo menos uma guia foi contestada: a fatura inteira volta para a rastreabilidade revisar essa(s) guia(s); as demais, marcadas como 'Ok', não mudam."
+              : "Todas as guias ficaram com 'Ok': a fatura fica liberada para a auditoria."}{' '}
+            Depois de confirmada, a decisão não pode ser desfeita.
+          </p>
+          <label>
+            Responsável (seu nome)
+            <input value={responsavel} onChange={(e) => setResponsavel(e.target.value)} maxLength={100} />
+          </label>
+          {erroDecisao && (
+            <p className="sf-erro" role="alert">
+              {erroDecisao}
+            </p>
+          )}
+          <div className="sf-acoes">
+            <button
+              type="button"
+              className="sf-botao"
+              disabled={enviando || responsavel.trim().length < 3}
+              onClick={confirmarDecisao}
+            >
+              Sim, confirmar decisão
+            </button>
+            <button
+              type="button"
+              className="sf-botao sf-botao--secundario"
+              onClick={() => setPainelAberto(false)}
+              disabled={enviando}
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
 
