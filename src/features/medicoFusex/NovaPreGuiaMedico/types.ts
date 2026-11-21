@@ -10,6 +10,18 @@ export interface BeneficiarioBusca {
   idade: number
   cpf: string
   telefone: string | null
+  /** Bloco do dependente quando o Prec CP é de um dependente vigente (T30-BE7); nulo para o titular. */
+  dependente?: DependenteMedico | null
+}
+
+/** Dependente encontrado pelo Prec CP (T30-BE7). responsavel: quem age pelo menor; nulo no maior. */
+export interface DependenteMedico {
+  dependenteId: number
+  titularNome: string
+  titularPrecCp: string
+  vinculo: string | null
+  menor: boolean
+  responsavel: string | null
 }
 
 export interface MedicoSolicitante {
@@ -46,4 +58,6 @@ export interface CriarPreGuiaMedicoPayload {
   beneficiarioId: number
   ocsId: number
   procedimentos: string[]
+  /** Paciente dependente (T30-FE5): o titular continua sendo o beneficiarioId. */
+  dependenteId?: number
 }

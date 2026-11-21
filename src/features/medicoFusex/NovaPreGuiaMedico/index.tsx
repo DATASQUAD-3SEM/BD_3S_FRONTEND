@@ -115,6 +115,7 @@ export default function NovaPreGuiaMedicoPage() {
         beneficiarioId: beneficiario.id,
         ocsId: ocs.id,
         procedimentos: exames.map((exame) => exame.codigoTuss),
+        ...(beneficiario.dependente ? { dependenteId: beneficiario.dependente.dependenteId } : {}),
       })
 
       // Limpa o formulário só depois de confirmado pelo backend.

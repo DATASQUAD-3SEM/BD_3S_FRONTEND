@@ -169,6 +169,66 @@ describe('NovaPreGuiaMedicoPage', () => {
     })
   })
 
+  it('T30-FE5: Prec CP de menor sob responsável externo mostra o paciente, o titular e quem recebe a Guia', async () => {
+    const menor = {
+      ...beneficiarioMock,
+      nome: 'Sofia Ferreira',
+      dependente: {
+        dependenteId: 21, titularNome: 'Antonio Carlos Ferreira', titularPrecCp: '45872213300', vinculo: 'Filha',
+        menor: true, responsavel: 'Helena Costa',
+      },
+    }
+    const fetchMock = fetchFalso((url, init) => {
+      if (url.startsWith('/api/medicos/beneficiarios')) return respostaJson(menor)
+      if (init?.method === 'POST') {
+        return respostaJson({ id: 13, numero: '0013', status: 'PENDENTE', dataCriacao: '2026-10-25T10:00:00' }, 201)
+      }
+      return undefined
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    render(<NovaPreGuiaMedicoPage />)
+
+    preencherPrecCp('12345678903')
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }))
+    expect(await screen.findByText('Dependente (Filha)')).toBeInTheDocument()
+    expect(screen.getByText('Antonio Carlos Ferreira · Prec CP 458722133-00')).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'Paciente menor de idade. Quando a Guia for emitida, ela aparece para o responsável legal, Helena Costa, que a envia à OCS e assina as sessões.',
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: /Laboratório Exemplo/ }))
+    fireEvent.change(screen.getByLabelText('Buscar por nome ou código TUSS'), { target: { value: 'hemo' } })
+    fireEvent.click(await screen.findByRole('button', { name: /Hemograma completo/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar ao setor de Guias' }))
+    await screen.findByText('Pré-guia 0013 enviada ao setor de Guias')
+
+    const chamadaPost = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST')
+    expect(JSON.parse(String(chamadaPost?.[1]?.body))).toEqual({
+      beneficiarioId: 7, ocsId: 1, procedimentos: ['40304361'], dependenteId: 21,
+    })
+  })
+
+  it('T30-FE5: aviso do menor sob a guarda do titular e do dependente maior', async () => {
+    const { avisoDoDependente } = await import('./components/BeneficiarioSecao')
+    const base = { dependenteId: 20, titularNome: 'Antonio', titularPrecCp: '45872213300', vinculo: 'Filho', menor: true }
+    expect(avisoDoDependente({ ...base, responsavel: 'Antonio' })).toBe(
+      'Paciente menor de idade. Quando a Guia for emitida, ela aparece para o titular, Antonio, que a envia à OCS e assina as sessões.',
+    )
+    expect(avisoDoDependente({ ...base, menor: false, responsavel: null })).toBe(
+      'Dependente maior de idade. Quando a Guia for emitida, ela aparece para o próprio dependente, que a envia à OCS e assina as sessões.',
+    )
+  })
+
+  it('T30-FE5: Prec CP do titular não mostra as linhas do dependente', async () => {
+    render(<NovaPreGuiaMedicoPage />)
+    preencherPrecCp('45872213300')
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }))
+    await screen.findByText('Antonio Carlos Ferreira')
+
+    expect(screen.queryByText('Titular')).not.toBeInTheDocument()
+    expect(screen.queryByRole('note')).not.toBeInTheDocument()
+  })
+
   it('em erro de envio, mostra a mensagem e mantém o preenchimento', async () => {
     vi.stubGlobal(
       'fetch',
