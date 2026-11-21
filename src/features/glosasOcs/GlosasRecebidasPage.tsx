@@ -7,6 +7,8 @@ import '../setorFatura/setorFatura.css'
 /** Fatura com glosa pendente de decisão da OCS (GlosaResumoResponse, T27-BE1). */
 export interface GlosaResumo {
   id: number;
+  /** Nome da OCS (T27-BE1). */
+  ocs?: string;
   numeroFatura: string | null;
   dataEnvioOcs: string | null;
   prazoOcs: string | null;
@@ -88,7 +90,10 @@ export default function GlosasRecebidasPage({ api = glosasApi }: Props) {
             <li key={glosa.id}>
               <article className="sf-cartao">
                 <Link to={`/ocs/glosas/${glosa.id}`} className="sf-cartao-cabecalho">
-                  <span className="sf-cartao-titulo">Fatura nº {glosa.numeroFatura ?? '—'}</span>
+                  <span className="sf-cartao-titulo">
+                    Fatura nº {glosa.numeroFatura ?? '—'}
+                    {glosa.ocs ? ` · ${glosa.ocs}` : ''}
+                  </span>
                   <span className={glosa.prazoVencido ? 'sf-selo sf-selo--vermelho' : 'sf-selo sf-selo--azul'}>
                     {glosa.prazoVencido ? 'Prazo vencido' : 'Aguardando decisão'}
                   </span>

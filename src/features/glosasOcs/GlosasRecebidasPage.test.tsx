@@ -6,6 +6,7 @@ import GlosasRecebidasPage, { type GlosaResumo, type GlosasApi } from './GlosasR
 
 const dentroDoPrazo: GlosaResumo = {
   id: 3,
+  ocs: 'Laboratorio Exemplo',
   numeroFatura: '003/2026',
   dataEnvioOcs: '2099-11-10T09:00:00',
   prazoOcs: '2099-11-16T23:59:59',
@@ -39,7 +40,8 @@ describe('GlosasRecebidasPage (T27-FE1)', () => {
   it('cartão dentro do prazo mostra o selo de aguardando e a data-limite', async () => {
     renderizar(apiCom(vi.fn().mockResolvedValue([dentroDoPrazo])))
 
-    expect(await screen.findByText('Fatura nº 003/2026')).toBeInTheDocument()
+    // O título traz o número da fatura e o nome da OCS (T27-BE1).
+    expect(await screen.findByText('Fatura nº 003/2026 · Laboratorio Exemplo')).toBeInTheDocument()
     expect(screen.getByText('Aguardando decisão')).toBeInTheDocument()
     expect(screen.getByText(new RegExp(`Prazo: até ${formatarDataCurta(dentroDoPrazo.prazoOcs)}`))).toBeInTheDocument()
   })
