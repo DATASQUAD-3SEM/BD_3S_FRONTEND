@@ -21,8 +21,16 @@ interface Props {
   onPagina: (pagina: number) => void
   editandoId: number | null
   onEditar: (id: number) => void
+  /** Abre os dependentes do titular (T31-FE1). */
+  onDependentes?: (id: number) => void
   onAlternar: (item: BeneficiarioItem) => void
   onTentarNovamente: () => void
+}
+
+/** "3 vigentes", "1 vigente" ou "Nenhum" (T31-FE1). */
+export function textoDependentes(quantidade: number): string {
+  if (quantidade <= 0) return 'Nenhum'
+  return quantidade === 1 ? '1 vigente' : `${quantidade} vigentes`
 }
 
 export default function ListaBeneficiarios({
@@ -37,6 +45,7 @@ export default function ListaBeneficiarios({
                                              onPagina,
                                              editandoId,
                                              onEditar,
+                                             onDependentes,
                                              onAlternar,
                                              onTentarNovamente,
                                            }: Props) {
@@ -95,6 +104,7 @@ export default function ListaBeneficiarios({
               <th>CPF (login)</th>
               <th>Prec CP</th>
               <th>Situação</th>
+              <th>Dependentes</th>
               <th>
                 <span className="benef-sr-only">Ações</span>
               </th>
@@ -111,7 +121,11 @@ export default function ListaBeneficiarios({
                       {item.ativo ? 'Ativo' : 'Inativo'}
                     </span>
                 </td>
+                <td>{textoDependentes(item.dependentesAtivos ?? 0)}</td>
                 <td className="benef-acoes">
+                  <button type="button" className="benef-btn" onClick={() => onDependentes?.(item.id)}>
+                    Dependentes
+                  </button>
                   <button type="button" className="benef-btn" onClick={() => onEditar(item.id)}>
                     Editar
                   </button>
