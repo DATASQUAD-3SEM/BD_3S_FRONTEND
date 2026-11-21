@@ -13,6 +13,7 @@ import MinhasGuiasPage from './features/minhasGuias/MinhasGuiasPage'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import SetorFaturasLayout from './features/setorFatura/SetorFaturasLayout'
+import GlosasRecebidasPage from './features/glosasOcs/GlosasRecebidasPage'
 import RastreabilidadeLayout from './features/rastreabilidade/RastreabilidadeLayout'
 import FaturasRecebidasPage from './features/rastreabilidade/FaturasRecebidasPage'
 import LisuraFaturaPage from './features/rastreabilidade/LisuraFaturaPage'
@@ -134,6 +135,8 @@ export default function App() {
         <Route path="guias-recebidas/:id" element={<DetalheGuiaRecebidaPage />} />
         <Route path="guias-finalizadas" element={<GuiasFinalizadasPage />} />
         <Route path="espelho" element={<EspelhoPage />} />
+        <Route path="glosas" element={<GlosasRecebidasPage />} />
+        <Route path="glosas/:id" element={<EmConstrucao nome="Decisão da glosa" task="T27-FE2" />} />
         <Route path="espelho/atual" element={<EspelhoEmConstrucaoPage />} />
         <Route path="espelho/historico/:id" element={<EspelhoEnviadoDetalhePage />} />
       </Route>

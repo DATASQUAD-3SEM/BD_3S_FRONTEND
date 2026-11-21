@@ -89,5 +89,6 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
     { to: '/ocs/guias-recebidas', label: 'Guias recebidas' },
     { to: '/ocs/guias-finalizadas', label: 'Guias Finalizadas' },
     { to: '/ocs/espelho', label: 'Espelho' },
+    { to: '/ocs/glosas', label: 'Glosas Recebidas' },
   ],
 }
