@@ -20,9 +20,18 @@ export interface PreGuiaCriada {
   ocsId: number
 }
 
+/** Paciente possivel para a pre-guia (PacienteResponse, T30-BE2). dependenteId nulo = o proprio titular. */
+export interface PacienteOpcao {
+  dependenteId: number | null
+  nome: string
+  relacao: string
+}
+
 export interface NovaPreGuiaForm {
   ocs: OcsOpcao | null
   arquivo: File | null
+  /** Paciente escolhido no passo 1; nulo = o proprio titular. */
+  dependenteId?: number | null
 }
 
 export const formVazio: NovaPreGuiaForm = {
