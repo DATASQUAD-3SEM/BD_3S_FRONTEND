@@ -20,6 +20,9 @@ type TipoResponsavel = 'TITULAR' | 'OUTRA_PESSOA' | null
 
 const MSG_CONTA_NOVA_RESPONSAVEL = 'Será criada uma conta de responsável legal, com login por este CPF.'
 const MSG_CPF_OUTRA_PESSOA = 'Este CPF pertence a outra pessoa do sistema e não pode ser responsável legal.'
+/** Consulta da conta pelo CPF: o servidor recusa CPF com dígitos verificadores errados (422). */
+export const MSG_CPF_INVALIDO = 'CPF inválido. Confira os dígitos.'
+export const MSG_CONSULTA_FALHOU = 'Não foi possível consultar este CPF agora. Tente de novo.'
 
 /**
  * Adicionar e editar dependente (T31-FE3). Menor: vigência determinada travada (sugestão de 22 anos menos um dia)
@@ -48,6 +51,8 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
   const [telefoneResponsavel, setTelefoneResponsavel] = useState('')
   const [contaResponsavel, setContaResponsavel] = useState<ContaPorCpf | null>(null)
   const [contaMaior, setContaMaior] = useState<ContaPorCpf | null>(null)
+  const [erroContaResponsavel, setErroContaResponsavel] = useState<string | null>(null)
+  const [erroContaMaior, setErroContaMaior] = useState<string | null>(null)
 
   const [erros, setErros] = useState<Record<string, string>>({})
   const [erroGeral, setErroGeral] = useState<string | null>(null)
@@ -111,6 +116,8 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
 
   async function consultar(cpfDigitado: string, alvo: 'responsavel' | 'maior') {
     const digitos = somenteDigitos(cpfDigitado)
+    const definirErro = alvo === 'responsavel' ? setErroContaResponsavel : setErroContaMaior
+    definirErro(null)
     if (digitos.length !== 11) {
       if (alvo === 'responsavel') setContaResponsavel(null)
       else setContaMaior(null)
@@ -124,9 +131,11 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
       } else {
         setContaMaior(conta)
       }
-    } catch {
+    } catch (erro) {
       if (alvo === 'responsavel') setContaResponsavel(null)
       else setContaMaior(null)
+      // Antes o erro era engolido e nenhum aviso aparecia: agora o motivo fica abaixo do campo.
+      definirErro(erro instanceof ApiError && erro.status === 422 ? MSG_CPF_INVALIDO : MSG_CONSULTA_FALHOU)
     }
   }
 
@@ -251,6 +260,11 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
               />
             </label>
             {erroCampo('cpf')}
+            {erroContaMaior && (
+              <span className="dep-erro" role="alert">
+                {erroContaMaior}
+              </span>
+            )}
           </>
         )}
         {idade !== null && <p>Idade: {idade} anos</p>}
@@ -273,7 +287,7 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
         <legend>Vigência</legend>
         {menor ? (
           <>
-            <label>
+            <label className="dep-opcao">
               <input type="checkbox" checked readOnly disabled /> Determinada
             </label>
             <label>
@@ -287,11 +301,11 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
           </>
         ) : (
           <>
-            <label>
+            <label className="dep-opcao">
               <input type="radio" name="vigencia" checked={vigencia === 'VITALICIA'} onChange={() => setVigencia('VITALICIA')} />{' '}
               Vitalícia (padrão)
             </label>
-            <label>
+            <label className="dep-opcao">
               <input type="radio" name="vigencia" checked={vigencia === 'DETERMINADA'} onChange={() => setVigencia('DETERMINADA')} />{' '}
               Determinada — informar data final
             </label>
@@ -317,11 +331,11 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
       {menor && !editando && (
         <fieldset className="dep-secao">
           <legend>Responsável legal (obrigatório para menor)</legend>
-          <label>
+          <label className="dep-opcao">
             <input type="radio" name="responsavel" checked={tipoResponsavel === 'TITULAR'} onChange={() => setTipoResponsavel('TITULAR')} />{' '}
             Titular ({titularNome})
           </label>
-          <label>
+          <label className="dep-opcao">
             <input
               type="radio"
               name="responsavel"
@@ -343,6 +357,11 @@ export default function DependenteFormPage({ titularId, dependenteId, api = chef
                   }}
                 />
               </label>
+              {erroContaResponsavel && (
+                <span className="dep-erro" role="alert">
+                  {erroContaResponsavel}
+                </span>
+              )}
               {responsavelReaproveitado && (
                 <p className="dep-aviso" role="status">
                   CPF encontrado: {contaResponsavel?.nome} já tem conta. Nenhuma conta nova será criada.

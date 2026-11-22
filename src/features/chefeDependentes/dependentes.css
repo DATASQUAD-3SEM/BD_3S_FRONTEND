@@ -21,3 +21,7 @@
 .dep-secao label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
 .dep-aviso { margin: 0; font-size: 13px; color: #5b6b62; }
 .dep-erro { color: #9b1c1c; font-size: 13px; }
+/* T31-FE3: caixa de seleção e opções de rádio do tamanho padrão, em linha com o rótulo */
+.dep-secao label.dep-opcao { flex-direction: row; align-items: center; gap: 8px; cursor: pointer; }
+.dep-secao label.dep-opcao input { width: auto; height: auto; margin: 0; flex: 0 0 auto; accent-color: #1f5f3f; }
+.dep-secao label.dep-opcao input:disabled { cursor: not-allowed; }
