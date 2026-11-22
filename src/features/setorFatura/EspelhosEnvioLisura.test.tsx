@@ -42,8 +42,8 @@ describe('Envio para a rastreabilidade pela tela (T24-FE3)', () => {
     render(<EspelhosRecebidosPage api={api} />)
     await user.click(await screen.findByRole('button', { name: /Laboratorio Exemplo/ }))
     await user.click(await screen.findByRole('button', { name: 'Enviar para a rastreabilidade' }))
-    await user.type(screen.getByLabelText('Responsável pelo envio'), 'Sd Almeida')
-    await user.click(screen.getByRole('button', { name: 'Confirmar envio' }))
+    await user.type(screen.getByLabelText('Responsável (seu nome)'), 'Sd Almeida')
+    await user.click(screen.getByRole('button', { name: 'Sim, enviar para a rastreabilidade' }))
 
     await waitFor(() => expect(enviarParaLisura).toHaveBeenCalledWith(2, { responsavel: 'Sd Almeida' }))
     await waitFor(() => expect(api.listarEspelhosRecebidos).toHaveBeenCalledTimes(2))

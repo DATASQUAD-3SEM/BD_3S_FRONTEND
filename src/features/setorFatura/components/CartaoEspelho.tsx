@@ -121,7 +121,10 @@ export default function CartaoEspelho({
               )}
 
               {espelho.situacao === 'PROTOCOLADA' && !!onEnviarLisura && (
-                <EnviarRastreabilidade onEnviar={(responsavel) => onEnviarLisura(espelho.id, responsavel)} />
+                <EnviarRastreabilidade
+                  numeroFatura={detalhe.numeroFatura}
+                  onEnviar={(responsavel) => onEnviarLisura(espelho.id, responsavel)}
+                />
               )}
 
               <ControleFluxoFatura etapas={detalhe.controleFluxo} />
