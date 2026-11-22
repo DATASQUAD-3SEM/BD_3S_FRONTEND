@@ -62,8 +62,9 @@ export default function GuiasFinalizadasPage() {
         </div>
       )}
 
-      {estado === 'pronto' && guias.length === 0 && (
-        <p className="ge-vazio">Nenhuma guia finalizada até o momento.</p>
+      {/* T20-FE2 (regra 10.7): nenhuma guia com "Adicionar para o espelho" (lista vazia ou todas ja vinculadas) */}
+      {estado === 'pronto' && !guias.some((guia) => guia.vinculo === 'DISPONIVEL') && (
+        <p className="ge-vazio">Nenhuma guia finalizada disponível para o espelho no momento.</p>
       )}
 
       {estado === 'pronto' && guias.length > 0 && (
