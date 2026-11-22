@@ -29,7 +29,7 @@ function itensDoMenu() {
 describe('LayoutPerfil (T0-FE)', () => {
   it('mostra só os itens do perfil logado, na ordem de cada perfil', () => {
     const esperado: Record<Perfil, string[]> = {
-      OCS: ['Guias recebidas', 'Guias Finalizadas', 'Espelho'],
+      OCS: ['Guias recebidas', 'Guias Finalizadas', 'Espelho', 'Glosas Recebidas'],
       BENEFICIARIO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas guias', 'Minhas informações'],
       MEDICO: ['Início', 'Nova pré-guia', 'Corrigir pré-guias', 'Guias para assinar', 'Minhas informações'],
       CHEFE_FUSEX: ['Guias para assinar', 'Beneficiários', 'Médicos', 'Minhas informações'],
