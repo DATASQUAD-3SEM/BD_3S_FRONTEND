@@ -82,7 +82,10 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
     { to: '/setor-fatura/espelhos-recebidos', label: 'Espelhos recebidos' },
     { to: '/setor-fatura/faturas-auditadas', label: 'Faturas Auditadas' },
   ],
-  RASTREABILIDADE: [{ to: '/rastreabilidade/faturas-recebidas', label: 'Faturas Recebidas' }],
+  RASTREABILIDADE: [
+    { to: '/rastreabilidade/faturas-recebidas', label: 'Faturas Recebidas' },
+    { to: '/rastreabilidade/versos', label: 'Versos das Guias' },
+  ],
   AUDITORIA: [
     { to: '/auditoria/faturas-recebidas', label: 'Faturas Recebidas' },
     { to: '/auditoria/faturas-analisadas', label: 'Faturas Analisadas' },
