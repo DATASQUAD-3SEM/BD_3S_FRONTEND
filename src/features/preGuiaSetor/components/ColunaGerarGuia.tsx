@@ -30,6 +30,8 @@ interface Props {
   /** Validade em dd/mm/aaaa (T16-FE): editavel depois da leitura. */
   validade: string;
   /** Erro da conferencia da UG ou da UG Origem (que nao tem campo), mostrado abaixo da UG. */
+  /** T22-FE1: numero ja usado em outra Guia (409 do servidor). */
+  erroNumero?: string | null;
   erroUg: string | null;
   erroValidade: string | null;
   /** Ha erro de UG, UG Origem ou validade no navegador: o texto abaixo do Concluir explica. */
@@ -67,6 +69,7 @@ export default function ColunaGerarGuia({
                                           arquivoNovo,
                                           ug,
                                           validade,
+                                          erroNumero = null,
                                           erroUg,
                                           erroValidade,
                                           conferenciaPendente,
@@ -167,6 +170,7 @@ export default function ColunaGerarGuia({
   };
 
   // Durante a leitura os erros ficam escondidos: os campos estao vazios so porque a leitura ainda nao terminou.
+  const mostrarErroNumero = !lendo && erroNumero !== null;
   const mostrarErroUg = !lendo && erroUg !== null;
   const mostrarErroValidade = !lendo && erroValidade !== null;
 
@@ -242,8 +246,15 @@ export default function ColunaGerarGuia({
         autoComplete="off"
         disabled={lendo}
         value={lendo ? '' : numero}
+        aria-invalid={mostrarErroNumero}
+        aria-describedby={mostrarErroNumero ? 'pgs-numero-guia-erro' : undefined}
         onChange={(e) => onNumeroChange(somenteDigitos(e.target.value).slice(0, TAMANHO_MAXIMO_NUMERO))}
       />
+      {mostrarErroNumero && (
+        <p id="pgs-numero-guia-erro" role="alert" className="pgs__erro-campo">
+          {erroNumero}
+        </p>
+      )}
 
       <label htmlFor="pgs-ug-guia">UG da Guia</label>
       <input
