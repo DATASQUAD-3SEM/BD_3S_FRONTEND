@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import NovaPreGuiaMedicoPage from '.'
 
 /**
  * Testes da Nova pre-guia do medico (T2-FE): busca do beneficiario, OCS, exames e envio.
  */
 
-const medicoMock = { nome: 'Ribeiro', patente: 'Cap Méd', crm: '000.000-SP' }
+const medicoMock = { nome: 'Ribeiro', patente: 'Cap Méd', crm: '000.000-SP', cpf: '11144477735', precCp: '11122233344' }
 
 const beneficiarioMock = {
   id: 7,
@@ -75,7 +75,12 @@ describe('NovaPreGuiaMedicoPage', () => {
   it('mostra o médico solicitante, a lista inicial de OCS e o aviso de OCS não escolhida', async () => {
     render(<NovaPreGuiaMedicoPage />)
 
-    expect(await screen.findByText('Cap Méd Ribeiro')).toBeInTheDocument()
+    const secao = await screen.findByRole('region', { name: 'Médico solicitante' })
+    expect(await within(secao).findByText('Ribeiro')).toBeInTheDocument()
+    expect(within(secao).getByText('Cap Méd')).toBeInTheDocument()
+    expect(within(secao).getByText('000.000-SP')).toBeInTheDocument()
+    expect(within(secao).getByText('111.444.777-35')).toBeInTheDocument()
+    expect(within(secao).getByText('111222333-44')).toBeInTheDocument()
     expect(screen.getByText('Preenchido automaticamente com seu perfil.')).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: /Laboratório Exemplo/ })).toBeInTheDocument()
     expect(
