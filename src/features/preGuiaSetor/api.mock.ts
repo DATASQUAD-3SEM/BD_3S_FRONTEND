@@ -89,7 +89,7 @@ function sementes(): DetalhePreGuia[] {
         { codigoTuss: '40304361', nome: 'Hemograma completo' },
         { codigoTuss: '40301630', nome: 'Glicose' },
       ],
-      medicoCriador: { patente: 'Cap Méd', nome: 'Ribeiro', crm: '000.000-SP' },
+      medicoCriador: { patente: 'Cap Méd', nome: 'Ribeiro', crm: '000.000-SP', precCp: '11122233344' },
       encaminhamento: null,
       guiaRascunho: null,
       guiaConcluida: false,
