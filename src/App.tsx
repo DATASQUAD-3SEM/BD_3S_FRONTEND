@@ -15,6 +15,7 @@ import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import SetorFaturasLayout from './features/setorFatura/SetorFaturasLayout'
 import RastreabilidadeLayout from './features/rastreabilidade/RastreabilidadeLayout'
 import FaturasRecebidasPage from './features/rastreabilidade/FaturasRecebidasPage'
+import LisuraFaturaPage from './features/rastreabilidade/LisuraFaturaPage'
 import AuditoriaLayout from './features/auditoria/AuditoriaLayout'
 import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
 import AuditadasPage from './features/setorFatura/AuditadasPage'
@@ -108,7 +109,7 @@ export default function App() {
         <Route index element={<Navigate to="faturas-recebidas" replace />} />
         {/* T25-FE-1 (Faturas Recebidas, SCRUM-225) e T25-FE2 (lisura da fatura, SCRUM-226): telas a implementar */}
         <Route path="faturas-recebidas" element={<FaturasRecebidasPage />} />
-        <Route path="faturas/:id" element={<EmConstrucao nome="Lisura da fatura" task="T25-FE2 (SCRUM-226)" />} />
+        <Route path="faturas/:id" element={<LisuraFaturaPage />} />
       </Route>
 
       <Route path="/auditoria" element={<RotaProtegida perfil="AUDITORIA"><AuditoriaLayout /></RotaProtegida>}>
