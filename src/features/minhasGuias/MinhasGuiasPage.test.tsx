@@ -559,6 +559,48 @@ function stubbearAssinaturaComConflito() {
   return fetchMock
 }
 
+/**
+ * Mock de fetch: POST responde 409 de Guia vencida (T18-BE3). A primeira leitura da lista traz a Guia 4 Em execução; a
+ * segunda (recarga) traz a mesma Guia já Encerrada, com as sessões não assinadas expiradas.
+ */
+function stubbearAssinaturaDeGuiaVencida() {
+  let leituras = 0
+  fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+    const metodo = init?.method ?? 'GET'
+    if (url === '/api/guias/minhas' && metodo === 'GET') {
+      leituras += 1
+      if (leituras === 1) return Promise.resolve(respostaJson(guiasComSessoesSolicitadas()))
+      const lista = guiasComSessoesSolicitadas().map((g) =>
+        g.id === 4
+          ? {
+              ...g,
+              situacao: 'ENCERRADA' as const,
+              sessoes: g.sessoes.map((s) => (s.status === 'SOLICITADA' ? { ...s, status: 'EXPIRADA' as const } : s)),
+            }
+          : g,
+      )
+      return Promise.resolve(respostaJson(lista))
+    }
+    if (/^\/api\/guias\/\d+\/sessoes\/\d+\/assinatura$/.test(url) && metodo === 'POST') {
+      return Promise.resolve(
+        respostaJson(
+          {
+            status: 409,
+            erro: 'Conflict',
+            mensagem: 'Esta Guia venceu em 20/11/2026. A sessão não pode mais ser assinada.',
+            detalhes: [],
+            timestamp: '',
+          },
+          409,
+        ),
+      )
+    }
+    return Promise.resolve(new Response('', { status: 404 }))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
 /** Mock de fetch: POST responde 422 (usuário sem assinatura cadastrada). */
 function stubbearAssinaturaSemAssinaturaCadastrada() {
   fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
@@ -797,6 +839,28 @@ describe('T18-FE-3 · Assinar sessão', () => {
     )
     // Botão volta a ficar habilitado (permite tentar de novo)
     expect(within(confirmacao).getByRole('button', { name: 'Confirmar assinatura' })).toBeEnabled()
+  })
+
+  it('409 de Guia vencida ao confirmar: mostra a mensagem e recarrega a lista com a Guia Encerrada', async () => {
+    const fetch = stubbearAssinaturaDeGuiaVencida()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    await userEvent.click(
+      within(cartaoDe('202610704')).getByRole('button', { name: 'Assinar sessões (2)' }),
+    )
+    await userEvent.click(botaoAssinarDaSessao(2))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar assinatura' }))
+
+    expect(await within(cartaoDe('202610704')).findByRole('alert')).toHaveTextContent(
+      'Esta Guia venceu em 20/11/2026. A sessão não pode mais ser assinada.',
+    )
+    expect(await within(cartaoDe('202610704')).findByText('Encerrada')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Sessões para assinar' })).not.toBeInTheDocument()
+    const leiturasDaLista = fetch.mock.calls.filter(
+      ([url, init]) => url === '/api/guias/minhas' && (init?.method ?? 'GET') === 'GET',
+    )
+    expect(leiturasDaLista).toHaveLength(2)
   })
 
   it('422 ao confirmar (sem assinatura cadastrada): mostra a mensagem dentro da confirmação', async () => {
