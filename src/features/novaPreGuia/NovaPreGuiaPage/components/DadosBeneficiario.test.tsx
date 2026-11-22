@@ -23,7 +23,8 @@ describe('DadosBeneficiario (somente leitura)', () => {
   it('renderiza os dados pessoais do beneficiário', () => {
     render(<DadosBeneficiario value={preenchido} />)
 
-    expect(screen.getByText('Beneficiário')).toBeInTheDocument()
+    expect(screen.getByText('Dados do paciente')).toBeInTheDocument()
+    expect(screen.getByText('Nome')).toBeInTheDocument()
     expect(screen.getByText('Idade')).toBeInTheDocument()
     expect(screen.getByText('Telefone')).toBeInTheDocument()
     expect(screen.getByText('CPF')).toBeInTheDocument()
