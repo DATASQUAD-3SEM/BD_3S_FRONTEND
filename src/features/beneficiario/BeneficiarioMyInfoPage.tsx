@@ -8,6 +8,8 @@ import {
 import { alterarSenha, salvarAssinatura, salvarTelefone } from './beneficiarioApi'
 import AssinaturaDigital from './components/AssinaturaDigital'
 import DependentesAba from './DependentesAba'
+import { MinhasInformacoesDependenteMaior, MinhasInformacoesResponsavel } from './MinhasInformacoesOutros'
+import { lerSessao } from '../../shared/auth/sessao'
 import { ApiError } from '../../shared/api/http'
 
 const TAMANHO_MINIMO_SENHA = 8
@@ -317,6 +319,15 @@ function AlterarSenha({ onAlterar }: AlterarSenhaProps) {
  * pelas funções de beneficiarioApi.ts.
  */
 export default function MinhasInformacoesPage() {
+  // T31-FE5: o responsável legal externo tem a própria tela (não tem cadastro de beneficiário).
+  if (lerSessao()?.perfil === 'RESPONSAVEL_EXTERNO') {
+    return <MinhasInformacoesResponsavel />
+  }
+  return <MinhasInformacoesBeneficiario />
+}
+
+/** Titular (dados de /beneficiarios/me); sem cadastro de titular, é o dependente maior (/dependente/me). */
+function MinhasInformacoesBeneficiario() {
   const {
     beneficiario,
     carregando,
@@ -331,11 +342,8 @@ export default function MinhasInformacoesPage() {
   }
 
   if (erro || !beneficiario) {
-    return (
-      <p role="alert">
-        Não foi possível carregar os dados do beneficiário.
-      </p>
-    )
+    // T31-FE5: o dependente maior entra como BENEFICIARIO mas não tem cadastro de titular.
+    return <MinhasInformacoesDependenteMaior mensagemErro="Não foi possível carregar os dados do beneficiário." />
   }
 
   const idade = calcularIdade(beneficiario.dataNascimento)
