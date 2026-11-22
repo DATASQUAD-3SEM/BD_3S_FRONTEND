@@ -40,4 +40,6 @@ export interface AuditoriaApi {
   detalhar(id: number): Promise<FaturaAuditoriaDetalhe>;
   /** PDF da Guia para a auditoria (só consulta). */
   obterPdfGuia(guiaId: number): Promise<Blob>;
+  /** Marca a fatura como visualizada: encerra o fluxo no Nexus. */
+  visualizar(id: number, responsavel: string): Promise<FaturaLisuraDetalhe>;
 }
