@@ -48,6 +48,7 @@ describe('Protocolo da fatura pela tela de Espelhos Recebidos (T24-FE2)', () => 
       detalharEspelho: vi.fn().mockResolvedValue(detalheSemNumero),
       proximoNumeroFatura: vi.fn().mockResolvedValue('007/2026'),
       protocolarFatura,
+      enviarParaLisura: vi.fn(),
     }
 
     render(<EspelhosRecebidosPage api={api} />)

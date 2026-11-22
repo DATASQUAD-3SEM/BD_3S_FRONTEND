@@ -113,7 +113,12 @@ export interface ProtocolarFaturaRequest {
   responsavel: string;
 }
 
-/** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1, T24-FE2). */
+/** Corpo do envio para a rastreabilidade (T24-BE4). */
+export interface EnviarLisuraRequest {
+  responsavel: string;
+}
+
+/** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1, T24-FE2, T24-FE3). */
 export interface SetorFaturasApi {
   /** Lista os espelhos recebidos e as faturas em andamento (sem as Auditadas). */
   listarEspelhosRecebidos(): Promise<EspelhoResumo[]>;
@@ -123,4 +128,6 @@ export interface SetorFaturasApi {
   proximoNumeroFatura(id: number): Promise<string>;
   /** Protocola o espelho: vira fatura Protocolada com o nº informado. */
   protocolarFatura(id: number, corpo: ProtocolarFaturaRequest): Promise<EspelhoDetalhe>;
+  /** Envia a fatura Protocolada para a rastreabilidade (vira Em lisura). */
+  enviarParaLisura(id: number, corpo: EnviarLisuraRequest): Promise<EspelhoDetalhe>;
 }
