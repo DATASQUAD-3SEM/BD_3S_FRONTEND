@@ -5,7 +5,7 @@ import { INICIO_PERFIL, MENUS, ROTULO_PERFIL, type Perfil } from './perfis'
 
 interface Props {
   perfil: Perfil
-  /** Nome exibido antes do perfil na barra superior (só beneficiário e médico). */
+  /** Nome exibido antes do perfil na barra superior (beneficiário, responsável legal e médico). */
   nomeUsuario?: string
   /** Item ativo forçado (ex.: em testes). Sem ele, o item ativo vem da rota atual. */
   itemAtivo?: string
@@ -26,8 +26,8 @@ export default function LayoutPerfil({ perfil, nomeUsuario, itemAtivo, children 
     navigate('/login', { replace: true })
   }
 
-  // Beneficiário e médico mostram "{nome} · {perfil}"; chefe e setores, só o nome do perfil
-  const usaNome = perfil === 'BENEFICIARIO' || perfil === 'MEDICO'
+  // Beneficiário, responsável legal e médico mostram "{nome} · {perfil}"; chefe e setores, só o nome do perfil
+  const usaNome = perfil === 'BENEFICIARIO' || perfil === 'RESPONSAVEL_EXTERNO' || perfil === 'MEDICO'
   const usuario = usaNome && nomeUsuario ? `${nomeUsuario} · ${ROTULO_PERFIL[perfil]}` : ROTULO_PERFIL[perfil]
 
   return (
