@@ -8,6 +8,7 @@ import {
   MSG_QUANTIDADE,
   MSG_QUANTIDADE_LIMITE,
   errosDaLinha,
+  examesDaLeitura,
   erroDeExames,
   examesIguaisAoSalvo,
   examesValidos,
@@ -123,5 +124,37 @@ describe('erroDeExames', () => {
     expect(erroDeExames(new ApiError(422, 'Dados invalidos', ['exames: Cod DGP repetido']))).toBe(true);
     expect(erroDeExames(new ApiError(422, 'Dados invalidos', ['pdf: Anexe o PDF']))).toBe(false);
     expect(erroDeExames(new ApiError(409, 'conflito'))).toBe(false);
+  });
+});
+
+describe('T21-BE1 · exames lidos do PDF (examesNaGuia)', () => {
+  it('converte codigo em Cod DGP e abre uma linha por exame lido, na ordem do PDF', () => {
+    const linhas = linhasDeExames(
+      examesDaLeitura([
+        { codigo: '40304361', descricao: 'Hemograma completo', quantidade: 2 },
+        { codigo: '40302040', descricao: 'Glicose', quantidade: 1 },
+      ]),
+    );
+    expect(linhas.map((l) => [l.codDgp, l.descricao, l.quantidade])).toEqual([
+      ['40304361', 'Hemograma completo', '2'],
+      ['40302040', 'Glicose', '1'],
+    ]);
+  });
+
+  it('quantidade nao lida deixa o campo vazio', () => {
+    const [linha] = linhasDeExames(examesDaLeitura([{ codigo: '50011015', descricao: null, quantidade: null }]));
+    expect(linha.quantidade).toBe('');
+    expect(linha.descricao).toBe('');
+  });
+
+  it('codigo repetido no PDF acusa o erro na segunda linha', () => {
+    const linhas = linhasDeExames(
+      examesDaLeitura([
+        { codigo: '40304361', descricao: 'Hemograma completo', quantidade: 1 },
+        { codigo: '40304361', descricao: 'Hemograma completo', quantidade: 1 },
+      ]),
+    );
+    expect(errosDaLinha(linhas[0], linhas).codDgp).toBeUndefined();
+    expect(errosDaLinha(linhas[1], linhas).codDgp).toBe(MSG_COD_REPETIDO);
   });
 });

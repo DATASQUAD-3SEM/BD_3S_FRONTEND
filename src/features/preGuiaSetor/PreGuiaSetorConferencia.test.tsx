@@ -35,6 +35,8 @@ const EXAMES_EXEMPLO = [
   { codDgp: '41001110', descricao: 'Ultrassonografia de abdome total', quantidade: 2 },
 ];
 
+const EXAMES_LIDOS = EXAMES_EXEMPLO.map((e) => ({ codigo: e.codDgp, descricao: e.descricao, quantidade: e.quantidade }));
+
 const MSG_PENDENTE = 'Não é possível concluir com a conferência pendente. Troque o arquivo ou corrija os campos.';
 const MSG_UG_OUTRA = 'Esta Guia não é do FUSEX. A UG deve ser Cmdo Bda Inf Amv.';
 const MSG_UG_ORIGEM_OUTRA = 'A UG Origem impressa na Guia é diferente de Cmdo Bda Inf Amv. Esta Guia não é do FUSEX.';
@@ -115,7 +117,7 @@ describe('T16-FE · Conferência de UG, UG Origem e validade', () => {
     const api = mockApi();
     vi.spyOn(api, 'extrairNumeroGuia').mockResolvedValueOnce({
       numeroGuia: '202610678',
-      exames: EXAMES_EXEMPLO,
+      examesNaGuia: EXAMES_LIDOS,
       ug: null,
       ugOrigem: null,
       validadeAte: '2027-01-01',
@@ -221,7 +223,7 @@ describe('T16-FE · Conferência de UG, UG Origem e validade', () => {
     const api = mockApi();
     vi.spyOn(api, 'extrairNumeroGuia').mockResolvedValueOnce({
       numeroGuia: '202610678',
-      exames: EXAMES_EXEMPLO,
+      examesNaGuia: EXAMES_LIDOS,
       ug: 'Cmdo Bda Inf Amv',
       ugOrigem: null,
       validadeAte: '2027-01-01',
@@ -386,5 +388,29 @@ describe('T16-FE · Conferência com rascunho salvo', () => {
     await usuario.type(campoUg(), 'cmdo bda inf amv');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(botaoConcluir()).toBeEnabled();
+  });
+});
+
+describe('T21-BE1 · exames lidos do PDF', () => {
+  it('preenche a tabela com os exames lidos e acusa o código repetido impresso na Guia', async () => {
+    const usuario = userEvent.setup();
+    const api = mockApi();
+    vi.spyOn(api, 'extrairNumeroGuia').mockResolvedValueOnce({
+      numeroGuia: '202612004',
+      examesNaGuia: [
+        { codigo: '40304361', descricao: 'Hemograma completo', quantidade: 1 },
+        { codigo: '40304361', descricao: 'Hemograma completo', quantidade: 1 },
+      ],
+      ug: UG_FUSEX,
+      ugOrigem: UG_FUSEX,
+      validadeAte: '2027-03-31',
+    });
+    await abrir(api);
+    await anexarPdf(usuario, 'guia-codigo-repetido.pdf');
+
+    expect(screen.getAllByDisplayValue('40304361')).toHaveLength(2);
+    expect(screen.getByText('Este código já está na lista. Some as quantidades numa linha só.')).toBeInTheDocument();
+    expect(botaoConcluir()).toBeDisabled();
+    expect(screen.getByText('Corrija os exames destacados na tabela para concluir.')).toBeInTheDocument();
   });
 });
