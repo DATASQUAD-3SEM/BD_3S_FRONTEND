@@ -20,6 +20,8 @@ export interface MedicoCriador {
   patente: string;
   nome: string;
   crm: string;
+  /** Prec CP do medico, so digitos (T17-BE1); nulo ou vazio mostra "—". */
+  precCp?: string | null;
 }
 
 export interface EncaminhamentoDetalhe {
