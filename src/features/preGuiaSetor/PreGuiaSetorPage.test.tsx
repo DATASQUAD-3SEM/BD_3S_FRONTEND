@@ -59,7 +59,7 @@ describe('T4-FE · Tela Pré-guia {número}', () => {
     renderizar(11);
     expect(await screen.findByText('40304361 · Hemograma completo')).toBeInTheDocument();
     expect(screen.getByText('40301630 · Glicose')).toBeInTheDocument();
-    expect(screen.getByText('Criada pelo Cap Méd Ribeiro (CRM 000.000-SP)')).toBeInTheDocument();
+    expect(screen.getByText('Criada pelo Cap Méd Ribeiro (CRM 000.000-SP · Prec CP 111222333-44)')).toBeInTheDocument();
     expect(screen.getByText('Não há anexo: pré-guia criada pelo médico')).toBeInTheDocument();
   });
 
