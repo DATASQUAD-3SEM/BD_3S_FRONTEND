@@ -17,3 +17,7 @@
 .dep-botao { padding: 6px 12px; border-radius: 6px; border: 1px solid #1f5f3f; background: #1f5f3f; color: #fff; cursor: pointer; }
 .dep-botao--secundario { background: #fff; color: #1f5f3f; }
 .dep-botao:disabled { opacity: 0.5; cursor: not-allowed; }
+.dep-secao { border: 1px solid #d8e0db; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.dep-secao label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.dep-aviso { margin: 0; font-size: 13px; color: #5b6b62; }
+.dep-erro { color: #9b1c1c; font-size: 13px; }
