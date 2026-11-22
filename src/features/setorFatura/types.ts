@@ -37,6 +37,8 @@ export interface EspelhoResumo {
   prazoOcs?: string | null;
   /** Ciência da OCS depois do envio mais recente, ISO. */
   dataCiencia?: string | null;
+  /** Quem deu a ciência (T24-BE2), para "A OCS deu ciência das glosas em dd/mm/aaaa ([responsável])." */
+  responsavelCiencia?: string | null;
 }
 
 /** Linha da tabela do detalhe (LinhaResponse): uma guia/procedimento do espelho. */
