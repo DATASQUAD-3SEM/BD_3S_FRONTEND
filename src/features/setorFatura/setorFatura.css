@@ -233,3 +233,11 @@
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 }
 .sf-rodape strong { color: #fff; }
+
+/* T27-FE2 (glosa da OCS): linha da Guia destacada, com a decisão Ok/Contestar e o motivo da contestação. */
+.sf-grupo-guia th,
+.sf-grupo-guia td { background: #eef5f0; border-bottom: 1px solid #d5e5da; vertical-align: middle; }
+.sf-grupo-guia th { font-size: 14px; color: #1f3d2b; }
+.sf-grupo-guia [role='group'] { justify-content: flex-start; }
+.sf-motivo { display: flex; flex-direction: column; gap: 4px; flex-basis: 100%; min-width: 260px; font-size: 12px; color: #5b6b62; }
+.sf-motivo textarea { min-height: 72px; }
