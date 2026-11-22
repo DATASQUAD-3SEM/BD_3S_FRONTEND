@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, expect, it, vi } from 'vitest'
 import DependenteFormPage from './DependenteFormPage'
+import { ApiError } from '../../shared/api/http'
 import { vigenciaSugerida } from './regrasDependente'
 import type { ChefeDependentesApi, ContaPorCpf, DependenteItem } from './tipos'
 
@@ -83,6 +84,32 @@ describe('DependenteFormPage (T31-FE3)', () => {
     expect(await screen.findByText('CPF encontrado: Helena Costa já tem conta. Nenhuma conta nova será criada.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Senha')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled()
+  })
+
+  it('CPF do responsável recusado pelo servidor (422): mostra "CPF inválido" em vez de não mostrar nada', async () => {
+    const api = criarApi()
+    api.consultarConta.mockRejectedValue(new ApiError(422, 'Dados invalidos', ['cpf: CPF invalido']))
+    render(<DependenteFormPage titularId={1} api={api} />)
+    await preencherBase(anosAtras(5))
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Outra pessoa' }))
+    fireEvent.change(screen.getByLabelText('CPF do responsável'), { target: { value: '41282945067' } })
+
+    expect(await screen.findByText('CPF inválido. Confira os dígitos.')).toBeInTheDocument()
+    expect(screen.queryByText(/CPF encontrado/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
+  })
+
+  it('falha de rede na consulta do CPF do responsável: pede para tentar de novo', async () => {
+    const api = criarApi()
+    api.consultarConta.mockRejectedValue(new ApiError(500, 'erro'))
+    render(<DependenteFormPage titularId={1} api={api} />)
+    await preencherBase(anosAtras(5))
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Outra pessoa' }))
+    fireEvent.change(screen.getByLabelText('CPF do responsável'), { target: { value: '41282945009' } })
+
+    expect(await screen.findByText('Não foi possível consultar este CPF agora. Tente de novo.')).toBeInTheDocument()
   })
 
   it('maior: Vitalícia marcada; com CPF de responsável externo, a conta é reaproveitada', async () => {
