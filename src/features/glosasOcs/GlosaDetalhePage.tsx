@@ -294,12 +294,16 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
                             Contestar
                           </button>
                           {r?.escolha === 'CONTESTADA' && (
-                            <textarea
-                              aria-label={`Motivo da contestação da guia ${grupo.guiaNumero}`}
-                              value={r.motivo}
-                              onChange={(e) => motivo(grupo.guiaId, e.target.value)}
-                              maxLength={500}
-                            />
+                            <label className="sf-motivo">
+                              <span>Motivo da contestação (10 a 500 caracteres)</span>
+                              <textarea
+                                aria-label={`Motivo da contestação da guia ${grupo.guiaNumero}`}
+                                value={r.motivo}
+                                onChange={(e) => motivo(grupo.guiaId, e.target.value)}
+                                maxLength={500}
+                              />
+                              <span className="sf-pequeno">{r.motivo.length}/500</span>
+                            </label>
                           )}
                         </div>
                       ) : (
@@ -316,14 +320,16 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
                       {linha.codigo} · {linha.procedimento}
                     </td>
                     <td>{linha.quantidadeSessoes}</td>
-                    <td>{formatarMoeda(linha.valorSessao)}</td>
+                    <td className="sf-moeda">{formatarMoeda(linha.valorSessao)}</td>
                     <td>
-                      {linha.valorContrato == null ? '—' : formatarMoeda(linha.valorContrato)}
+                      <span className="sf-moeda">
+                        {linha.valorContrato == null ? '—' : formatarMoeda(linha.valorContrato)}
+                      </span>
                       {linha.origemContrato && (
                         <span className="sf-selo"> {ROTULO_ORIGEM[linha.origemContrato] ?? linha.origemContrato}</span>
                       )}
                     </td>
-                    <td>{linha.glosa == null || linha.glosa === 0 ? '—' : formatarMoeda(linha.glosa)}</td>
+                    <td className="sf-moeda">{linha.glosa == null || linha.glosa === 0 ? '—' : formatarMoeda(linha.glosa)}</td>
                     <td>{linha.observacao ?? '—'}</td>
                     {pendentes.length > 0 && <td />}
                   </tr>
