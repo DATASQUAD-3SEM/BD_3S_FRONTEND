@@ -20,11 +20,20 @@ export interface PreGuiaCriada {
   ocsId: number
 }
 
-/** Paciente possivel para a pre-guia (PacienteResponse, T30-BE2). dependenteId nulo = o proprio titular. */
+/**
+ * Paciente possivel para a pre-guia (PacienteResponse, T30-BE2). dependenteId nulo = o proprio titular. Os demais
+ * campos alimentam o bloco "Dados do paciente" (T30-FE1).
+ */
 export interface PacienteOpcao {
   dependenteId: number | null
   nome: string
   relacao: string
+  dataNascimento?: string | null
+  idade?: number | null
+  faixaEtaria?: string | null
+  precCp?: string | null
+  cpf?: string | null
+  telefone?: string | null
 }
 
 export interface NovaPreGuiaForm {
