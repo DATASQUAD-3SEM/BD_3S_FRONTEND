@@ -3,7 +3,7 @@
  *
  * O login fica em shared/auth (tela /login e RotaProtegida): cada area so abre para o perfil dono dela.
  */
-export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'SETOR_FATURA' | 'RASTREABILIDADE' | 'AUDITORIA' | 'RECEPCAO' | 'OCS'
+export type Perfil = 'BENEFICIARIO' | 'MEDICO' | 'CHEFE_FUSEX' | 'SETOR_GUIAS' | 'SETOR_FATURA' | 'RASTREABILIDADE' | 'AUDITORIA' | 'RECEPCAO' | 'OCS' | 'RESPONSAVEL_EXTERNO'
 
 export interface ItemMenu {
   to: string
@@ -24,6 +24,7 @@ export const LOGIN_PADRAO: Record<Perfil, string> = {
   AUDITORIA: 'auditoria',
   RECEPCAO: 'recepcao',
   OCS: 'ocs.laboratorio',
+  RESPONSAVEL_EXTERNO: '',
 }
 
 /** Nome do perfil na barra superior. */
@@ -37,6 +38,7 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
   AUDITORIA: 'Auditoria',
   RECEPCAO: 'Recepção',
   OCS: 'OCS',
+  RESPONSAVEL_EXTERNO: 'Responsável legal',
 }
 
 /** Página inicial de cada perfil. */
@@ -50,6 +52,7 @@ export const INICIO_PERFIL: Record<Perfil, string> = {
   AUDITORIA: '/auditoria/faturas-recebidas',
   RECEPCAO: '/recepcao/guias-para-impressao',
   OCS: '/ocs/espelho',
+  RESPONSAVEL_EXTERNO: '/beneficiario/inicio',
 }
 
 /** Menu lateral de cada perfil: mostra so os itens do perfil logado. */
@@ -83,6 +86,13 @@ export const MENUS: Record<Perfil, ItemMenu[]> = {
   AUDITORIA: [
     { to: '/auditoria/faturas-recebidas', label: 'Faturas Recebidas' },
     { to: '/auditoria/faturas-analisadas', label: 'Faturas Analisadas' },
+  ],
+  RESPONSAVEL_EXTERNO: [
+    { to: '/beneficiario/inicio', label: 'Início' },
+    { to: '/pre-guias/nova', label: 'Nova pré-guia' },
+    { to: '/pre-guias', label: 'Minhas pré-guias' },
+    { to: '/guias', label: 'Minhas guias' },
+    { to: '/beneficiario/minhas-informacoes', label: 'Minhas informações' },
   ],
   RECEPCAO: [{ to: '/recepcao/guias-para-impressao', label: 'Guias para impressão' }],
   OCS: [

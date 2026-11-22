@@ -68,7 +68,7 @@ export default function App() {
       {/* Teste de conexao com o backend: aberto, sem login */}
       <Route path="/diagnostico/conexao" element={<main className="app-main"><ConexaoPage /></main>} />
 
-      <Route element={<RotaProtegida perfil="BENEFICIARIO"><AppLayout /></RotaProtegida>}>
+      <Route element={<RotaProtegida perfil={["BENEFICIARIO", "RESPONSAVEL_EXTERNO"]}><AppLayout /></RotaProtegida>}>
         <Route path="/beneficiario/inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
         <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
         <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
