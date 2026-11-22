@@ -17,6 +17,18 @@ interface Props {
  * No mobile o menu vira gaveta. As telas entregam só o conteúdo da área principal (Outlet).
  * O botão "Sair" encerra a sessão e volta para a tela de login.
  */
+/** Iniciais do avatar da barra superior: primeira letra do primeiro e do último nome ("Antonio Ferreira" → "AF"). */
+export function iniciais(nome: string): string {
+  const partes = nome
+    .trim()
+    .split(/\s+/)
+    .filter((p) => /^[A-Za-zÀ-ÿ]/.test(p))
+  if (partes.length === 0) return ''
+  const primeira = partes[0][0]
+  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : ''
+  return (primeira + ultima).toUpperCase()
+}
+
 export default function LayoutPerfil({ perfil, nomeUsuario, itemAtivo, children }: Props) {
   const [menuAberto, setMenuAberto] = useState(false)
   const navigate = useNavigate()
@@ -44,10 +56,14 @@ export default function LayoutPerfil({ perfil, nomeUsuario, itemAtivo, children 
         </button>
 
         <Link className="brand" to={INICIO_PERFIL[perfil]} aria-label="Nexus: página inicial">
+          <span className="brand-simbolo" aria-hidden="true">N</span>
           <span className="brand-nome">Nexus</span>
         </Link>
 
         <div className="app-topbar-direita">
+          <span className="app-avatar" aria-hidden="true">
+            {iniciais(usaNome && nomeUsuario ? nomeUsuario : ROTULO_PERFIL[perfil])}
+          </span>
           <span className="app-usuario">{usuario}</span>
           <button type="button" className="app-sair" onClick={sair}>
             Sair
