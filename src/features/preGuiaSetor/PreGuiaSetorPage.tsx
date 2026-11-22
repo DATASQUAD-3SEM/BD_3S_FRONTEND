@@ -213,6 +213,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
   const conferenciaPendente = temErroDeConferencia(erros) || erroPrecCp;
   const erroUg = mensagemDoCampoUg(erros) ?? errosServidor?.ug ?? errosServidor?.ugOrigem ?? null;
   const erroValidade = erros.validade ?? errosServidor?.validadeAte ?? null;
+  const erroNumero = errosServidor?.numeroGuia ?? null;
 
   // Edita um campo sem perder o resto do que esta na tela; com so o rascunho salvo, parte dos valores dele.
   const editarAnexo = (mudancas: Partial<AnexoSessao>) => {
@@ -403,6 +404,7 @@ export default function PreGuiaSetorPage({ id, api = preGuiaSetorApi, onVoltarFi
                 arquivoNovo={arquivoNovo}
                 ug={ugGuia}
                 validade={validadeGuia}
+                erroNumero={erroNumero}
                 erroUg={erroUg}
                 erroValidade={erroValidade}
                 conferenciaPendente={conferenciaPendente}

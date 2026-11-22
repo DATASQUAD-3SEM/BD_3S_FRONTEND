@@ -104,14 +104,26 @@ export function temErroDeConferencia(erros: ErrosConferencia): boolean {
 
 /** Erros 422 do servidor sobre UG, UG Origem ou validade (T16-BE2), cada um com a mensagem sem o prefixo. */
 export interface ErrosServidorConferencia {
+  numeroGuia?: string;
   ug?: string;
   ugOrigem?: string;
   validadeAte?: string;
 }
 
-/** Le os detalhes "campo: mensagem" de um 422. Devolve null se o erro nao e sobre UG, UG Origem ou validade. */
+/** T22-FE1: 409 do servidor quando o numero ja pertence a outra Guia. */
+export const MSG_NUMERO_JA_USADO =
+  'Este número de Guia já foi usado em outra Guia. Confira o número impresso no PDF ou troque o arquivo.';
+
+/**
+ * Le os detalhes "campo: mensagem" de um 422 (UG, UG Origem ou validade) ou do 409 do numero ja usado em outra Guia.
+ * Devolve null se o erro nao e sobre esses campos.
+ */
 export function errosDeConferenciaDoServidor(erro: unknown): ErrosServidorConferencia | null {
-  if (!(erro instanceof ApiError) || erro.status !== 422) return null;
+  if (!(erro instanceof ApiError)) return null;
+  if (erro.status === 409) {
+    return erro.detalhes.some((d) => d.startsWith('numeroGuia:')) ? { numeroGuia: MSG_NUMERO_JA_USADO } : null;
+  }
+  if (erro.status !== 422) return null;
   const erros: ErrosServidorConferencia = {};
   for (const linha of erro.detalhes) {
     const achado = /^(ug|ugOrigem|validadeAte):\s*(.*)$/.exec(linha);
