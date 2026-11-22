@@ -5,7 +5,6 @@
 export interface BeneficiarioBusca {
   id: number
   nome: string
-  grupo: string
   faixaEtaria: string
   idade: number
   cpf: string

@@ -45,7 +45,6 @@ export default function BeneficiarioSecao({
   const linhas = beneficiario
     ? [
       { rotulo: 'Nome', valor: beneficiario.nome },
-      { rotulo: 'Grupo', valor: beneficiario.grupo },
       {
         rotulo: 'Faixa etária',
         valor: `${beneficiario.faixaEtaria} (${beneficiario.idade} anos)`,

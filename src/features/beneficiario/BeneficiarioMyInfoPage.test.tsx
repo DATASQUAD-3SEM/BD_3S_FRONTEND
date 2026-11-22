@@ -16,7 +16,6 @@ const BENEFICIARIO_INICIAL = {
   precCp: '45872213300',
   telefone: '(12) 98765-4321',
   dataNascimento: '1978-05-10',
-  grupo: 'Exército Brasileiro · FUSEX',
   assinaturaCadastrada: false,
 }
 
