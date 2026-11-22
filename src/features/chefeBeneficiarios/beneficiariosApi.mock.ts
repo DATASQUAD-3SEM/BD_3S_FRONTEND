@@ -21,6 +21,7 @@ interface Registro {
   dataNascimento: string
   telefone: string
   ativo: boolean
+  dependentesAtivos?: number
 }
 
 const registros: Registro[] = [
@@ -32,6 +33,7 @@ const registros: Registro[] = [
     dataNascimento: '1968-05-10',
     telefone: '11987654321',
     ativo: true,
+    dependentesAtivos: 3,
   },
   {
     id: 2,

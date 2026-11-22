@@ -19,9 +19,11 @@ interface Aviso {
 
 interface Props {
   api?: BeneficiariosApi
+  /** Abre os dependentes do titular (T31-FE1). */
+  onDependentes?: (id: number) => void
 }
 
-export default function BeneficiariosPage({ api = apiPadrao }: Props) {
+export default function BeneficiariosPage({ api = apiPadrao, onDependentes }: Props) {
   const [busca, setBusca] = useState('')
   const [buscaAplicada, setBuscaAplicada] = useState('')
   const [situacao, setSituacao] = useState<SituacaoFiltro>('ativos')
@@ -133,6 +135,9 @@ export default function BeneficiariosPage({ api = apiPadrao }: Props) {
   return (
     <div className="benef-pagina">
       <h1 className="benef-titulo">Beneficiários</h1>
+      <p className="benef-subtitulo">
+        Aqui aparecem só os titulares. Os dependentes ficam dentro do titular ao qual pertencem.
+      </p>
 
       {aviso && (
         <p className={`benef-aviso benef-aviso--${aviso.tipo}`} role={aviso.tipo === 'erro' ? 'alert' : 'status'}>
@@ -152,6 +157,7 @@ export default function BeneficiariosPage({ api = apiPadrao }: Props) {
         onPagina={mudarPagina}
         editandoId={edicao?.id ?? null}
         onEditar={abrirEdicao}
+        onDependentes={onDependentes}
         onAlternar={alternarSituacao}
         onTentarNovamente={recarregarLista}
       />

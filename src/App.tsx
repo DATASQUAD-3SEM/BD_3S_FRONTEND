@@ -33,7 +33,7 @@ import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
 import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
-import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
+import BeneficiariosRota from './features/chefeBeneficiarios/BeneficiariosRota'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
@@ -90,7 +90,9 @@ export default function App() {
       <Route path="/chefe" element={<RotaProtegida perfil="CHEFE_FUSEX"><ChefeLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-assinar" replace />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
-        <Route path="beneficiarios" element={<BeneficiariosPage />} />
+        <Route path="beneficiarios" element={<BeneficiariosRota />} />
+        {/* T31-FE2 (Dependentes do titular): tela a implementar na SCRUM-266 */}
+        <Route path="beneficiarios/:id/dependentes" element={<EmConstrucao nome="Dependentes" task="T31-FE2 (SCRUM-266)" />} />
         <Route path="medicos" element={<MedicosPage />} />
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>

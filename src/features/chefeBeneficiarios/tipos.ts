@@ -10,6 +10,8 @@ export interface BeneficiarioItem {
   cpf: string
   precCp: string
   ativo: boolean
+  /** Dependentes vigentes do titular (T31-BE1). */
+  dependentesAtivos?: number
 }
 
 export interface ListaBeneficiarios {
