@@ -63,6 +63,11 @@ describe('LayoutPerfil (T0-FE)', () => {
     expect(screen.getByText('Cap Méd Ribeiro · Médico FUSEX')).toBeInTheDocument()
   })
 
+  it('responsável legal mostra "{nome} · Responsável legal" (T30-FE3)', () => {
+    renderizar('RESPONSAVEL_EXTERNO', '/beneficiario/inicio', 'Helena Costa')
+    expect(screen.getByText('Helena Costa · Responsável legal')).toBeInTheDocument()
+  })
+
   it('chefe, setor de Guias e recepção mostram só o nome do perfil', () => {
     for (const [perfil, rotulo] of [
       ['CHEFE_FUSEX', 'Chefe do FUSEX'],
