@@ -41,6 +41,7 @@ describe('Protocolo da fatura pela tela de Espelhos Recebidos (T24-FE2)', () => 
     const user = userEvent.setup()
     const protocolarFatura = vi.fn().mockResolvedValue(detalheProtocolado)
     const api: SetorFaturasApi = {
+      listarAuditadas: vi.fn(),
       listarEspelhosRecebidos: vi
         .fn()
         .mockResolvedValueOnce([espelhoSemNumero])

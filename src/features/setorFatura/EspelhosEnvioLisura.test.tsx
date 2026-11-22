@@ -28,6 +28,7 @@ describe('Envio para a rastreabilidade pela tela (T24-FE3)', () => {
     const user = userEvent.setup()
     const enviarParaLisura = vi.fn().mockResolvedValue({ ...detalheProtocolada, situacao: 'EM_LISURA' })
     const api: SetorFaturasApi = {
+      listarAuditadas: vi.fn(),
       listarEspelhosRecebidos: vi
         .fn()
         .mockResolvedValueOnce([faturaProtocolada])

@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http'
-import type { EspelhoDetalhe, EspelhoResumo, LinhaEspelho, SetorFaturasApi } from './types'
+import type { EspelhoDetalhe, EspelhoResumo, FaturaAuditada, LinhaEspelho, SetorFaturasApi } from './types'
 
 /**
  * Mock em memoria da tela de Espelhos Recebidos (T24-FE1). Sete espelhos do prototipo, cobrindo as situacoes
@@ -164,6 +164,24 @@ export function criarMockSetorFaturas({ atrasoMs = 0 }: OpcoesMock = {}): SetorF
   const espera = () => (atrasoMs > 0 ? new Promise<void>((resolve) => setTimeout(resolve, atrasoMs)) : Promise.resolve())
 
   return {
+    async listarAuditadas(): Promise<FaturaAuditada[]> {
+      await espera()
+      return sementesFixas
+        .filter((s) => s.resumo.situacao === 'AUDITADA')
+        .map((s) => ({
+          id: s.resumo.id,
+          ocs: s.resumo.ocs,
+          dataInicio: s.resumo.dataInicio,
+          dataEnvio: s.resumo.dataEnvio,
+          numeroFatura: s.resumo.numeroFatura,
+          dataEntrada: s.resumo.dataEntrada,
+          dataVisualizacao: null,
+          valorInformado: valorInformado(s.linhas),
+          valorGlosa: s.glosa,
+          valorFinal: s.valorFinal,
+        }))
+    },
+
     async listarEspelhosRecebidos(): Promise<EspelhoResumo[]> {
       await espera()
       // Backend listar exclui Auditadas; volta em dataEnvio ASC para a tela ordenar do mais recente.

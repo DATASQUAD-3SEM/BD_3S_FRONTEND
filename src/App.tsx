@@ -14,6 +14,7 @@ import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import SetorFaturasLayout from './features/setorFatura/SetorFaturasLayout'
 import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
+import AuditadasPage from './features/setorFatura/AuditadasPage'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
@@ -97,7 +98,7 @@ export default function App() {
         <Route index element={<Navigate to="espelhos-recebidos" replace />} />
         <Route path="espelhos-recebidos" element={<EspelhosRecebidosPage />} />
         {/* T24-FE4 (Faturas Auditadas): tela a implementar na SCRUM-217 */}
-        <Route path="faturas-auditadas" element={<EmConstrucao nome="Faturas Auditadas" task="T24-FE4 (SCRUM-217)" />} />
+        <Route path="faturas-auditadas" element={<AuditadasPage />} />
       </Route>
 
       <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>

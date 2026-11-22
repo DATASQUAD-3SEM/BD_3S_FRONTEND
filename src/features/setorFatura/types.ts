@@ -118,8 +118,25 @@ export interface EnviarLisuraRequest {
   responsavel: string;
 }
 
-/** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1, T24-FE2, T24-FE3). */
+/** Fatura já auditada (FaturaAuditadaResponse, T24-BE). Só leitura. */
+export interface FaturaAuditada {
+  id: number;
+  ocs: string;
+  dataInicio: string;
+  dataEnvio: string;
+  numeroFatura: string | null;
+  dataEntrada: string;
+  /** Quando a auditoria visualizou a fatura; null se não registrado. */
+  dataVisualizacao: string | null;
+  valorInformado: number;
+  valorGlosa: number | null;
+  valorFinal: number | null;
+}
+
+/** Cliente HTTP do Setor de Faturas (T24-FE1 a T24-FE4). */
 export interface SetorFaturasApi {
+  /** Faturas auditadas (aba própria, T24-FE4). */
+  listarAuditadas(): Promise<FaturaAuditada[]>;
   /** Lista os espelhos recebidos e as faturas em andamento (sem as Auditadas). */
   listarEspelhosRecebidos(): Promise<EspelhoResumo[]>;
   /** Detalhe de um espelho/fatura (guias + controle de fluxo). */
