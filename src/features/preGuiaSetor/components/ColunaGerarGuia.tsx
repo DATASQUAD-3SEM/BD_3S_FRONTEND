@@ -2,7 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import { ApiError } from '../../../shared/api/http';
 import { mascaraData, somenteDigitos } from '../../../shared/utils/formatadores';
 import { MSG_CONFERENCIA_PENDENTE, mensagemConferenciaPaciente } from '../conferenciaGuia';
-import type { LinhaExame } from '../examesGuia';
+import { MSG_EXAMES_PENDENTES, examesDaLeitura, type LinhaExame } from '../examesGuia';
 import { validarPdfGuia } from '../regras';
 import type { ExtracaoNumeroGuia, LeituraDaGuia, PacienteDaLeitura } from '../types';
 import TabelaExamesGuia from './TabelaExamesGuia';
@@ -102,7 +102,7 @@ export default function ColunaGerarGuia({
       const leitura = await extrairNumeroGuia(pdf);
       onAnexar(pdf, {
         numero: leitura.numeroGuia,
-        exames: leitura.exames ?? [],
+        exames: examesDaLeitura(leitura.examesNaGuia),
         ug: leitura.ug ?? '',
         ugOrigem: leitura.ugOrigem ?? null,
         validadeAte: leitura.validadeAte ?? null,
@@ -311,7 +311,9 @@ export default function ColunaGerarGuia({
           ? 'Ao concluir, a Guia segue para a assinatura do médico e do chefe.'
           : nomeArquivo && !lendo && conferenciaPendente
             ? MSG_CONFERENCIA_PENDENTE
-            : 'Disponível depois de anexar a Guia.'}
+            : nomeArquivo && !lendo
+              ? MSG_EXAMES_PENDENTES
+              : 'Disponível depois de anexar a Guia.'}
       </p>
       {avisoConclusao && <p role="status" className="pgs__aviso">{avisoConclusao}</p>}
     </div>

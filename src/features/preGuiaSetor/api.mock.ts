@@ -191,7 +191,7 @@ export function criarMockPreGuiaSetor({ atrasoMs = 200 }: OpcoesMock = {}): PreG
       } else {
         exames = EXAMES_EXEMPLO.map((e) => ({ ...e }));
       }
-      return { numeroGuia: '202610678', exames, ...conferencia, ...precCp };
+      return { numeroGuia: '202610678', examesNaGuia: exames.map((e) => ({ codigo: e.codDgp, descricao: e.descricao, quantidade: e.quantidade })), ...conferencia, ...precCp };
     },
 
     // Confere como o servidor (T16-BE2): UG, UG Origem e validade valem 422 e nada e gravado. So a validade e gravada.

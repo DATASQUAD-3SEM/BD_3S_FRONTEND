@@ -37,6 +37,16 @@ export interface ExameGuia {
   quantidade: number;
 }
 
+/** T21-BE1: exame lido do PDF (examesNaGuia): codigo, descricao e quantidade (null quando nao foi lida). */
+export interface ExameLidoNaGuia {
+  codigo: string;
+  descricao: string | null;
+  quantidade: number | null;
+}
+
+/** Exame que abre uma linha da tabela: lido do PDF ou gravado no rascunho. */
+export type ExameParaLinha = Omit<ExameGuia, 'quantidade'> & { quantidade: number | null };
+
 export interface GuiaRascunhoDetalhe {
   numero: string;
   nomeArquivo: string;
@@ -93,7 +103,8 @@ export interface GuiaConcluidaResposta {
  */
 export interface ExtracaoNumeroGuia {
   numeroGuia: string;
-  exames?: ExameGuia[];
+  /** T21-BE1: exames lidos do quadro Procedimentos (lista vazia se nada foi lido). */
+  examesNaGuia?: ExameLidoNaGuia[];
   ug?: string | null;
   ugOrigem?: string | null;
   validadeAte?: string | null;
@@ -117,7 +128,7 @@ export interface PacienteDaLeitura {
 /** O que a tela guarda depois de ler o PDF (ou de uma leitura que falhou: tudo vazio). */
 export interface LeituraDaGuia {
   numero: string;
-  exames: ExameGuia[];
+  exames: ExameParaLinha[];
   ug: string;
   /** UG Origem lida do PDF: nao tem campo na tela e nao e editavel. Nula se nao foi lida. */
   ugOrigem: string | null;
