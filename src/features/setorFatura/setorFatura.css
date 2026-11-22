@@ -118,3 +118,118 @@
 .sf-faixa { margin: 0.75rem 0; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid; }
 .sf-faixa--ok { border-color: #2e7d32; background: #e8f5e9; }
 .sf-faixa--alerta { border-color: #b26a00; background: #fff4e0; }
+
+/*
+ * T25-FE2 (lisura): classes usadas pela lisura e pelas telas de fatura que nao tinham estilo. Sem elas, os botoes
+ * herdavam o estilo global (grandes, 44px de altura, texto branco) e o resumo saia com o rotulo colado no valor.
+ */
+.sf-voltar { align-self: flex-start; font-size: 14px; color: #1f5f3f; text-decoration: none; font-weight: 600; }
+.sf-voltar:hover { text-decoration: underline; }
+
+.sf-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+.sf-resumo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.sf-resumo > div > span { font-size: 12px; color: #5b6b62; text-transform: uppercase; letter-spacing: 0.03em; }
+.sf-resumo > div > strong { font-size: 18px; color: #1f3d2b; }
+.sf-moeda { white-space: nowrap; }
+
+.sf-tabela-wrapper { overflow-x: auto; background: #fff; border: 1px solid #dfe5e1; border-radius: 10px; }
+.sf-tabela-wrapper .sf-tabela { margin: 0; }
+.sf-tabela td .sf-selo { margin-left: 4px; }
+.sf-tabela td .sf-pequeno { display: block; margin-top: 4px; }
+.sf-tabela textarea {
+  width: 100%;
+  min-width: 160px;
+  min-height: 56px;
+  padding: 6px 8px;
+  border: 1px solid #b9c4bd;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.sf-tabela [role='group'] { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 120px; }
+
+/* Botoes do setor: principal (verde) e secundario (contorno). Dentro de tabelas, compactos. */
+.sf-botao {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid #1f4d2b;
+  border-radius: 8px;
+  background: #1f4d2b;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sf-botao--secundario { background: #fff; color: #1f4d2b; }
+.sf-botao--secundario[aria-pressed='true'] { background: #1f4d2b; color: #fff; }
+.sf-tabela .sf-botao { min-height: 30px; padding: 3px 12px; font-size: 13px; }
+
+.sf-link {
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: #1f5f3f;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.sf-link:hover { color: #123a22; }
+
+.sf-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.sf-acoes label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5b6b62; }
+.sf-acoes input,
+.sf-painel input {
+  min-width: 220px;
+  padding: 8px 10px;
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.sf-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 640px;
+  padding: 12px 14px;
+  border: 1px solid #b6dcc4;
+  border-left: 4px solid #1f4d2b;
+  border-radius: 8px;
+  background: #f3f9f5;
+}
+.sf-painel p { margin: 0; font-size: 14px; }
+.sf-painel label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5b6b62; }
+.sf-painel .sf-botao { align-self: flex-start; }
+
+/* Rodape da lisura: fica visivel na parte de baixo da tela enquanto as linhas sao decididas. */
+.sf-rodape {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid #1f4d2b;
+  border-radius: 10px;
+  background: #1f4d2b;
+  color: #fff;
+  font-size: 15px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+}
+.sf-rodape strong { color: #fff; }
