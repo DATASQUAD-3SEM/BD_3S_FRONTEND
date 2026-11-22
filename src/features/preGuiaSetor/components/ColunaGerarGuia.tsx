@@ -4,7 +4,7 @@ import { mascaraData, somenteDigitos } from '../../../shared/utils/formatadores'
 import { MSG_CONFERENCIA_PENDENTE, mensagemConferenciaPaciente } from '../conferenciaGuia';
 import type { LinhaExame } from '../examesGuia';
 import { validarPdfGuia } from '../regras';
-import type { ExtracaoNumeroGuia, LeituraDaGuia } from '../types';
+import type { ExtracaoNumeroGuia, LeituraDaGuia, PacienteDaLeitura } from '../types';
 import TabelaExamesGuia from './TabelaExamesGuia';
 
 const TAMANHO_MAXIMO_NUMERO = 20;
@@ -40,6 +40,8 @@ interface Props {
   precCpLido: string | null;
   /** Resultado da conferencia do Prec CP: true/false, null quando nao foi lido; undefined quando a leitura falhou (429/500) ou nao ha anexo novo. */
   precCpConfere: boolean | null | undefined;
+  /** Paciente da pré-guia segundo a leitura (T30-BE4): o Prec CP esperado é o do dependente, quando houver. */
+  pacienteDaLeitura?: PacienteDaLeitura | null;
   /** Exames da Guia, editaveis na tabela (T22-FE1). */
   linhasExames: LinhaExame[];
   onExamesChange: (linhas: LinhaExame[]) => void;
@@ -71,6 +73,7 @@ export default function ColunaGerarGuia({
                                           precCpCadastrado,
                                           precCpLido,
                                           precCpConfere,
+                                          pacienteDaLeitura,
                                           linhasExames,
                                           onExamesChange,
                                           erroExames,
@@ -106,6 +109,14 @@ export default function ColunaGerarGuia({
         // T21-BE1: precCpConfere null = nao lido ou sem Prec CP na pre-guia (mostra aviso, nao bloqueia).
         precCpLido: leitura.precCpLido ?? null,
         precCpConfere: leitura.precCpConfere ?? null,
+        paciente:
+          leitura.pacienteDependente == null
+            ? null
+            : {
+                dependente: leitura.pacienteDependente,
+                nome: leitura.pacienteNome ?? null,
+                precCp: leitura.precCpPaciente ?? null,
+              },
       });
       setMensagem({ tipo: 'ok', texto: 'Número extraído automaticamente. Você pode editar se necessário.' });
     } catch (erro) {
@@ -163,7 +174,7 @@ export default function ColunaGerarGuia({
   // definido). Em 429/500, com so o rascunho salvo ou durante a leitura, nada do bloco aparece.
   const mostrarConferencia = !!nomeArquivo && !lendo && precCpConfere !== undefined;
   const mensagemPaciente = mostrarConferencia
-    ? mensagemConferenciaPaciente(precCpConfere ?? null, precCpLido, precCpCadastrado)
+    ? mensagemConferenciaPaciente(precCpConfere ?? null, precCpLido, precCpCadastrado, pacienteDaLeitura)
     : null;
 
   return (

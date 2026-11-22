@@ -1,5 +1,6 @@
 import { ApiError } from '../../shared/api/http';
 import { formatarData, somenteDigitos } from '../../shared/utils/formatadores';
+import type { PacienteDaLeitura } from './types';
 
 /**
  * Conferencia da UG, da UG Origem e da validade da Guia no navegador (T16-FE). O servidor confere de novo
@@ -137,9 +138,18 @@ export function mensagemConferenciaPaciente(
   precCpConfere: boolean | null,
   precCpLido: string | null,
   precCpCadastrado: string,
+  paciente?: PacienteDaLeitura | null,
 ): MensagemConferenciaPaciente {
-  const cadastrado = somenteDigitos(precCpCadastrado);
+  // T30-FE4: para paciente dependente, o Prec CP esperado é o do dependente (vem da leitura, T30-BE4).
+  const dependente = paciente?.dependente === true;
+  const cadastrado = somenteDigitos(dependente && paciente?.precCp ? paciente.precCp : precCpCadastrado);
   if (precCpConfere === true) {
+    if (dependente) {
+      return {
+        estilo: 'ok',
+        texto: `O Prec CP do paciente nesta Guia confere com o do dependente ${paciente?.nome ?? ''} da pré-guia.`,
+      };
+    }
     return { estilo: 'ok', texto: `O Prec CP do paciente confere com a pré-guia (${cadastrado}).` };
   }
   if (precCpConfere === false) {
