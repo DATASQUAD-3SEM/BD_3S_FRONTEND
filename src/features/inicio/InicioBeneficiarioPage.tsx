@@ -1,9 +1,9 @@
-import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { GuiaDoBeneficiario } from '../minhasGuias/types'
 import type { PreGuiaDoBeneficiario } from '../minhasPreGuias/types'
 import { inicioApi, type InicioApi, type PessoaInicio, type TipoPessoaInicio } from './inicioApi'
-import { Icone, type NomeIcone } from './icones'
+import { Icone } from './icones'
+import { Atalho, CartaoPendencia, useCarga } from './inicioComum'
 import './inicio.css'
 
 /**
@@ -16,8 +16,6 @@ const FRASE: Record<TipoPessoaInicio, string> = {
   DEPENDENTE_MAIOR: 'Aqui você acompanha as suas pré-guias e guias.',
   RESPONSAVEL: 'Aqui você acompanha as pré-guias e guias dos menores que você acompanha como responsável legal.',
 }
-
-type Carga<T> = { estado: 'carregando' } | { estado: 'ok'; dados: T } | { estado: 'erro' }
 
 interface Props {
   api?: InicioApi
@@ -35,21 +33,6 @@ export function contarPendencias(preGuias: PreGuiaDoBeneficiario[] | null, guias
     sessoesParaAssinar:
       guias?.reduce((total, g) => total + g.sessoes.filter((s) => s.status === 'SOLICITADA').length, 0) ?? null,
   }
-}
-
-function useCarga<T>(carregar: () => Promise<T>): Carga<T> {
-  const [carga, setCarga] = useState<Carga<T>>({ estado: 'carregando' })
-  useEffect(() => {
-    let ativo = true
-    carregar()
-      .then((dados) => ativo && setCarga({ estado: 'ok', dados }))
-      .catch(() => ativo && setCarga({ estado: 'erro' }))
-    return () => {
-      ativo = false
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return carga
 }
 
 export default function InicioBeneficiarioPage({ api = inicioApi }: Props) {
@@ -143,74 +126,12 @@ export default function InicioBeneficiarioPage({ api = inicioApi }: Props) {
           Atalhos
         </h2>
         <nav className="inicio-atalhos" aria-labelledby="inicio-atalhos">
-          <Atalho icone="mais" destino="/pre-guias/nova" titulo="Nova pré-guia">
-            Anexe o encaminhamento médico e escolha a OCS.
-          </Atalho>
-          <Atalho icone="documento" destino="/pre-guias" titulo="Minhas pré-guias">
-            Acompanhe a análise e corrija o que for pedido.
-          </Atalho>
-          <Atalho icone="guia" destino="/guias" titulo="Minhas guias">
-            Envie à OCS, assine as sessões e veja o PDF.
-          </Atalho>
-          <Atalho icone="pessoa" destino="/beneficiario/minhas-informacoes" titulo="Minhas informações">
-            Seus dados, sua senha e sua assinatura.
-          </Atalho>
+          <Atalho icone="mais" destino="/pre-guias/nova" titulo="Nova pré-guia" descricao="Anexe o encaminhamento médico e escolha a OCS." />
+          <Atalho icone="documento" destino="/pre-guias" titulo="Minhas pré-guias" descricao="Acompanhe a análise e corrija o que for pedido." />
+          <Atalho icone="guia" destino="/guias" titulo="Minhas guias" descricao="Envie à OCS, assine as sessões e veja o PDF." />
+          <Atalho icone="pessoa" destino="/beneficiario/minhas-informacoes" titulo="Minhas informações" descricao="Seus dados, sua senha e sua assinatura." />
         </nav>
       </section>
     </div>
-  )
-}
-
-interface CartaoProps {
-  icone: NomeIcone
-  tom: 'alerta' | 'info' | 'sucesso' | 'destaque'
-  titulo: string
-  descricao: string
-  quantidade: number | null
-  erro: boolean
-  destino: string
-  acao: string
-}
-
-function CartaoPendencia({ icone, tom, titulo, descricao, quantidade, erro, destino, acao }: CartaoProps) {
-  const vazio = !erro && quantidade === 0
-  return (
-    <li className={`inicio-cartao inicio-cartao--${tom}${vazio ? ' inicio-cartao--vazio' : ''}`} aria-label={titulo}>
-      <div className="inicio-cartao-topo">
-        <span className="inicio-cartao-icone" aria-hidden="true">
-          <Icone nome={icone} />
-        </span>
-        <span className="inicio-cartao-numero" data-testid="quantidade">
-          {erro ? '!' : quantidade === null ? '…' : quantidade}
-        </span>
-      </div>
-      <h3>{titulo}</h3>
-      {erro ? (
-        <p className="inicio-cartao-erro">Não foi possível carregar.</p>
-      ) : vazio ? (
-        <p className="inicio-cartao-desc">Nada pendente</p>
-      ) : (
-        <p className="inicio-cartao-desc">{descricao}</p>
-      )}
-      {!erro && !vazio && quantidade !== null && (
-        <Link to={destino} className="inicio-cartao-acao">
-          {acao} <span aria-hidden="true">→</span>
-        </Link>
-      )}
-    </li>
-  )
-}
-
-function Atalho({ icone, destino, titulo, children }: { icone: NomeIcone; destino: string; titulo: string; children: ReactNode }) {
-  return (
-    <Link to={destino} className="inicio-atalho">
-      <span className="inicio-atalho-icone" aria-hidden="true">
-        <Icone nome={icone} />
-      </span>
-      <span>
-        <strong>{titulo}</strong>
-        <small>{children}</small>
-      </span>
-    </Link>
   )
 }
