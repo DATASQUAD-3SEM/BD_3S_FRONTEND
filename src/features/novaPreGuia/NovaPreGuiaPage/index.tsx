@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { get } from '../../../shared/api/http'
 import { mensagemDeErro } from '../../../shared/api/erros'
 import { useBeneficiario } from '../../beneficiario/BeneficiarioContext'
-import { criarPreGuia } from '../api'
-import { formVazio, type NovaPreGuiaForm } from './types'
+import { criarPreGuia, listarPacientes } from '../api'
+import { formVazio, type NovaPreGuiaForm, type PacienteOpcao } from './types'
 
 import DadosBeneficiario from './components/DadosBeneficiario'
+import PassoPaciente from './components/PassoPaciente'
 import SelecaoOcs from './components/SelecaoOcs'
 import UploadEncaminhamento from './components/UploadEncaminhamento'
 import FeedbackUpload from './components/FeedbackUpload'
@@ -26,8 +28,39 @@ export default function NovaPreGuiaPage() {
 
   const { beneficiario, carregando: carregandoBeneficiario, erro: erroBeneficiario } = useBeneficiario()
 
+  // Pacientes possiveis (T30-FE1). Se a lista nao carregar, a tela segue como antes: o proprio titular.
+  const [pacientes, setPacientes] = useState<PacienteOpcao[] | null>(null)
+  const [maioresNomes, setMaioresNomes] = useState<string[]>([])
+
+  useEffect(() => {
+    let ativo = true
+    listarPacientes()
+      .then((lista) => {
+        if (ativo) setPacientes(lista)
+      })
+      .catch(() => {
+        if (ativo) setPacientes([{ dependenteId: null, nome: '', relacao: 'Titular' }])
+      })
+    get<{ nome: string; podeCriarPreGuia: boolean }[]>('/beneficiario/dependentes')
+      .then((dependentes) => {
+        if (ativo) setMaioresNomes(dependentes.filter((d) => !d.podeCriarPreGuia).map((d) => d.nome))
+      })
+      .catch(() => {
+        if (ativo) setMaioresNomes([])
+      })
+    return () => {
+      ativo = false
+    }
+  }, [])
+
+  // Com um so paciente possivel, o passo nao aparece e o paciente e esse.
+  const passoPaciente = pacientes !== null && pacientes.length > 1
+  const dependenteEscolhido: number | null | undefined =
+    pacientes !== null && pacientes.length === 1 ? pacientes[0].dependenteId : form.dependenteId
+
   const faltas: string[] = []
   if (carregandoBeneficiario || erroBeneficiario || !beneficiario) faltas.push('dados do beneficiário')
+  if (pacientes === null || pacientes.length === 0 || dependenteEscolhido === undefined) faltas.push('paciente')
   if (form.ocs === null) faltas.push('OCS')
   if (form.arquivo === null) faltas.push('arquivo de encaminhamento')
 
@@ -39,7 +72,7 @@ export default function NovaPreGuiaPage() {
     setMensagem(null)
 
     try {
-      const preGuia = await criarPreGuia(form)
+      const preGuia = await criarPreGuia({ ...form, dependenteId: dependenteEscolhido ?? null })
       setForm(formVazio)
       setVersaoFormulario((v) => v + 1)
       setMensagem({
@@ -63,6 +96,15 @@ export default function NovaPreGuiaPage() {
         <p className="erro" role="alert">
           Não foi possível carregar os dados do beneficiário: {erroBeneficiario}
         </p>
+      )}
+
+      {passoPaciente && (
+        <PassoPaciente
+          pacientes={pacientes}
+          maioresNomes={maioresNomes}
+          value={form.dependenteId}
+          onChange={(dependenteId) => setForm({ ...form, dependenteId })}
+        />
       )}
 
       {beneficiario && <DadosBeneficiario value={beneficiario} />}
