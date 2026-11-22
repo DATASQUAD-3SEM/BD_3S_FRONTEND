@@ -53,10 +53,26 @@ describe('GuiasFinalizadasPage (T20-FE2)', () => {
     expect(screen.getByTestId('skeleton-guias')).toBeInTheDocument()
   })
 
-  it('sem guias finalizadas, mostra a mensagem de lista vazia', async () => {
+  it('sem guias finalizadas, mostra só o aviso de nenhuma guia disponível', async () => {
     vi.mocked(guiasFinalizadasApi.listar).mockResolvedValue([])
     renderizar()
-    expect(await screen.findByText('Nenhuma guia finalizada até o momento.')).toBeInTheDocument()
+    expect(await screen.findByText('Nenhuma guia finalizada disponível para o espelho no momento.')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Guia nº/ })).not.toBeInTheDocument()
+  })
+
+  it('com todas as guias já vinculadas a um espelho, mostra o aviso e os cartões abaixo dele', async () => {
+    vi.mocked(guiasFinalizadasApi.listar).mockResolvedValue([vinculada])
+    renderizar()
+    expect(await screen.findByText('Nenhuma guia finalizada disponível para o espelho no momento.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Guia nº 202610702' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Adicionar para o espelho' })).not.toBeInTheDocument()
+  })
+
+  it('com ao menos uma guia disponível, o aviso não aparece', async () => {
+    vi.mocked(guiasFinalizadasApi.listar).mockResolvedValue([disponivel, vinculada])
+    renderizar()
+    expect(await screen.findByRole('heading', { name: 'Guia nº 202610703' })).toBeInTheDocument()
+    expect(screen.queryByText('Nenhuma guia finalizada disponível para o espelho no momento.')).not.toBeInTheDocument()
   })
 
   it('mostra o botao de adicionar para guia disponivel e o texto de vinculo para guia ja usada', async () => {
@@ -155,6 +171,6 @@ describe('GuiasFinalizadasPage (T20-FE2)', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar as guias finalizadas.')
     await userEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }))
-    expect(await screen.findByText('Nenhuma guia finalizada até o momento.')).toBeInTheDocument()
+    expect(await screen.findByText('Nenhuma guia finalizada disponível para o espelho no momento.')).toBeInTheDocument()
   })
 })
