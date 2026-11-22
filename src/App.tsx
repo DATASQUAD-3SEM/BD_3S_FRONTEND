@@ -32,6 +32,7 @@ import ChefeMinhasInformacoesPage from './features/chefeFusex/ChefeMyInfoPage'
 import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
 import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
 import EmConstrucao from './shared/components/EmConstrucao'
+import InicioBeneficiarioPage from './features/inicio/InicioBeneficiarioPage'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
 import BeneficiariosRota from './features/chefeBeneficiarios/BeneficiariosRota'
 import DependentesTitularRota from './features/chefeDependentes/DependentesTitularRota'
@@ -73,7 +74,7 @@ export default function App() {
       <Route path="/diagnostico/conexao" element={<main className="app-main"><ConexaoPage /></main>} />
 
       <Route element={<RotaProtegida perfil={["BENEFICIARIO", "RESPONSAVEL_EXTERNO"]}><AppLayout /></RotaProtegida>}>
-        <Route path="/beneficiario/inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
+        <Route path="/beneficiario/inicio" element={<InicioBeneficiarioPage />} />
         <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
         <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
