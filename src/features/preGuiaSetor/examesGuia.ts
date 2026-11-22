@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http';
-import type { ExameGuia } from './types';
+import type { ExameGuia, ExameLidoNaGuia, ExameParaLinha } from './types';
 
 /**
  * Lista "Exames na Guia" do Setor de Guias (T22-FE1): linhas editaveis, validacao no navegador e
@@ -30,6 +30,7 @@ export const MSG_QUANTIDADE_LIMITE = 'A quantidade deve ser no máximo 999.';
 export const MSG_COD_REPETIDO = 'Este código já está na lista. Some as quantidades numa linha só.';
 export const MSG_LISTA_VAZIA = 'Informe ao menos um exame da Guia.';
 export const MSG_NAO_LIDO = 'Não foi possível ler os exames desta Guia. Digite os exames impressos na Guia.';
+export const MSG_EXAMES_PENDENTES = 'Corrija os exames destacados na tabela para concluir.';
 export const MSG_ATENCAO = 'Atenção: Confira os exames antes de concluir.';
 
 const DESCRICAO_MAXIMA = 500;
@@ -37,20 +38,28 @@ const QUANTIDADE_MAXIMA = 999;
 
 let proximaChave = 1;
 
-/** Linha nova. Sem campos preenchidos, nao mostra erro ate ser tocada. */
-export function novaLinha(exame?: ExameGuia): LinhaExame {
+/**
+ * Linha nova. Sem campos preenchidos, nao mostra erro ate ser tocada. Linha que vem de um exame (lido do PDF ou
+ * gravado) ja mostra os erros, para o setor ver, por exemplo, um codigo repetido impresso na Guia.
+ */
+export function novaLinha(exame?: ExameParaLinha): LinhaExame {
   return {
     chave: proximaChave++,
     codDgp: exame?.codDgp ?? '',
     descricao: exame?.descricao ?? '',
-    quantidade: exame ? String(exame.quantidade) : '',
-    tocada: false,
+    quantidade: exame?.quantidade != null ? String(exame.quantidade) : '',
+    tocada: exame !== undefined,
   };
 }
 
 /** Lista inicial a partir dos exames lidos ou gravados. Sem exames, abre uma linha vazia. */
-export function linhasDeExames(exames: ExameGuia[] = []): LinhaExame[] {
+export function linhasDeExames(exames: ExameParaLinha[] = []): LinhaExame[] {
   return exames.length > 0 ? exames.map((e) => novaLinha(e)) : [novaLinha()];
+}
+
+/** T21-BE1: converte os exames lidos do PDF (codigo) para o formato das linhas (codDgp). */
+export function examesDaLeitura(lidos: ExameLidoNaGuia[] = []): ExameParaLinha[] {
+  return lidos.map((e) => ({ codDgp: e.codigo ?? '', descricao: e.descricao ?? '', quantidade: e.quantidade }));
 }
 
 /** Erros de uma linha. Os codigos repetidos so acusam a partir da segunda ocorrencia. */

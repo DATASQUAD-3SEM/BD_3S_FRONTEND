@@ -112,7 +112,7 @@ describe('T21-FE · Conferência do Prec CP do paciente', () => {
     const api = mockApi();
     vi.spyOn(api, 'extrairNumeroGuia').mockResolvedValueOnce({
       numeroGuia: '202610678',
-      exames: [{ codDgp: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 }],
+      examesNaGuia: [{ codigo: '41001109', descricao: 'TC - Abdome superior', quantidade: 1 }],
       ug: 'Cmdo Bda Inf Amv',
       ugOrigem: 'Cmdo Bda Inf Amv',
       validadeAte: '2027-01-01',
