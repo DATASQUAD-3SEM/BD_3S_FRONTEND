@@ -62,85 +62,100 @@ export default function LoginPage() {
   return (
     <div className="login-pagina">
       <header className="login-topbar">
-        <span className="login-marca">Nexus</span>
+        <span className="login-marca">
+          <span className="login-marca-simbolo" aria-hidden="true">N</span>
+          Nexus
+        </span>
       </header>
 
       <main className="login-conteudo">
-        <form className="login-cartao" onSubmit={enviar} noValidate>
-          <h1>Entrar</h1>
-          <p className="login-legenda">
-            Beneficiário e médico: o seu login é o CPF. Chefe e setores: use o nome de usuário.
-          </p>
+        <aside className="login-apresentacao" aria-label="Sobre o Nexus">
+          <p className="login-apresentacao-sobretitulo">FUSEX · Cmdo Bda Inf Amv</p>
+          <p className="login-apresentacao-titulo">Guias, sessões e faturas num só lugar.</p>
+          <ul className="login-apresentacao-lista">
+            <li>Pré-guias com o encaminhamento médico, acompanhadas do envio até a Guia.</li>
+            <li>Sessões pedidas pela OCS e assinadas pelo beneficiário no próprio sistema.</li>
+            <li>Espelho, lisura, glosa e auditoria das faturas com controle de fluxo.</li>
+          </ul>
+        </aside>
 
-          <label htmlFor="login-usuario">CPF ou nome de usuário</label>
-          <input
-            id="login-usuario"
-            className="login-input"
-            autoComplete="username"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-          />
-
-          <div className="login-linha-senha">
-            <label htmlFor="login-senha">Senha</label>
-            <button
-              type="button"
-              className="login-mostrar"
-              onClick={() => setMostrarSenha((v) => !v)}
-              aria-pressed={mostrarSenha}
-            >
-              {mostrarSenha ? 'Ocultar' : 'Mostrar'}
-            </button>
-          </div>
-          <input
-            id="login-senha"
-            className="login-input"
-            type={mostrarSenha ? 'text' : 'password'}
-            autoComplete="current-password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-          />
-
-          {erro && (
-            <div className="login-erro" role="alert">
-              <strong>{erro.titulo}</strong>
-              {erro.detalhe && <span>{erro.detalhe}</span>}
-            </div>
-          )}
-
-          <button type="submit" className="login-entrar" disabled={enviando}>
-            {enviando ? 'Entrando...' : 'Entrar'}
-          </button>
-
-          <p className="login-rodape">Não tem acesso? O cadastro é feito pelo Chefe do FUSEX.</p>
-        </form>
-
-        {acessoRapidoHabilitado() && (
-          <section className="login-cartao login-rapido" aria-labelledby="titulo-acesso-rapido">
-            <h2 id="titulo-acesso-rapido">Acesso rápido (demonstração)</h2>
+        <div className="login-coluna">
+          <form className="login-cartao" onSubmit={enviar} noValidate>
+            <h1>Entrar</h1>
             <p className="login-legenda">
-              Entra com as contas de exemplo do seed (senha {SENHA_DEMONSTRACAO}). Visível só no modo de
-              desenvolvimento.
+              Beneficiário e médico: o seu login é o CPF. Chefe e setores: use o nome de usuário.
             </p>
-            <div className="login-rapido-lista">
-              {CONTAS_DEMONSTRACAO.map((conta) => (
-                <button
-                  key={conta.perfil}
-                  type="button"
-                  className="login-rapido-botao"
-                  disabled={enviando}
-                  onClick={() => void autenticar(conta.login, SENHA_DEMONSTRACAO)}
-                >
-                  <strong>Entrar como {ROTULO_PERFIL[conta.perfil]}</strong>
-                  <span>{conta.descricao}</span>
-                </button>
-              ))}
+
+            <label htmlFor="login-usuario">CPF ou nome de usuário</label>
+            <input
+              id="login-usuario"
+              className="login-input"
+              autoComplete="username"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+
+            <div className="login-linha-senha">
+              <label htmlFor="login-senha">Senha</label>
+              <button
+                type="button"
+                className="login-mostrar"
+                onClick={() => setMostrarSenha((v) => !v)}
+                aria-pressed={mostrarSenha}
+              >
+                {mostrarSenha ? 'Ocultar' : 'Mostrar'}
+              </button>
             </div>
-            <Link className="login-diagnostico" to="/diagnostico/conexao">
-              Testar conexão com o backend
-            </Link>
-          </section>
-        )}
+            <input
+              id="login-senha"
+              className="login-input"
+              type={mostrarSenha ? 'text' : 'password'}
+              autoComplete="current-password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+
+            {erro && (
+              <div className="login-erro" role="alert">
+                <strong>{erro.titulo}</strong>
+                {erro.detalhe && <span>{erro.detalhe}</span>}
+              </div>
+            )}
+
+            <button type="submit" className="login-entrar" disabled={enviando}>
+              {enviando ? 'Entrando...' : 'Entrar'}
+            </button>
+
+            <p className="login-rodape">Não tem acesso? O cadastro é feito pelo Chefe do FUSEX.</p>
+          </form>
+
+          {acessoRapidoHabilitado() && (
+            <section className="login-cartao login-rapido" aria-labelledby="titulo-acesso-rapido">
+              <h2 id="titulo-acesso-rapido">Acesso rápido (demonstração)</h2>
+              <p className="login-legenda">
+                Entra com as contas de exemplo do seed (senha {SENHA_DEMONSTRACAO}). Visível só no modo de
+                desenvolvimento.
+              </p>
+              <div className="login-rapido-lista">
+                {CONTAS_DEMONSTRACAO.map((conta) => (
+                  <button
+                    key={conta.perfil}
+                    type="button"
+                    className="login-rapido-botao"
+                    disabled={enviando}
+                    onClick={() => void autenticar(conta.login, SENHA_DEMONSTRACAO)}
+                  >
+                    <strong>Entrar como {ROTULO_PERFIL[conta.perfil]}</strong>
+                    <span>{conta.descricao}</span>
+                  </button>
+                ))}
+              </div>
+              <Link className="login-diagnostico" to="/diagnostico/conexao">
+                Testar conexão com o backend
+              </Link>
+            </section>
+          )}
+        </div>
       </main>
     </div>
   )

@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import LayoutPerfil from './LayoutPerfil'
+import LayoutPerfil, { iniciais } from './LayoutPerfil'
 import { MENUS, type Perfil } from './perfis'
 
 /**
@@ -123,5 +123,28 @@ describe('LayoutPerfil (T0-FE)', () => {
     // escolher um item fecha a gaveta
     await user.click(screen.getByRole('link', { name: 'Guias para impressão' }))
     expect(container.querySelector('.app-body')).not.toHaveClass('menu-aberto')
+  })
+})
+
+describe('T36-FE1 · barra superior', () => {
+  it('iniciais do avatar: primeira letra do primeiro e do último nome', () => {
+    expect(iniciais('Antonio Carlos Ferreira')).toBe('AF')
+    expect(iniciais('  Helena  ')).toBe('H')
+    expect(iniciais('Capitao Carlos Eduardo Lima')).toBe('CL')
+    expect(iniciais('')).toBe('')
+  })
+
+  it('mostra o símbolo da marca e o avatar com as iniciais, sem mudar o texto "{nome} · {perfil}"', () => {
+    const { container } = renderizar('BENEFICIARIO', '/pre-guias', 'Antonio Carlos Ferreira')
+
+    expect(screen.getByText('Antonio Carlos Ferreira · Beneficiário')).toBeInTheDocument()
+    expect(container.querySelector('.app-avatar')).toHaveTextContent('AF')
+    expect(container.querySelector('.brand-simbolo')).toHaveTextContent('N')
+  })
+
+  it('chefe e setores: avatar com as iniciais do perfil', () => {
+    const { container } = renderizar('SETOR_GUIAS', '/setor-guias/fila', 'Nome que não aparece')
+
+    expect(container.querySelector('.app-avatar')).toHaveTextContent('SG')
   })
 })
