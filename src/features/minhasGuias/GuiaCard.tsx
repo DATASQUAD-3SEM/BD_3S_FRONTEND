@@ -11,7 +11,12 @@ interface Props {
   guia: GuiaDoBeneficiario
   api: MinhasGuiasApi
   onAtualizar: (guiaAtualizada: GuiaDoBeneficiario) => void
+  /** Recarrega a lista de guias (usado quando a Guia venceu enquanto a tela estava aberta). */
+  onRecarregar?: () => void
 }
+
+/** 409 da assinatura quando a validade da Guia já passou (T18-BE3). */
+const GUIA_VENCIDA = /^Esta Guia venceu em /
 
 function textoQuantidade(quantidade: number): string {
   return quantidade === 1 ? '1 sessão autorizada' : `${quantidade} sessões autorizadas`
@@ -66,7 +71,7 @@ function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
     .sort((a, b) => a.numero - b.numero)
 }
 
-export default function GuiaCard({ guia, api, onAtualizar }: Props) {
+export default function GuiaCard({ guia, api, onAtualizar, onRecarregar }: Props) {
   const c = contarSessoes(guia)
   const sessoesAutorizadas = guia.procedimentos.reduce(
     (total, p) => total + p.quantidade,
@@ -85,6 +90,8 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
   const [sessaoEmConfirmacao, setSessaoEmConfirmacao] = useState<number | null>(null)
   const [assinando, setAssinando] = useState(false)
   const [erroAssinatura, setErroAssinatura] = useState<string | null>(null)
+  // T18-FE3: aviso de Guia vencida durante a assinatura; fica no cartão depois que a lista é recarregada
+  const [avisoGuiaVencida, setAvisoGuiaVencida] = useState<string | null>(null)
 
   // Ver guia (PDF), T23-FE1: o painel busca o PDF a cada abertura (desmonta ao fechar)
   const [pdfAberto, setPdfAberto] = useState(false)
@@ -164,7 +171,7 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
   // confirma a assinatura: chama POST /guias/{id}/sessoes/{sessaoId}/assinatura.
   // Em sucesso, atualiza o cartão via onAtualizar, mostra a mensagem de quantas faltam
   // e fecha o painel se não houver mais sessões SOLICITADA.
-  // 422 = sem assinatura cadastrada (fallback server-side); 409 = sessão já não está SOLICITADA.
+  // 422 = sem assinatura cadastrada (fallback server-side); 409 = sessão já não está SOLICITADA ou Guia vencida.
   async function confirmarAssinatura(sessaoId: number) {
     if (assinando) return
     setAssinando(true)
@@ -190,6 +197,12 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
     } catch (erro: unknown) {
       if (erro instanceof ApiError && erro.status === 422) {
         setErroAssinatura(MSG_SEM_ASSINATURA)
+      } else if (erro instanceof ApiError && erro.status === 409 && GUIA_VENCIDA.test(erro.message)) {
+        // A Guia venceu com a tela aberta: o servidor já virou a Guia e expirou as sessões solicitadas.
+        setAvisoGuiaVencida(erro.message)
+        setSessaoEmConfirmacao(null)
+        setPainelSessoesAberto(false)
+        onRecarregar?.()
       } else if (erro instanceof ApiError && erro.status === 409) {
         setErroAssinatura(
           'Não foi possível assinar esta sessão. Ela pode ter sido assinada em outra aba.',
@@ -321,6 +334,12 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
             </button>
           </div>
         </div>
+      )}
+
+      {avisoGuiaVencida && (
+        <p className="erro" role="alert">
+          {avisoGuiaVencida}
+        </p>
       )}
 
       {/* mensagem de sucesso do envio */}
