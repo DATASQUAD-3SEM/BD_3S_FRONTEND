@@ -23,8 +23,8 @@ export default function TabelaGuiasEspelho({ linhas }: Props) {
           <th scope="col">Código</th>
           <th scope="col">Procedimento</th>
           <th scope="col">Qtd. sessões</th>
-          <th scope="col">Valor por sessão (R)</th>
-          <th scope="col">Valor (R)</th>
+          <th scope="col">Valor por sessão (R$)</th>
+          <th scope="col">Valor (R$)</th>
         </tr>
         </thead>
         <tbody>

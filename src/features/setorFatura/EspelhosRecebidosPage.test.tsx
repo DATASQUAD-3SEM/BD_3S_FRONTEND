@@ -94,6 +94,31 @@ describe('T24-FE1 · Espelhos Recebidos', () => {
     expect(screen.getByText('TC - Abdome superior')).toBeInTheDocument()
   })
 
+  it('cabeçalho da tabela do detalhe traz os valores em R$', async () => {
+    const usuario = userEvent.setup()
+    renderizar()
+    await usuario.click(await screen.findByRole('button', { name: /Fatura nº 001\/2026/ }))
+    await screen.findByText('VALOR TOTAL')
+
+    expect(screen.getByRole('columnheader', { name: 'Valor por sessão (R$)' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Valor (R$)' })).toBeInTheDocument()
+  })
+
+  it('fatura com ciência da OCS mostra a data e quem deu a ciência, vindos da lista', async () => {
+    const api = mockApi()
+    const lista = await api.listarEspelhosRecebidos()
+    vi.spyOn(api, 'listarEspelhosRecebidos').mockResolvedValueOnce(
+      lista.map((f) =>
+        f.numeroFatura === '003/2026'
+          ? { ...f, dataCiencia: '2026-11-21T10:00:00', responsavelCiencia: 'Wandinho' }
+          : f,
+      ),
+    )
+    renderizar(api)
+
+    expect(await screen.findByText('A OCS deu ciência das glosas em 21/11/2026 (Wandinho).')).toBeInTheDocument()
+  })
+
   it('controle de fluxo: uma linha por etapa, com responsável e datas; Glosa / OCS só em fatura com glosa', async () => {
     const usuario = userEvent.setup()
     renderizar()

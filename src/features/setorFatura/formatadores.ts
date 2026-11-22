@@ -53,7 +53,7 @@ export function classeSeloSituacao(situacao: SituacaoFatura): string {
  * ciência dada, prazo vencido ou prazo em curso. Nas demais situações, null.
  */
 export function avisoPrazoOcs(
-  fatura: Pick<EspelhoResumo, 'situacao' | 'prazoOcs' | 'dataCiencia'> & { responsavelCiencia?: string | null },
+  fatura: Pick<EspelhoResumo, 'situacao' | 'prazoOcs' | 'dataCiencia' | 'responsavelCiencia'>,
   agora: Date = new Date(),
 ): string | null {
   if (fatura.situacao !== 'AGUARDANDO_OCS' || !fatura.prazoOcs) return null
