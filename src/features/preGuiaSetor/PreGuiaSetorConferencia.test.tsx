@@ -414,3 +414,26 @@ describe('T21-BE1 · exames lidos do PDF', () => {
     expect(screen.getByText('Corrija os exames destacados na tabela para concluir.')).toBeInTheDocument();
   });
 });
+
+describe('T22-FE1 · número de Guia já usado', () => {
+  it('409 do número aparece abaixo do campo, sem a mensagem genérica, e some ao editar o número', async () => {
+    const usuario = userEvent.setup();
+    const api = mockApi();
+    vi.spyOn(api, 'anexarGuia').mockRejectedValueOnce(
+      new ApiError(409, 'Numero de Guia ja usado em outra Guia', ['numeroGuia: Numero de Guia ja usado em outra Guia']),
+    );
+    const concluir = vi.spyOn(api, 'concluirGuia');
+    await abrir(api);
+    await anexarPdf(usuario, 'guia-ok.pdf');
+
+    await usuario.click(botaoConcluir());
+    expect(await screen.findByText(
+      'Este número de Guia já foi usado em outra Guia. Confira o número impresso no PDF ou troque o arquivo.',
+    )).toBeInTheDocument();
+    expect(screen.queryByText(/confira se a Guia está anexada/)).not.toBeInTheDocument();
+    expect(concluir).not.toHaveBeenCalled();
+
+    await usuario.type(screen.getByLabelText('Número da Guia'), '9');
+    expect(screen.queryByText(/já foi usado em outra Guia/)).not.toBeInTheDocument();
+  });
+});
