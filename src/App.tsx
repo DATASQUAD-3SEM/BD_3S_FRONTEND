@@ -13,6 +13,9 @@ import MinhasGuiasPage from './features/minhasGuias/MinhasGuiasPage'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
 import SetorFaturasLayout from './features/setorFatura/SetorFaturasLayout'
+import RastreabilidadeLayout from './features/rastreabilidade/RastreabilidadeLayout'
+import FaturasRecebidasPage from './features/rastreabilidade/FaturasRecebidasPage'
+import AuditoriaLayout from './features/auditoria/AuditoriaLayout'
 import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
 import AuditadasPage from './features/setorFatura/AuditadasPage'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
@@ -94,11 +97,25 @@ export default function App() {
       {/* rota antiga da fila */}
       <Route path="/fila-pre-guias" element={<Navigate to="/setor-guias/fila" replace />} />
 
-      <Route path="/setor-fatura" element={<RotaProtegida perfil="SETOR_FATURAS"><SetorFaturasLayout /></RotaProtegida>}>
+      <Route path="/setor-fatura" element={<RotaProtegida perfil="SETOR_FATURA"><SetorFaturasLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="espelhos-recebidos" replace />} />
         <Route path="espelhos-recebidos" element={<EspelhosRecebidosPage />} />
         {/* T24-FE4 (Faturas Auditadas): tela a implementar na SCRUM-217 */}
         <Route path="faturas-auditadas" element={<AuditadasPage />} />
+      </Route>
+
+      <Route path="/rastreabilidade" element={<RotaProtegida perfil="RASTREABILIDADE"><RastreabilidadeLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="faturas-recebidas" replace />} />
+        {/* T25-FE-1 (Faturas Recebidas, SCRUM-225) e T25-FE2 (lisura da fatura, SCRUM-226): telas a implementar */}
+        <Route path="faturas-recebidas" element={<FaturasRecebidasPage />} />
+        <Route path="faturas/:id" element={<EmConstrucao nome="Lisura da fatura" task="T25-FE2 (SCRUM-226)" />} />
+      </Route>
+
+      <Route path="/auditoria" element={<RotaProtegida perfil="AUDITORIA"><AuditoriaLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="faturas-recebidas" replace />} />
+        {/* T26-FE1 (Faturas Recebidas) e T26-FE4 (Faturas Analisadas): telas a implementar */}
+        <Route path="faturas-recebidas" element={<EmConstrucao nome="Faturas Recebidas" task="T26-FE1" />} />
+        <Route path="faturas-analisadas" element={<EmConstrucao nome="Faturas Analisadas" task="T26-FE4" />} />
       </Route>
 
       <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>

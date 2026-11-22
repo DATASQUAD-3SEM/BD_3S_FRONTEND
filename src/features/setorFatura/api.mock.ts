@@ -90,7 +90,7 @@ function sementes(): Semente[] {
       glosa: null,
       valorFinal: null,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-15'), dataSaida: iso('2026-11-15'), responsavel: 'setor.faturas', valorInicial: 710.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-15'), dataSaida: iso('2026-11-15'), responsavel: 'setor.fatura', valorInicial: 710.0, valorFinal: null, motivo: null },
       ],
     },
     // 002/2026 — Em lisura.
@@ -100,7 +100,7 @@ function sementes(): Semente[] {
       glosa: null,
       valorFinal: null,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-10'), dataSaida: iso('2026-11-10'), responsavel: 'setor.faturas', valorInicial: 135.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-10'), dataSaida: iso('2026-11-10'), responsavel: 'setor.fatura', valorInicial: 135.0, valorFinal: null, motivo: null },
         { etapa: 'Lisura / Glosa', setor: 'Rastreabilidade', dataEntrada: iso('2026-11-11'), dataSaida: null, responsavel: null, valorInicial: 135.0, valorFinal: null, motivo: null },
       ],
     },
@@ -114,7 +114,7 @@ function sementes(): Semente[] {
       glosa: 50.0,
       valorFinal: 450.0,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-05'), dataSaida: iso('2026-11-05'), responsavel: 'setor.faturas', valorInicial: 500.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-11-05'), dataSaida: iso('2026-11-05'), responsavel: 'setor.fatura', valorInicial: 500.0, valorFinal: null, motivo: null },
         { etapa: 'Lisura / Glosa', setor: 'Rastreabilidade', dataEntrada: iso('2026-11-06'), dataSaida: iso('2026-11-08'), responsavel: 'rastreabilidade', valorInicial: 500.0, valorFinal: 450.0, motivo: null },
         { etapa: 'Glosa / OCS', setor: 'OCS', dataEntrada: iso('2026-11-08'), dataSaida: null, responsavel: null, valorInicial: 450.0, valorFinal: 450.0, motivo: null },
       ],
@@ -126,7 +126,7 @@ function sementes(): Semente[] {
       glosa: 60.0,
       valorFinal: 300.0,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-28'), dataSaida: iso('2026-10-28'), responsavel: 'setor.faturas', valorInicial: 360.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-28'), dataSaida: iso('2026-10-28'), responsavel: 'setor.fatura', valorInicial: 360.0, valorFinal: null, motivo: null },
         { etapa: 'Lisura / Glosa', setor: 'Rastreabilidade', dataEntrada: iso('2026-10-29'), dataSaida: iso('2026-11-02'), responsavel: 'rastreabilidade', valorInicial: 360.0, valorFinal: 300.0, motivo: null },
         { etapa: 'Glosa / OCS', setor: 'OCS', dataEntrada: iso('2026-11-02'), dataSaida: null, responsavel: null, valorInicial: 300.0, valorFinal: 300.0, motivo: null },
       ],
@@ -138,7 +138,7 @@ function sementes(): Semente[] {
       glosa: null,
       valorFinal: 90.0,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-20'), dataSaida: iso('2026-10-20'), responsavel: 'setor.faturas', valorInicial: 90.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-20'), dataSaida: iso('2026-10-20'), responsavel: 'setor.fatura', valorInicial: 90.0, valorFinal: null, motivo: null },
         { etapa: 'Lisura / Glosa', setor: 'Rastreabilidade', dataEntrada: iso('2026-10-21'), dataSaida: iso('2026-10-25'), responsavel: 'rastreabilidade', valorInicial: 90.0, valorFinal: 90.0, motivo: null },
         { etapa: 'Auditagem', setor: 'Auditoria', dataEntrada: iso('2026-10-26'), dataSaida: null, responsavel: null, valorInicial: 90.0, valorFinal: 90.0, motivo: null },
       ],
@@ -150,10 +150,10 @@ function sementes(): Semente[] {
       glosa: null,
       valorFinal: 350.0,
       controleFluxo: [
-        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-10'), dataSaida: iso('2026-10-10'), responsavel: 'setor.faturas', valorInicial: 350.0, valorFinal: null, motivo: null },
+        { etapa: 'Protocolo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-10'), dataSaida: iso('2026-10-10'), responsavel: 'setor.fatura', valorInicial: 350.0, valorFinal: null, motivo: null },
         { etapa: 'Lisura / Glosa', setor: 'Rastreabilidade', dataEntrada: iso('2026-10-11'), dataSaida: iso('2026-10-15'), responsavel: 'rastreabilidade', valorInicial: 350.0, valorFinal: 350.0, motivo: null },
         { etapa: 'Auditagem', setor: 'Auditoria', dataEntrada: iso('2026-10-16'), dataSaida: iso('2026-10-18'), responsavel: 'auditoria', valorInicial: 350.0, valorFinal: 350.0, motivo: null },
-        { etapa: 'Arquivo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-19'), dataSaida: iso('2026-10-19'), responsavel: 'setor.faturas', valorInicial: 350.0, valorFinal: 350.0, motivo: null },
+        { etapa: 'Arquivo', setor: 'Setor de Faturas', dataEntrada: iso('2026-10-19'), dataSaida: iso('2026-10-19'), responsavel: 'setor.fatura', valorInicial: 350.0, valorFinal: 350.0, motivo: null },
       ],
     },
   ]
