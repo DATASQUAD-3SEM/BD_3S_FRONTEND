@@ -17,6 +17,14 @@ interface OpcoesMock {
 
 const iso = (data: string) => `${data}T10:00:00`
 
+/** Data relativa a hoje (dias a somar), em ISO com o horario informado. Mantem o mock "dentro do prazo" em qualquer dia. */
+function relativo(dias: number, horario: string): string {
+  const d = new Date()
+  d.setDate(d.getDate() + dias)
+  const dois = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${dois(d.getMonth() + 1)}-${dois(d.getDate())}T${horario}`
+}
+
 function linha(
   itemId: number,
   guiaId: number,
@@ -98,7 +106,7 @@ function sementes(): Semente[] {
     },
     // 003/2026 — Aguardando a OCS (com glosa, dentro do prazo).
     {
-      resumo: { id: 4, ocs: 'Hospital Exemplo', dataInicio: iso('2026-10-31'), dataEnvio: iso('2026-11-05'), dataEntrada: iso('2026-11-05'), situacao: 'AGUARDANDO_OCS', numeroFatura: '003/2026', valorTotal: 500.0 },
+      resumo: { id: 4, ocs: 'Hospital Exemplo', dataInicio: iso('2026-10-31'), dataEnvio: iso('2026-11-05'), dataEntrada: iso('2026-11-05'), situacao: 'AGUARDANDO_OCS', numeroFatura: '003/2026', valorTotal: 500.0, dataEnvioOcs: relativo(-1, '09:00:00'), prazoOcs: relativo(4, '23:59:59'), dataCiencia: null },
       linhas: [
         linha(401, 204, '202610681', 'Ana Lima', '41001109', 'TC - Abdome superior', 1, 350.0),
         linha(402, 205, '202610682', 'Carlos Souza', '40301630', 'Glicose', 5, 30.0, 50.0),
@@ -113,7 +121,7 @@ function sementes(): Semente[] {
     },
     // 004/2026 — Aguardando a OCS (com glosa, prazo vencido).
     {
-      resumo: { id: 5, ocs: 'Clínica Exemplo', dataInicio: iso('2026-10-23'), dataEnvio: iso('2026-10-28'), dataEntrada: iso('2026-10-28'), situacao: 'AGUARDANDO_OCS', numeroFatura: '004/2026', valorTotal: 360.0 },
+      resumo: { id: 5, ocs: 'Clínica Exemplo', dataInicio: iso('2026-10-23'), dataEnvio: iso('2026-10-28'), dataEntrada: iso('2026-10-28'), situacao: 'AGUARDANDO_OCS', numeroFatura: '004/2026', valorTotal: 360.0, dataEnvioOcs: iso('2026-11-02'), prazoOcs: '2026-11-05T23:59:59', dataCiencia: null },
       linhas: [linha(501, 206, '202610683', 'Beatriz Alves', '41001110', 'Ultrassonografia abdome total', 2, 180.0)],
       glosa: 60.0,
       valorFinal: 300.0,
@@ -184,6 +192,10 @@ export function criarMockSetorFaturas({ atrasoMs = 0 }: OpcoesMock = {}): SetorF
         totais: { informado, glosa, final: valorFinal },
         eventos: [],
         controleFluxo: controleFluxo.map((e) => ({ ...e })),
+        dataEnvioOcs: resumo.dataEnvioOcs ?? null,
+        prazoOcs: resumo.prazoOcs ?? null,
+        dataCiencia: resumo.dataCiencia ?? null,
+        responsavelCiencia: null,
       }
     },
   }

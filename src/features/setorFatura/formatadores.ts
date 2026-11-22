@@ -48,6 +48,25 @@ export function classeSeloSituacao(situacao: SituacaoFatura): string {
   return CLASSE_SELO_SITUACAO[situacao]
 }
 
+/**
+ * Aviso do prazo da OCS para o setor de Faturas (regra 12.8), só para a fatura Aguardando a OCS:
+ * ciência dada, prazo vencido ou prazo em curso. Nas demais situações, null.
+ */
+export function avisoPrazoOcs(
+  fatura: Pick<EspelhoResumo, 'situacao' | 'prazoOcs' | 'dataCiencia'> & { responsavelCiencia?: string | null },
+  agora: Date = new Date(),
+): string | null {
+  if (fatura.situacao !== 'AGUARDANDO_OCS' || !fatura.prazoOcs) return null
+  if (fatura.dataCiencia) {
+    const quem = fatura.responsavelCiencia ? ` (${fatura.responsavelCiencia})` : ''
+    return `A OCS deu ciência das glosas em ${formatarDataCurta(fatura.dataCiencia)}${quem}.`
+  }
+  const vencido = agora.getTime() > new Date(fatura.prazoOcs).getTime()
+  return vencido
+    ? `Prazo da OCS vencido em ${formatarDataCurta(fatura.prazoOcs)}`
+    : `Prazo da OCS: até ${formatarDataCurta(fatura.prazoOcs)}`
+}
+
 /** "Espelho nº 12" enquanto não há nº de fatura; "Fatura nº 001/2026" depois. */
 export function tituloDoEspelho(espelho: Pick<EspelhoResumo, 'id' | 'numeroFatura'>): string {
   return espelho.numeroFatura ? `Fatura nº ${espelho.numeroFatura}` : `Espelho nº ${espelho.id}`
