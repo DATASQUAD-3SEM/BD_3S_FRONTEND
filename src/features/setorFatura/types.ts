@@ -107,10 +107,20 @@ export interface EspelhoDetalhe {
   responsavelCiencia?: string | null;
 }
 
-/** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1). */
+/** Corpo do protocolo da fatura (T24-BE3). */
+export interface ProtocolarFaturaRequest {
+  numeroFatura: string;
+  responsavel: string;
+}
+
+/** Cliente HTTP da tela de Espelhos Recebidos (T24-FE1, T24-FE2). */
 export interface SetorFaturasApi {
   /** Lista os espelhos recebidos e as faturas em andamento (sem as Auditadas). */
   listarEspelhosRecebidos(): Promise<EspelhoResumo[]>;
   /** Detalhe de um espelho/fatura (guias + controle de fluxo). */
   detalharEspelho(id: number): Promise<EspelhoDetalhe>;
+  /** Sugestao do proximo nº da fatura da OCS no ano (so sugere; nao reserva). */
+  proximoNumeroFatura(id: number): Promise<string>;
+  /** Protocola o espelho: vira fatura Protocolada com o nº informado. */
+  protocolarFatura(id: number, corpo: ProtocolarFaturaRequest): Promise<EspelhoDetalhe>;
 }

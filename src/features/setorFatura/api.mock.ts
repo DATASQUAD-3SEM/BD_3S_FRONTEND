@@ -173,6 +173,28 @@ export function criarMockSetorFaturas({ atrasoMs = 0 }: OpcoesMock = {}): SetorF
         .sort((a, b) => a.dataEnvio.localeCompare(b.dataEnvio))
     },
 
+    async proximoNumeroFatura(id: number): Promise<string> {
+      await espera()
+      const semente = sementesFixas.find((s) => s.resumo.id === id)
+      if (!semente) throw new ApiError(404, 'Espelho não encontrado')
+      const usados = sementesFixas
+        .map((s) => s.resumo.numeroFatura)
+        .filter((n): n is string => !!n && n.endsWith('/2026'))
+        .map((n) => Number(n.slice(0, 3)))
+      const proximo = Math.max(0, ...usados) + 1
+      return `${String(proximo).padStart(3, '0')}/2026`
+    },
+
+    async protocolarFatura(id: number, corpo): Promise<EspelhoDetalhe> {
+      await espera()
+      const semente = sementesFixas.find((s) => s.resumo.id === id)
+      if (!semente) throw new ApiError(404, 'Espelho não encontrado')
+      if (semente.resumo.situacao !== 'RECEBIDO') throw new ApiError(409, 'Este espelho já é uma fatura.')
+      semente.resumo.numeroFatura = corpo.numeroFatura
+      semente.resumo.situacao = 'PROTOCOLADA'
+      return this.detalharEspelho(id)
+    },
+
     async detalharEspelho(id: number): Promise<EspelhoDetalhe> {
       await espera()
       const semente = sementesFixas.find((s) => s.resumo.id === id)
