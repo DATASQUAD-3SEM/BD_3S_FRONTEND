@@ -387,7 +387,7 @@ function LinhaDaLisura({ linha, ocs, rascunho, editavel, onMudar, onVerPdf }: Li
           {linha.codigo} · {linha.procedimento}
         </td>
         <td>{linha.quantidadeSessoes}</td>
-        <td>{formatarMoeda(linha.valorSessao)}</td>
+        <td className="sf-moeda">{formatarMoeda(linha.valorSessao)}</td>
         <td>
           {travada ? (
             <span className="sf-selo">Ok pela OCS</span>
@@ -427,12 +427,12 @@ function LinhaDaLisura({ linha, ocs, rascunho, editavel, onMudar, onVerPdf }: Li
           )}
         </td>
         <td>
-          {contrato === null ? '—' : formatarMoeda(contrato)}
+          <span className="sf-moeda">{contrato === null ? '—' : formatarMoeda(contrato)}</span>
           {tabela && <span className="sf-selo"> {rascunho.corrigir ? 'Tabela (corrigida)' : 'Tabela'}</span>}
           {!tabela && rascunho.decisao === 'sim' && <span className="sf-selo"> Conferido</span>}
           {!tabela && rascunho.decisao === 'nao' && contrato !== null && <span className="sf-selo"> Manual</span>}
         </td>
-        <td>{glosa === null || glosa === 0 ? '—' : formatarMoeda(glosa)}</td>
+        <td className="sf-moeda">{glosa === null || glosa === 0 ? '—' : formatarMoeda(glosa)}</td>
         <td>{textoSituacao(comparacao)}</td>
         <td>
           {editavel ? (
