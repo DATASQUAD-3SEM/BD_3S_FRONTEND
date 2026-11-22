@@ -58,6 +58,11 @@ export default function MinhasGuiasPage({ api = minhasGuiasApi }: Props) {
     setTentativa((n) => n + 1)
   }
 
+  // Recarrega a lista sem voltar ao estado de carregamento: os cartões continuam na tela (T18-FE3).
+  function recarregar() {
+    setTentativa((n) => n + 1)
+  }
+
   // Atualiza uma guia na lista pelo id, preservando a posição original.
   function atualizarGuia(guiaAtualizada: GuiaDoBeneficiario) {
   setGuias((atuais) =>
@@ -134,6 +139,7 @@ export default function MinhasGuiasPage({ api = minhasGuiasApi }: Props) {
                guia={guia}
                api={api}
                onAtualizar={atualizarGuia}
+               onRecarregar={recarregar}
              />
             ))}
           </div>
