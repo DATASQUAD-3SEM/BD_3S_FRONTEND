@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FaturaLisuraDetalhe, LinhaLisura } from '../rastreabilidade/types'
 import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf'
 import ControleFluxoFatura from '../setorFatura/components/ControleFluxoFatura'
@@ -33,6 +33,7 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
   const [carga, setCarga] = useState<Carga>('carregando')
   const [pdf, setPdf] = useState<{ guiaId: number; numero: string } | null>(null)
   const navegar = useNavigate()
+  const vemDasAnalisadas = (useLocation().state as { origem?: string } | null)?.origem === 'analisadas'
   const [painelAberto, setPainelAberto] = useState(false)
   const [responsavel, setResponsavel] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -102,9 +103,15 @@ export default function AuditoriaFaturaPage({ api = auditoriaApi }: Props) {
 
   return (
     <section className="sf">
-      <Link to="/auditoria/faturas-recebidas" className="sf-voltar">
-        ← Faturas recebidas
-      </Link>
+      {vemDasAnalisadas ? (
+        <Link to="/auditoria/faturas-analisadas" className="sf-voltar">
+          ← Faturas analisadas
+        </Link>
+      ) : (
+        <Link to="/auditoria/faturas-recebidas" className="sf-voltar">
+          ← Faturas recebidas
+        </Link>
+      )}
 
       <header className="sf-cabecalho">
         <h1>Fatura nº {fatura.numeroFatura ?? '—'}</h1>

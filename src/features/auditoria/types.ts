@@ -42,4 +42,20 @@ export interface AuditoriaApi {
   obterPdfGuia(guiaId: number): Promise<Blob>;
   /** Marca a fatura como visualizada: encerra o fluxo no Nexus. */
   visualizar(id: number, responsavel: string): Promise<FaturaLisuraDetalhe>;
+  /** Faturas que a auditoria já visualizou (T26-FE4). */
+  listarAnalisadas(): Promise<FaturaAnalisadaResumo[]>;
+}
+
+/** Fatura já visualizada pela auditoria (AuditoriaAnalisadaResponse, T26-BE3). */
+export interface FaturaAnalisadaResumo {
+  id: number;
+  ocs: string;
+  numeroFatura: string | null;
+  dataEntrada: string;
+  /** Quando a auditoria visualizou a fatura (ordena a lista, da mais recente para a mais antiga). */
+  dataVisualizacao: string | null;
+  responsavelVisualizacao: string | null;
+  valorInformado: number;
+  valorGlosa: number | null;
+  valorFinal: number | null;
 }

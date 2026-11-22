@@ -30,7 +30,7 @@ const outra: FaturaAuditoriaResumo = {
 }
 
 function apiCom(listarFaturas: AuditoriaApi['listarFaturas']): AuditoriaApi {
-  return { listarFaturas, detalhar: vi.fn(), obterPdfGuia: vi.fn(), visualizar: vi.fn() }
+  return { listarFaturas, detalhar: vi.fn(), obterPdfGuia: vi.fn(), visualizar: vi.fn(), listarAnalisadas: vi.fn() }
 }
 
 function renderizar(api: AuditoriaApi) {
