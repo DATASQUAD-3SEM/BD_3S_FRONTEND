@@ -98,8 +98,33 @@ describe('GlosaDetalhePage (T27-FE2)', () => {
     renderizar(apiCom(todasOk))
 
     expect(await screen.findByText(/Ciência dada em .* por Ana Silva/)).toBeInTheDocument()
+    expect(screen.getByText('Ciência já registrada para todas as guias. Nada mais a fazer aqui.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Confirmar decisão' })).not.toBeInTheDocument()
     expect(screen.queryByRole('columnheader', { name: 'Sua decisão' })).not.toBeInTheDocument()
+  })
+
+  it('com o prazo vencido e sem decisão, a tela fica só de leitura com o aviso de prazo vencido', async () => {
+    const vencida = detalhe({ dataEnvioOcs: '2026-10-07T09:00:00', prazoOcs: '2026-10-12T23:59:59', prazoVencido: true })
+    renderizar(apiCom(vencida))
+
+    expect(
+      await screen.findByText(
+        'O prazo de 3 dias úteis venceu em 12/10/2026 sem decisão. A glosa segue como lisurada pela rastreabilidade e a fatura pode seguir para a auditoria.',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Sua decisão' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Ok' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Contestar' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirmar decisão' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Ciência já registrada para todas as guias. Nada mais a fazer aqui.')).not.toBeInTheDocument()
+  })
+
+  it('dentro do prazo e sem decisão, não mostra o aviso de prazo vencido nem o de ciência', async () => {
+    renderizar(apiCom(detalhe()))
+
+    expect(await screen.findByRole('button', { name: 'Confirmar decisão' })).toBeInTheDocument()
+    expect(screen.queryByText(/O prazo de 3 dias úteis venceu/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Ciência já registrada/)).not.toBeInTheDocument()
   })
 
   it('erro ao carregar mostra a mensagem', async () => {
