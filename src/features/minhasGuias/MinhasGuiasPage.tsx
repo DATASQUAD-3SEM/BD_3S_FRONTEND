@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import GuiaCard from './GuiaCard'
 import { minhasGuiasApi } from './api'
+import FiltroPaciente, { FILTRO_TODOS, filtrarPorPaciente, fraseDaLista } from '../minhasPreGuias/filtroPaciente'
 import type { GuiaDoBeneficiario, MinhasGuiasApi, SituacaoGuia } from './types'
 import './minhasGuias.css'
 
@@ -64,11 +65,15 @@ export default function MinhasGuiasPage({ api = minhasGuiasApi }: Props) {
   )
 }
 
+  const [filtroPaciente, setFiltroPaciente] = useState(FILTRO_TODOS)
+
   const filtradas = useMemo(() => {
-    if (filtro === 'todas') return guias
-    const permitidas = filtro === 'em-andamento' ? EM_ANDAMENTO : FINALIZADAS
-    return guias.filter((g) => permitidas.includes(g.situacao))
-  }, [guias, filtro])
+    const porSituacao =
+      filtro === 'todas'
+        ? guias
+        : guias.filter((g) => (filtro === 'em-andamento' ? EM_ANDAMENTO : FINALIZADAS).includes(g.situacao))
+    return filtrarPorPaciente(porSituacao, filtroPaciente)
+  }, [guias, filtro, filtroPaciente])
 
   return (
     <section className="mg-pagina">
@@ -99,6 +104,10 @@ export default function MinhasGuiasPage({ api = minhasGuiasApi }: Props) {
 
       {estado === 'pronto' && guias.length > 0 && (
         <>
+          {fraseDaLista(guias, 'guias') && <p>{fraseDaLista(guias, 'guias')}</p>}
+
+          <FiltroPaciente itens={guias} value={filtroPaciente} onChange={setFiltroPaciente} />
+
           <div className="mg-filtro">
             <label htmlFor="mg-filtro-mostrar">Mostrar</label>
             <select

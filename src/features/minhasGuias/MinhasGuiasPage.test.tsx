@@ -162,6 +162,24 @@ describe('T18-FE-1 · Minhas guias', () => {
     expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
   })
 
+  it('Guia de dependente com vigência vencida segue a própria validade, sem mensagem de acesso encerrado', async () => {
+    const emExecucao = guias.find((g) => g.id === 4)!
+    stubbearLista([
+      {
+        ...emExecucao,
+        paciente: {
+          dependenteId: 7, nome: 'Miguel', relacao: 'Filho', menor: true, voceResponsavel: false,
+          vigenciaFim: '2020-01-01',
+        },
+      },
+    ])
+    render(<MinhasGuiasPage />)
+
+    const cartao = await screen.findByLabelText('Guia nº 202610704')
+    expect(within(cartao).queryByText(/foi encerrado/)).not.toBeInTheDocument()
+    expect(within(cartao).getByRole('button', { name: 'Ver guia (PDF)' })).toBeInTheDocument()
+  })
+
   it('mostra a mensagem de lista vazia (e não mostra o filtro)', async () => {
     stubbearLista([])
     render(<MinhasGuiasPage />)

@@ -3,6 +3,7 @@ import { formatarData } from '../../shared/utils/formatadores'
 import { ApiError } from '../../shared/api/http'
 import { obterBeneficiarioLogado } from '../beneficiario/dadosBeneficiario'
 import VisualizadorPdf from '../espelhoOcs/VisualizadorPdf'
+import { textoPaciente } from '../minhasPreGuias/paciente'
 import SituacaoGuiaBadge from './SituacaoGuiaBadge'
 import type { GuiaDoBeneficiario, MinhasGuiasApi, SessaoDaGuia } from './types'
 
@@ -58,6 +59,7 @@ const MSG_SEM_ASSINATURA =
   'Você ainda não tem assinatura cadastrada. Cadastre em Minhas informações para assinar.'
 
 //Sessões ASSINADAS ordenadas por número, para a linha "Já assinadas: sessão N em ..."
+
 function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
   return guia.sessoes
     .filter((s) => s.status === 'ASSINADA')
@@ -213,6 +215,8 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         <SituacaoGuiaBadge situacao={guia.situacao} />
       </header>
 
+      {guia.paciente && <p className="mg-card__meta">Paciente: {textoPaciente(guia.paciente)}</p>}
+
       <p className="mg-card__meta">
         Válida até {formatarData(guia.validadeAte) || '—'}
         {guia.dataEnvio && <> · Enviada à OCS em {formatarData(guia.dataEnvio)}</>}
@@ -228,6 +232,7 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
         </ul>
       )}
 
+      {/* Vigência vencida do dependente não muda a Guia: ela segue a própria validade (regra 13, T30-BE6). */}
       <p className="mg-card__texto">{textoPrincipal(guia, c)}</p>
 
       {guia.situacao === 'ENCERRADA' && (
@@ -353,6 +358,12 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
             </button>
           </header>
 
+          {guia.paciente?.voceResponsavel && guia.paciente.dependenteId !== null && (
+            <p className="mg-assinar__vazio">
+              Você assina pelo paciente {guia.paciente.nome}, como responsável legal, com a sua assinatura cadastrada. Assine uma sessão por vez.
+            </p>
+          )}
+
           {solicitadas.length === 0 ? (
             <p className="mg-assinar__vazio">Nenhuma sessão aguardando assinatura.</p>
           ) : (
@@ -391,7 +402,9 @@ export default function GuiaCard({ guia, api, onAtualizar }: Props) {
                       >
                         <p className="mg-assinar__confirmacao-titulo">
                           <strong>
-                            Assinar a sessão {sessao.numero} · {sessao.procedimento}?
+                            {guia.paciente?.voceResponsavel && guia.paciente.dependenteId !== null
+                              ? `Assinar esta sessão de ${guia.paciente.nome} com a sua assinatura cadastrada, como responsável legal?`
+                              : `Assinar a sessão ${sessao.numero} · ${sessao.procedimento}?`}
                           </strong>
                         </p>
 

@@ -1,3 +1,4 @@
+import type { PacienteDaLista } from '../minhasPreGuias/paciente'
 export type SituacaoGuia =
   | 'NAO_ENVIADA'
   | 'ENVIADA'
@@ -40,6 +41,8 @@ export interface GuiaDoBeneficiario {
   situacao: SituacaoGuia
   procedimentos: ProcedimentoDaGuia[]
   sessoes: SessaoDaGuia[]
+  /** Paciente da Guia (T30-BE3): titular, menor sob guarda ou dependente maior. */
+  paciente?: PacienteDaLista
 }
 
 export interface MinhasGuiasApi {

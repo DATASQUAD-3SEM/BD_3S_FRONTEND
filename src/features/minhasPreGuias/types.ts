@@ -5,6 +5,7 @@ import type { OrigemPreGuia, StatusPreGuia } from '../../shared/types/domain';
  */
 
 export type { OrigemPreGuia, StatusPreGuia };
+import type { PacienteDaLista } from './paciente';
 
 export type ModoPdf = 'baixar' | 'visualizar';
 
@@ -18,6 +19,8 @@ export interface PreGuiaDoBeneficiario {
   status: StatusPreGuia;
   observacao?: string;
   guia?: { numero: string; validadeAte: string };
+  /** Paciente da pre-guia (T30-BE3): titular ou dependente. */
+  paciente?: PacienteDaLista;
 }
 
 export interface MinhasPreGuiasApi {
