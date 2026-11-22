@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 
 import { get } from '../../../shared/api/http'
 import { mensagemDeErro } from '../../../shared/api/erros'
-import { useBeneficiario } from '../../beneficiario/BeneficiarioContext'
+import type { Beneficiario } from '../../../shared/types/domain'
 import { criarPreGuia, listarPacientes } from '../api'
 import { formVazio, type NovaPreGuiaForm, type PacienteOpcao } from './types'
 
@@ -15,9 +15,10 @@ import FeedbackUpload from './components/FeedbackUpload'
 import RevisaoResumo from './components/RevisaoResumo'
 
 /**
- * Nova pre-guia do beneficiario: escolha da OCS, envio do encaminhamento medico (foto ou PDF) e envio ao
- * setor de Guias. Os dados pessoais vem do BeneficiarioContext e nao sao enviados: o backend usa o usuario logado.
- * Em sucesso, o formulario e limpo e a pre-guia passa a aparecer em Minhas pre-guias como Pendente.
+ * Nova pre-guia do beneficiario, do dependente maior e do responsavel legal: escolha do paciente, da OCS, envio do
+ * encaminhamento medico (foto ou PDF) e envio ao setor de Guias. Os dados do paciente vem de GET /pre-guias/pacientes
+ * (T30-BE2), e nao de GET /beneficiarios/me, que so existe para o titular (T30-FE1). Eles nao sao enviados: o backend
+ * usa o usuario logado e o dependenteId. Em sucesso, o formulario e limpo e a pre-guia aparece em Minhas pre-guias.
  */
 export default function NovaPreGuiaPage() {
   const [form, setForm] = useState<NovaPreGuiaForm>(formVazio)
@@ -26,10 +27,9 @@ export default function NovaPreGuiaPage() {
   // Muda a cada envio com sucesso para recriar o campo de upload vazio
   const [versaoFormulario, setVersaoFormulario] = useState(0)
 
-  const { beneficiario, carregando: carregandoBeneficiario, erro: erroBeneficiario } = useBeneficiario()
-
-  // Pacientes possiveis (T30-FE1). Se a lista nao carregar, a tela segue como antes: o proprio titular.
+  // Pacientes possiveis, com os dados de cada um (T30-FE1 e T30-BE2).
   const [pacientes, setPacientes] = useState<PacienteOpcao[] | null>(null)
+  const [erroPacientes, setErroPacientes] = useState(false)
   const [maioresNomes, setMaioresNomes] = useState<string[]>([])
   // T31-FE4: "Criar pré-guia" do dependente abre esta tela com o menor já escolhido (?paciente=<dependenteId>).
   const [parametros] = useSearchParams()
@@ -43,10 +43,13 @@ export default function NovaPreGuiaPage() {
         setPacientes(lista)
         if (pacienteInicial !== null && lista.some((p) => p.dependenteId === pacienteInicial)) {
           setForm((atual) => ({ ...atual, dependenteId: pacienteInicial }))
+        } else if (lista.some((p) => p.dependenteId === null)) {
+          // O titular comeca marcado; o responsavel legal (sem a opcao "Voce") escolhe o menor.
+          setForm((atual) => ({ ...atual, dependenteId: null }))
         }
       })
       .catch(() => {
-        if (ativo) setPacientes([{ dependenteId: null, nome: '', relacao: 'Titular' }])
+        if (ativo) setErroPacientes(true)
       })
     get<{ nome: string; tipo?: string; podeCriarPreGuia: boolean }[]>('/beneficiario/dependentes')
       .then((dependentes) => {
@@ -66,9 +69,20 @@ export default function NovaPreGuiaPage() {
   const dependenteEscolhido: number | null | undefined =
     pacientes !== null && pacientes.length === 1 ? pacientes[0].dependenteId : form.dependenteId
 
+  const pacienteEscolhido =
+    dependenteEscolhido === undefined ? undefined : pacientes?.find((p) => p.dependenteId === dependenteEscolhido)
+  const dadosPaciente: Beneficiario | null = pacienteEscolhido
+    ? {
+        nome: pacienteEscolhido.nome,
+        cpf: pacienteEscolhido.cpf ?? '',
+        precCp: pacienteEscolhido.precCp ?? '',
+        telefone: pacienteEscolhido.telefone ?? null,
+        dataNascimento: pacienteEscolhido.dataNascimento ?? null,
+      }
+    : null
+
   const faltas: string[] = []
-  if (carregandoBeneficiario || erroBeneficiario || !beneficiario) faltas.push('dados do beneficiário')
-  if (pacientes === null || pacientes.length === 0 || dependenteEscolhido === undefined) faltas.push('paciente')
+  if (!pacienteEscolhido) faltas.push('paciente')
   if (form.ocs === null) faltas.push('OCS')
   if (form.arquivo === null) faltas.push('arquivo de encaminhamento')
 
@@ -98,11 +112,11 @@ export default function NovaPreGuiaPage() {
     <>
       <h1>Nova pré-guia</h1>
 
-      {carregandoBeneficiario && <p>Carregando dados do beneficiário...</p>}
+      {pacientes === null && !erroPacientes && <p>Carregando dados do paciente...</p>}
 
-      {erroBeneficiario && (
+      {erroPacientes && (
         <p className="erro" role="alert">
-          Não foi possível carregar os dados do beneficiário: {erroBeneficiario}
+          Não foi possível carregar os dados do paciente. Recarregue a página.
         </p>
       )}
 
@@ -115,7 +129,8 @@ export default function NovaPreGuiaPage() {
         />
       )}
 
-      {beneficiario && <DadosBeneficiario value={beneficiario} />}
+      {dadosPaciente && <DadosBeneficiario value={dadosPaciente} />}
+      {!dadosPaciente && passoPaciente && <p className="sf-pequeno">Escolha o paciente no passo 1.</p>}
 
       <SelecaoOcs value={form.ocs} onChange={(ocs) => setForm({ ...form, ocs })} />
 
@@ -127,7 +142,7 @@ export default function NovaPreGuiaPage() {
 
       <FeedbackUpload arquivo={form.arquivo} />
 
-      <RevisaoResumo form={form} beneficiario={beneficiario} />
+      <RevisaoResumo form={form} beneficiario={dadosPaciente} />
 
       <button type="button" onClick={() => void enviar()} disabled={enviando || !podeEnviar}>
         {enviando ? 'Enviando...' : 'Enviar pré-guia'}
