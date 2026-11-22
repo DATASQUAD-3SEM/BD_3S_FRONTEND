@@ -23,10 +23,13 @@ export interface DependenteMedico {
   responsavel: string | null
 }
 
+/** GET /medicos/me (T34-BE1): dados do medico logado que vao na pre-guia. CPF e Prec CP so com digitos. */
 export interface MedicoSolicitante {
   nome: string
   patente: string
   crm: string
+  cpf?: string | null
+  precCp?: string | null
 }
 
 export interface OcsBusca {

@@ -1,7 +1,9 @@
+import { formatarCpf, formatarPrecCp } from '../../../../shared/utils/formatadores'
 import type { MedicoSolicitante } from '../types'
 
 /**
- * Secao "Medico solicitante": nome e CRM preenchidos automaticamente com o perfil do medico logado.
+ * Secao "Medico solicitante" (T34-FE1): Nome, Patente, CRM, CPF e Prec CP preenchidos automaticamente com o perfil do
+ * medico logado (regra 2, rota 2). Valor vazio mostra "—".
  */
 
 interface Props {
@@ -28,14 +30,18 @@ export default function MedicoSecao({ medico, carregando, erro }: Props) {
       {medico && (
         <>
           <dl className="npg-card-leitura">
-            <div className="npg-campo">
-              <dt>Nome</dt>
-              <dd>{`${medico.patente} ${medico.nome}`}</dd>
-            </div>
-            <div className="npg-campo">
-              <dt>CRM</dt>
-              <dd>{medico.crm}</dd>
-            </div>
+            {[
+              { rotulo: 'Nome', valor: medico.nome },
+              { rotulo: 'Patente', valor: medico.patente },
+              { rotulo: 'CRM', valor: medico.crm },
+              { rotulo: 'CPF', valor: medico.cpf?.trim() ? formatarCpf(medico.cpf) : '' },
+              { rotulo: 'Prec CP', valor: medico.precCp?.trim() ? formatarPrecCp(medico.precCp) : '' },
+            ].map((campo) => (
+              <div className="npg-campo" key={campo.rotulo}>
+                <dt>{campo.rotulo}</dt>
+                <dd>{campo.valor || '—'}</dd>
+              </div>
+            ))}
           </dl>
           <p className="npg-ajuda">Preenchido automaticamente com seu perfil.</p>
         </>
