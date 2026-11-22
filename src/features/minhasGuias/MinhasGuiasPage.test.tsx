@@ -657,6 +657,15 @@ describe('T18-FE-3 · Assinar sessão', () => {
     }
   })
 
+  it('com o painel fechado, o cartão mostra as sessões já assinadas', async () => {
+    stubbearListaEAssinatura()
+    render(<MinhasGuiasPage />)
+    await screen.findByLabelText('Guia nº 202610704')
+
+    expect(screen.queryByRole('region', { name: 'Sessões para assinar' })).not.toBeInTheDocument()
+    expect(within(cartaoDe('202610704')).getByText(/Já assinadas: sessão 1 em 26\/10\/2026/)).toBeInTheDocument()
+  })
+
   it('abrir "Assinar sessões" lista só as sessões SOLICITADA', async () => {
     stubbearListaEAssinatura()
     render(<MinhasGuiasPage />)
