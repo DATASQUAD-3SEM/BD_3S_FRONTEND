@@ -71,6 +71,20 @@ function sessoesAssinadas(guia: GuiaDoBeneficiario): SessaoDaGuia[] {
     .sort((a, b) => a.numero - b.numero)
 }
 
+/** "Já assinadas: sessão N em dd/mm/aaaa", uma linha por sessão assinada (T18-FE3). */
+function ListaJaAssinadas({ sessoes }: { sessoes: SessaoDaGuia[] }) {
+  if (sessoes.length === 0) return null
+  return (
+    <ul className="mg-assinar__ja-assinadas">
+      {sessoes.map((sessao) => (
+        <li key={sessao.id}>
+          Já assinadas: sessão {sessao.numero} em {formatarData(sessao.dataAssinatura)}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export default function GuiaCard({ guia, api, onAtualizar, onRecarregar }: Props) {
   const c = contarSessoes(guia)
   const sessoesAutorizadas = guia.procedimentos.reduce(
@@ -253,6 +267,9 @@ export default function GuiaCard({ guia, api, onAtualizar, onRecarregar }: Props
           Sessões assinadas: {c.assinadas}. Sessões expiradas (não cobráveis): {c.expiradas}.
         </p>
       )}
+
+      {/* T18-FE3: as sessões já assinadas ficam visíveis no cartão também com o painel de assinatura fechado */}
+      {!painelSessoesAberto && <ListaJaAssinadas sessoes={assinadas} />}
 
       {/* botão Ver guia (PDF), em todo cartão (T23-FE1) */}
       <button
@@ -467,15 +484,7 @@ export default function GuiaCard({ guia, api, onAtualizar, onRecarregar }: Props
             </ul>
           )}
 
-          {assinadas.length > 0 && (
-            <ul className="mg-assinar__ja-assinadas">
-              {assinadas.map((sessao) => (
-                <li key={sessao.id}>
-                  Já assinadas: sessão {sessao.numero} em {formatarData(sessao.dataAssinatura)}
-                </li>
-              ))}
-            </ul>
-          )}
+          <ListaJaAssinadas sessoes={assinadas} />
 
           {mensagemSucesso && (
             <p className="mg-sucesso" role="status">
