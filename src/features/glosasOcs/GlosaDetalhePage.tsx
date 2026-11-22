@@ -128,9 +128,13 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
     }
   }, [api, glosaId])
 
-  // Guias que ainda pedem decisão nesta rodada (sem decisão registrada e fatura sem ciência).
+  // Guias que ainda pedem decisão nesta rodada (sem decisão registrada, fatura sem ciência e dentro do prazo).
+  // T27-FE2 (regra 14.5): vencido o prazo de 3 dias úteis sem decisão, a tela fica só de leitura.
   const pendentes = useMemo(
-    () => (detalhe && !detalhe.dataCiencia ? detalhe.guiasGlosadas.filter((g) => g.decisaoOcs === null) : []),
+    () =>
+      detalhe && !detalhe.dataCiencia && !detalhe.prazoVencido
+        ? detalhe.guiasGlosadas.filter((g) => g.decisaoOcs === null)
+        : [],
     [detalhe],
   )
 
@@ -217,6 +221,19 @@ export default function GlosaDetalhePage({ api = glosaDetalheApi }: Props) {
         valor do contrato usado na lisura está errado, explicando o motivo). A decisão é por guia; depois de confirmada,
         não pode ser desfeita.
       </p>
+
+      {detalhe.dataCiencia && (
+        <p className="sf-faixa" role="status">
+          Ciência já registrada para todas as guias. Nada mais a fazer aqui.
+        </p>
+      )}
+
+      {!detalhe.dataCiencia && detalhe.prazoVencido && (
+        <p className="sf-faixa sf-faixa--alerta" role="status">
+          O prazo de 3 dias úteis venceu em {formatarDataCurta(detalhe.prazoOcs)} sem decisão. A glosa segue como
+          lisurada pela rastreabilidade e a fatura pode seguir para a auditoria.
+        </p>
+      )}
 
       <div className="sf-resumo">
         <div>
