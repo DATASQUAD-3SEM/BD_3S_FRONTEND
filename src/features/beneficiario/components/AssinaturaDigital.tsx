@@ -6,14 +6,41 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import { ApiError } from '../../../shared/api/http'
+import { buscarAssinaturaAtual } from './assinaturaApi'
 
 /**
- * Cartao de assinatura digital, reutilizado nas telas Minhas informacoes dos tres perfis.
+ * Cartao de assinatura digital, reutilizado nas cinco telas Minhas informacoes (beneficiario, dependente maior,
+ * responsavel legal, medico e chefe).
  * Permite desenhar no quadro (mouse ou toque) ou enviar uma imagem PNG/JPG; o botao de salvar
  * so habilita quando ha algo desenhado ou enviado, e um quadro em branco nunca e enviado.
+ *
+ * T37-FE1: o quadro de desenho tem proporcao fixa de 3:1 e resolucao interna fixa, entao o traco nao depende do
+ * tamanho do quadro na tela (o recorte final e feito pelo servidor, T37-BE1). Acima do quadro fica a
+ * pre-visualizacao da assinatura atual, numa area fixa de 3:1, buscada no servidor (T37-BE3) ao abrir a tela e
+ * de novo depois de salvar, para mostrar a imagem normalizada que o servidor guardou.
  */
 
 const TIPOS_IMAGEM_ACEITOS = ['image/png', 'image/jpeg']
+
+/** Resolucao interna do quadro (proporcao 3:1, a mesma da imagem que o servidor guarda). */
+const LARGURA_QUADRO = 900
+const ALTURA_QUADRO = 300
+/** Espessura do traco em pixels da tela, qualquer que seja o tamanho do quadro. */
+const ESPESSURA_TRACO = 3
+/** Margem de cada lado ao encaixar uma imagem enviada, em fracao do quadro. */
+const MARGEM_IMAGEM = 0.04
+
+type Previa =
+  | { situacao: 'carregando' }
+  | { situacao: 'vazia' }
+  | { situacao: 'erro' }
+  | { situacao: 'pronta'; endereco: string }
+
+const AVISO_PREVIA: Record<'carregando' | 'vazia' | 'erro', string> = {
+  carregando: 'Carregando a assinatura...',
+  vazia: 'Nenhuma assinatura cadastrada.',
+  erro: 'Não foi possível carregar a assinatura atual.',
+}
 
 interface AssinaturaDigitalProps {
   /** true = beneficiario ja tem assinatura salva (badge verde). */
@@ -23,6 +50,11 @@ interface AssinaturaDigitalProps {
    * Quem chama decide como salvar (mock ou backend). Se falhar, lance um erro.
    */
   onSalvar: (imagem: Blob) => Promise<void>
+  /**
+   * Busca a imagem da assinatura atual (null = ainda nao cadastrada). Padrao: GET /usuarios/me/assinatura.
+   * Passe sempre a mesma funcao entre renderizacoes (nunca uma funcao criada dentro do render).
+   */
+  buscarAtual?: () => Promise<Blob | null>
 }
 
 interface Mensagem {
@@ -58,54 +90,71 @@ function canvasParaPng(canvas: HTMLCanvasElement): Promise<Blob> {
   })
 }
 
-export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDigitalProps) {
+export default function AssinaturaDigital({
+  cadastrada,
+  onSalvar,
+  buscarAtual = buscarAssinaturaAtual,
+}: AssinaturaDigitalProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const inputImagemRef = useRef<HTMLInputElement | null>(null)
   const [desenhando, setDesenhando] = useState(false)
   const [temConteudo, setTemConteudo] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [mensagem, setMensagem] = useState<Mensagem | null>(null)
+  const [previa, setPrevia] = useState<Previa>(
+    cadastrada ? { situacao: 'carregando' } : { situacao: 'vazia' },
+  )
+  // Sobe a cada salvamento para buscar de novo a imagem que o servidor guardou.
+  const [versaoPrevia, setVersaoPrevia] = useState(0)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    if (!cadastrada && versaoPrevia === 0) return
 
-    const rect = canvas.getBoundingClientRect()
-    if (rect.width === 0 || rect.height === 0) return
+    let cancelado = false
 
-    const dpr = window.devicePixelRatio || 1
+    buscarAtual()
+      .then((imagem) => {
+        if (cancelado) return
+        setPrevia(
+          imagem
+            ? { situacao: 'pronta', endereco: URL.createObjectURL(imagem) }
+            : { situacao: 'vazia' },
+        )
+      })
+      .catch(() => {
+        if (!cancelado) setPrevia({ situacao: 'erro' })
+      })
 
-    // Resolução interna = tamanho na tela × DPR (deixa o traço nítido em telas de alta densidade)
-    canvas.width = Math.round(rect.width * dpr)
-    canvas.height = Math.round(rect.height * dpr)
+    return () => {
+      cancelado = true
+    }
+  }, [cadastrada, versaoPrevia, buscarAtual])
 
-    // Mapeia coordenadas da tela para a resolução interna
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0)
+  // Libera o endereco da imagem anterior quando chega outra e ao sair da tela.
+  useEffect(() => {
+    if (previa.situacao !== 'pronta') return
+    const endereco = previa.endereco
+    return () => URL.revokeObjectURL(endereco)
+  }, [previa])
 
-    ctx.strokeStyle = '#22382b'
-    ctx.lineWidth = 3
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-  }, [])
-
-  /** Apaga todo o quadro, ignorando a transformação atual. */
+  /** Apaga todo o quadro. */
   function apagarQuadro(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-    ctx.save()
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.restore()
     ctx.beginPath()
   }
 
+  /** Quantos pixels internos do quadro cabem em um pixel da tela (o quadro se ajusta a largura disponivel). */
+  const escalaDoQuadro = (canvas: HTMLCanvasElement, rect: DOMRect) =>
+    rect.width > 0 ? canvas.width / rect.width : 1
+
+  /** Posicao do ponteiro em pixels internos do quadro, qualquer que seja o tamanho dele na tela. */
   const obterCoordenadas = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
+    const canvas = e.currentTarget
+    const rect = canvas.getBoundingClientRect()
+    const escala = escalaDoQuadro(canvas, rect)
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) * escala,
+      y: (e.clientY - rect.top) * escala,
     }
   }
 
@@ -116,6 +165,12 @@ export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDi
     e.currentTarget.setPointerCapture(e.pointerId)
     setDesenhando(true)
     setMensagem(null)
+
+    ctx.strokeStyle = '#22382b'
+    ctx.lineWidth =
+      ESPESSURA_TRACO * escalaDoQuadro(e.currentTarget, e.currentTarget.getBoundingClientRect())
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
 
     const { x, y } = obterCoordenadas(e)
     ctx.beginPath()
@@ -155,13 +210,13 @@ export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDi
     const ctx = canvas?.getContext('2d')
     if (!canvas || !ctx) return
 
-    const rect = canvas.getBoundingClientRect()
     apagarQuadro(canvas, ctx)
 
-    const margem = 12
+    const margemX = canvas.width * MARGEM_IMAGEM
+    const margemY = canvas.height * MARGEM_IMAGEM
     const escala = Math.min(
-      (rect.width - margem * 2) / imagem.width,
-      (rect.height - margem * 2) / imagem.height,
+      (canvas.width - margemX * 2) / imagem.width,
+      (canvas.height - margemY * 2) / imagem.height,
       1,
     )
     const largura = imagem.width * escala
@@ -169,8 +224,8 @@ export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDi
 
     ctx.drawImage(
       imagem,
-      (rect.width - largura) / 2,
-      (rect.height - altura) / 2,
+      (canvas.width - largura) / 2,
+      (canvas.height - altura) / 2,
       largura,
       altura,
     )
@@ -223,6 +278,7 @@ export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDi
       const imagem = await canvasParaPng(canvas)
       await onSalvar(imagem)
       setMensagem({ tipo: 'sucesso', texto: 'Assinatura salva com sucesso.' })
+      setVersaoPrevia((versao) => versao + 1)
     } catch (erro: unknown) {
       setMensagem({
         tipo: 'erro',
@@ -252,12 +308,36 @@ export default function AssinaturaDigital({ cadastrada, onSalvar }: AssinaturaDi
         Usada para assinar documentos. Desenhe no quadro (mouse ou dedo) ou envie uma imagem.
       </p>
 
+      <p className="info-assinatura-rotulo">Assinatura atual</p>
+      <div
+        className="info-previa-assinatura"
+        aria-label="Pré-visualização da assinatura atual"
+      >
+        {previa.situacao === 'pronta' ? (
+          <img src={previa.endereco} alt="Assinatura atual cadastrada" />
+        ) : (
+          <span
+            className="info-previa-assinatura-aviso"
+            role={previa.situacao === 'erro' ? 'alert' : 'status'}
+          >
+            {AVISO_PREVIA[previa.situacao]}
+          </span>
+        )}
+      </div>
+
+      <p className="info-assinatura-rotulo">Nova assinatura</p>
       <div
         className="info-quadro-assinatura"
         aria-label="Área de desenho da assinatura digital"
       >
+        <div className="info-quadro-linha-guia" aria-hidden="true" />
+        <span className="info-quadro-dica" aria-hidden="true">
+          Assine sobre a linha
+        </span>
         <canvas
           ref={canvasRef}
+          width={LARGURA_QUADRO}
+          height={ALTURA_QUADRO}
           onPointerDown={iniciarDesenho}
           onPointerMove={desenhar}
           onPointerUp={finalizarTraco}

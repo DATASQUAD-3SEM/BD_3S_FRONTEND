@@ -596,10 +596,51 @@ button:focus-visible { outline: 3px solid #7fb08c; outline-offset: 2px; }
   margin: 0 0 0.6rem;
 }
 
+.info-assinatura-rotulo {
+  margin: 0 0 0.3rem;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* T37-FE1: pre-visualizacao e quadro de desenho usam a mesma area de proporcao 3:1 (a da imagem guardada). */
+.info-previa-assinatura {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 3 / 1;
+
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  background: #fff;
+
+  box-sizing: border-box;
+  margin-bottom: 0.9rem;
+  overflow: hidden;
+}
+
+.info-previa-assinatura img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.info-previa-assinatura-aviso {
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  padding: 0 0.75rem;
+  text-align: center;
+}
+
 .info-quadro-assinatura {
   position: relative;
   width: 100%;
-  height: 152px;
+  max-width: 900px;
+  aspect-ratio: 3 / 1;
 
   border: 2px dashed #c4d2c8;
   border-radius: 8px;
@@ -609,6 +650,30 @@ button:focus-visible { outline: 3px solid #7fb08c; outline-offset: 2px; }
   margin-bottom: 0.65rem;
   overflow: hidden;
   touch-action: none;
+}
+
+/* Linha-guia e dica ficam fora do canvas: nao entram na imagem enviada. */
+.info-quadro-linha-guia {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 72%;
+
+  border-top: 1px solid #9fb3a5;
+  pointer-events: none;
+}
+
+.info-quadro-dica {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(72% + 0.25rem);
+
+  color: #6b7f72;
+  font-size: 0.75rem;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
 }
 
 .info-quadro-assinatura canvas {
