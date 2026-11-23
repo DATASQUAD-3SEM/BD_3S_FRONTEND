@@ -1,0 +1,36 @@
+/* T36-FE2: Nova pre-guia do beneficiario (passo Paciente e dados do paciente). */
+.passo-paciente { border: 1px solid var(--cinza-borda); border-radius: var(--raio-grande); background: #fff; box-shadow: var(--sombra-1); }
+.passo-paciente-titulo {
+  padding: 0 0.4rem;
+  font-family: var(--fonte-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+}
+.passo-paciente-pergunta { margin: 0 0 0.75rem; color: var(--texto-suave); }
+.passo-paciente-opcoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.6rem; margin-bottom: 0.75rem; }
+.passo-paciente-opcao {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--cinza-campo);
+  border-radius: var(--raio);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.passo-paciente-opcao:hover { border-color: var(--verde); }
+.passo-paciente-opcao--marcada { border-color: var(--verde); background: var(--verde-claro-2); box-shadow: var(--foco); }
+
+.dados-lista--grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.dados-lista--grade .dados-linha,
+.dados-lista--grade .dados-linha[data-par='true'] { background: #fff; border-bottom: 1px solid #eef2ef; border-right: 1px solid #eef2ef; }
+
+.selecao-ocs-rotulo { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; color: var(--texto-suave); }
+.selecao-ocs-busca { width: 100%; margin-bottom: 0.9rem; }
+.selecao-ocs-lista { list-style: none; padding: 0; }
+.selecao-ocs-lista li { display: flex; }
+.selecao-ocs-lista .passo-paciente-opcao { flex: 1; align-items: flex-start; }
+.selecao-ocs-lista .passo-paciente-opcao input { margin-top: 0.2rem; }
+.selecao-ocs-contrato { display: block; color: var(--texto-suave); }

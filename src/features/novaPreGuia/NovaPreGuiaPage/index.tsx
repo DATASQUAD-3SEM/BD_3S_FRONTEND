@@ -9,6 +9,7 @@ import { formVazio, type NovaPreGuiaForm, type PacienteOpcao } from './types'
 
 import DadosBeneficiario from './components/DadosBeneficiario'
 import PassoPaciente from './components/PassoPaciente'
+import './novaPreGuia.css'
 import SelecaoOcs from './components/SelecaoOcs'
 import UploadEncaminhamento from './components/UploadEncaminhamento'
 import FeedbackUpload from './components/FeedbackUpload'

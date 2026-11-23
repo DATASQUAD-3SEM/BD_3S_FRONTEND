@@ -28,26 +28,32 @@ export default function PassoPaciente({ pacientes, maioresNomes, value, onChange
   const citacaoMaiores = maioresNomes.length > 0 ? ` (como ${maioresNomes.join(', ')})` : ''
 
   return (
-    <fieldset>
-      <legend>1. Paciente</legend>
-      <p>Para quem é esta pré-guia?</p>
+    <fieldset className="painel passo-paciente">
+      <legend className="passo-paciente-titulo">1. Paciente</legend>
+      <p className="passo-paciente-pergunta">Para quem é esta pré-guia?</p>
 
-      {pacientes.map((paciente) => {
-        const id = paciente.dependenteId === null ? 'titular' : String(paciente.dependenteId)
-        const rotulo = rotuloDoPaciente(paciente)
-        return (
-          <label key={id} htmlFor={`paciente-${id}`}>
-            <input
-              id={`paciente-${id}`}
-              type="radio"
-              name="paciente"
-              checked={value === paciente.dependenteId}
-              onChange={() => onChange(paciente.dependenteId)}
-            />{' '}
-            {rotulo}
-          </label>
-        )
-      })}
+      <div className="passo-paciente-opcoes">
+        {pacientes.map((paciente) => {
+          const id = paciente.dependenteId === null ? 'titular' : String(paciente.dependenteId)
+          const rotulo = rotuloDoPaciente(paciente)
+          return (
+            <label
+              key={id}
+              htmlFor={`paciente-${id}`}
+              className={`passo-paciente-opcao${value === paciente.dependenteId ? ' passo-paciente-opcao--marcada' : ''}`}
+            >
+              <input
+                id={`paciente-${id}`}
+                type="radio"
+                name="paciente"
+                checked={value === paciente.dependenteId}
+                onChange={() => onChange(paciente.dependenteId)}
+              />
+              <span>{rotulo}</span>
+            </label>
+          )
+        })}
+      </div>
 
       <p className="sf-pequeno">
         Dependentes maiores de idade{citacaoMaiores} não aparecem aqui: eles criam as próprias pré-guias. Dependentes

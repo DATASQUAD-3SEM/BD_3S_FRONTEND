@@ -1,4 +1,5 @@
 import type { Beneficiario } from '../../../../shared/types/domain'
+import { formatarTelefone } from '../../../../shared/utils/formatadores'
 
 import {
   calcularIdade,
@@ -97,7 +98,7 @@ export default function DadosBeneficiario({ value }: Props) {
     },
     {
       rotulo: 'Telefone',
-      valor: value.telefone ?? '',
+      valor: value.telefone ? formatarTelefone(value.telefone) : '',
     },
   ]
 
@@ -107,7 +108,7 @@ export default function DadosBeneficiario({ value }: Props) {
         Dados do paciente
       </h2>
 
-      <div className="dados-lista">
+      <div className="dados-lista dados-lista--grade">
         {linhas.map((linha, i) => (
           <div
             className="dados-linha"

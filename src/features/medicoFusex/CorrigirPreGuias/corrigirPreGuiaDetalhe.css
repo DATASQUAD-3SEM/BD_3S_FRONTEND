@@ -128,11 +128,20 @@
   align-items: flex-start;
   gap: 2px;
   padding: 10px 12px;
+  min-height: 0;
   background: #fff;
+  /* T36-FE2: o estilo global de botao deixava o texto branco sobre o fundo branco (nome do exame sumia) */
+  color: var(--texto);
   border: none;
+  border-radius: 0;
+  font-weight: 400;
   text-align: left;
   cursor: pointer;
 }
+
+.pgd__item:hover:not(:disabled) { background: var(--verde-claro-2); filter: none; }
+
+.pgd__item strong { color: var(--verde-escuro); font-size: 15px; }
 
 .pgd__item:disabled {
   opacity: 0.6;
