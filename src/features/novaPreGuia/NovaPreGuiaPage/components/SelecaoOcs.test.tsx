@@ -56,7 +56,7 @@ describe('SelecaoOcs', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
     render(<SelecaoOcs value={null} onChange={vi.fn()} />)
 
-    expect(await screen.findByText(/Nao foi possivel carregar/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Não foi possível carregar as OCS/i)).toBeInTheDocument()
   })
 
   it('marca como selecionada a OCS que ja estava no value', async () => {
