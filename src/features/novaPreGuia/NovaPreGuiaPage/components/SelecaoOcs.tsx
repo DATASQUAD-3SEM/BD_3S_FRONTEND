@@ -43,26 +43,28 @@ export default function SelecaoOcs({ value, onChange }: Props) {
   const lista = resultado?.lista ?? []
 
   return (
-    <section className="painel">
-      <h2>OCS</h2>
-      <p>Escolha a rede credenciada onde o exame sera realizado.</p>
+    <section className="painel painel-dados">
+      <h2 className="painel-titulo">OCS</h2>
+      <p className="passo-paciente-pergunta">Escolha a rede credenciada onde o exame será realizado.</p>
 
-      <label htmlFor="busca-ocs">Buscar OCS</label>
+      <label htmlFor="busca-ocs" className="selecao-ocs-rotulo">
+        Buscar OCS
+      </label>
       <input
         id="busca-ocs"
         type="text"
+        className="selecao-ocs-busca"
         placeholder="Digite o nome, contrato ou tipo..."
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
-        style={{ width: '100%', marginBottom: '0.75rem' }}
       />
 
-      {carregando && <p>Carregando OCS...</p>}
+      {carregando && <p className="sf-pequeno">Carregando OCS...</p>}
 
       {!carregando && resultado?.erro && (
         <div className="erro" role="alert">
           <p>
-            <strong>Nao foi possivel carregar as OCS.</strong>
+            <strong>Não foi possível carregar as OCS.</strong>
           </p>
           <p>{resultado.erro}</p>
         </div>
@@ -71,28 +73,14 @@ export default function SelecaoOcs({ value, onChange }: Props) {
       {!carregando && !resultado?.erro && lista.length === 0 && <p>Nenhuma OCS encontrada.</p>}
 
       {!carregando && !resultado?.erro && lista.length > 0 && (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul className="passo-paciente-opcoes selecao-ocs-lista">
           {lista.map((o) => (
-            <li key={o.id} style={{ marginBottom: '0.5rem' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  cursor: 'pointer',
-                  alignItems: 'flex-start',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="ocs"
-                  checked={value?.id === o.id}
-                  onChange={() => onChange(o)}
-                  style={{ marginTop: '0.25rem' }}
-                />
+            <li key={o.id}>
+              <label className={`passo-paciente-opcao${value?.id === o.id ? ' passo-paciente-opcao--marcada' : ''}`}>
+                <input type="radio" name="ocs" checked={value?.id === o.id} onChange={() => onChange(o)} />
                 <span>
                   <strong>{o.nome}</strong>
-                  <br />
-                  <small>
+                  <small className="selecao-ocs-contrato">
                     Contrato: {o.contrato} · {o.tipo.toUpperCase()}
                   </small>
                 </span>

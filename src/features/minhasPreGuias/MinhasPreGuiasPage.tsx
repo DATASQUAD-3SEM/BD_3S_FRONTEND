@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import PreGuiaCard from './PreGuiaCard';
 import { minhasPreGuiasApi } from './api';
+import FiltroPaciente, { FILTRO_TODOS, filtrarPorPaciente, fraseDaLista } from './filtroPaciente';
 import type { MinhasPreGuiasApi, PreGuiaDoBeneficiario } from './types';
 import './minhasPreGuias.css';
 
@@ -25,6 +26,7 @@ export default function MinhasPreGuiasPage({
   const [estado, setEstado] = useState<Estado>('carregando');
   const [preGuias, setPreGuias] = useState<PreGuiaDoBeneficiario[]>([]);
   const [tentativa, setTentativa] = useState(0);
+  const [filtroPaciente, setFiltroPaciente] = useState(FILTRO_TODOS);
 
   useEffect(() => {
     let cancelado = false;
@@ -80,8 +82,14 @@ export default function MinhasPreGuiasPage({
         </div>
       )}
 
+      {estado === 'pronto' && fraseDaLista(preGuias, 'pré-guias') && <p>{fraseDaLista(preGuias, 'pré-guias')}</p>}
+
+      {estado === 'pronto' && (
+        <FiltroPaciente itens={preGuias} value={filtroPaciente} onChange={setFiltroPaciente} />
+      )}
+
       {estado === 'pronto' &&
-        preGuias.map((p) => (
+        filtrarPorPaciente(preGuias, filtroPaciente).map((p) => (
           <PreGuiaCard key={p.id} preGuia={p} api={api} onVisualizarECorrigir={onVisualizarECorrigir} />
         ))}
     </section>

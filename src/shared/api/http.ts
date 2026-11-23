@@ -127,3 +127,11 @@ export function put<T>(caminho: string, corpo: unknown): Promise<T> {
 export function del(caminho: string): Promise<void> {
   return request<void>(caminho, { method: 'DELETE' })
 }
+
+export function delComCorpo<T>(caminho: string, corpo: unknown): Promise<T> {
+  return request<T>(caminho, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo),
+  })
+}

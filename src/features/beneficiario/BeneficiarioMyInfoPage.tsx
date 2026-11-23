@@ -7,6 +7,9 @@ import {
 } from './calculosBeneficiario'
 import { alterarSenha, salvarAssinatura, salvarTelefone } from './beneficiarioApi'
 import AssinaturaDigital from './components/AssinaturaDigital'
+import DependentesAba from './DependentesAba'
+import { MinhasInformacoesDependenteMaior, MinhasInformacoesResponsavel } from './MinhasInformacoesOutros'
+import { lerSessao } from '../../shared/auth/sessao'
 import { ApiError } from '../../shared/api/http'
 
 const TAMANHO_MINIMO_SENHA = 8
@@ -316,23 +319,31 @@ function AlterarSenha({ onAlterar }: AlterarSenhaProps) {
  * pelas funções de beneficiarioApi.ts.
  */
 export default function MinhasInformacoesPage() {
+  // T31-FE5: o responsável legal externo tem a própria tela (não tem cadastro de beneficiário).
+  if (lerSessao()?.perfil === 'RESPONSAVEL_EXTERNO') {
+    return <MinhasInformacoesResponsavel />
+  }
+  return <MinhasInformacoesBeneficiario />
+}
+
+/** Titular (dados de /beneficiarios/me); sem cadastro de titular, é o dependente maior (/dependente/me). */
+function MinhasInformacoesBeneficiario() {
   const {
     beneficiario,
     carregando,
     erro,
     atualizarBeneficiario,
   } = useBeneficiario()
+  // T31-FE4: aba "Dependentes", só para o titular (a tela carrega o titular em /beneficiarios/me).
+  const [aba, setAba] = useState<'dados' | 'dependentes'>('dados')
 
   if (carregando) {
     return <p>Carregando beneficiário...</p>
   }
 
   if (erro || !beneficiario) {
-    return (
-      <p role="alert">
-        Não foi possível carregar os dados do beneficiário.
-      </p>
-    )
+    // T31-FE5: o dependente maior entra como BENEFICIARIO mas não tem cadastro de titular.
+    return <MinhasInformacoesDependenteMaior mensagemErro="Não foi possível carregar os dados do beneficiário." />
   }
 
   const idade = calcularIdade(beneficiario.dataNascimento)
@@ -341,6 +352,19 @@ export default function MinhasInformacoesPage() {
     <div className="minhas-info-page">
       <h1>Minhas informações</h1>
 
+      <div role="tablist" aria-label="Minhas informações" className="info-abas">
+        <button type="button" role="tab" aria-selected={aba === 'dados'} onClick={() => setAba('dados')}>
+          Meus dados
+        </button>
+        <button type="button" role="tab" aria-selected={aba === 'dependentes'} onClick={() => setAba('dependentes')}>
+          Dependentes
+        </button>
+      </div>
+
+      {aba === 'dependentes' && <DependentesAba titularNome={beneficiario.nome} />}
+
+      {aba === 'dados' && (
+      <>
       {/* Dados pessoais (somente leitura) */}
       <section className="info-card">
         <h2>Dados pessoais</h2>
@@ -349,11 +373,6 @@ export default function MinhasInformacoesPage() {
           <div className="info-dado">
             <span>Nome</span>
             <p>{beneficiario.nome}</p>
-          </div>
-
-          <div className="info-dado">
-            <span>Grupo</span>
-            <p>{beneficiario.grupo ?? '—'}</p>
           </div>
 
           <div className="info-dado">
@@ -407,6 +426,8 @@ export default function MinhasInformacoesPage() {
           atualizarBeneficiario({ assinaturaCadastrada: true })
         }}
       />
+      </>
+      )}
     </div>
   )
 }

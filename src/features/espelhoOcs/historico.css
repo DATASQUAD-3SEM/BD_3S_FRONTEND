@@ -1,0 +1,81 @@
+.eh-skeleton {
+  height: 72px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #e6ebe8;
+}
+
+.eh-vazio {
+  background: #fff;
+  border: 1px dashed #b9c4bd;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  color: #1f1f1f;
+}
+
+.eh-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eh-linha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.eh-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eh-texto strong {
+  color: #1f3d2b;
+  font-size: 15px;
+}
+
+.eh-texto span {
+  color: #5b6b62;
+  font-size: 13px;
+}
+
+.eh-valores {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #1f3d2b;
+}
+
+.eh-pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eh-pagina h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f3d2b;
+}
+
+.eh-subtitulo {
+  margin: 0;
+  color: #5b6b62;
+  font-size: 14px;
+}
+
+.eh-botao-pdf {
+  margin-left: 8px;
+}

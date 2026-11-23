@@ -1,6 +1,6 @@
 import { formatarCpf } from '../../../../shared/utils/formatadores'
-import { formatarTelefone, mascaraPrecCp } from '../../../../shared/utils/formatadores'
-import type { BeneficiarioBusca } from '../types'
+import { formatarPrecCp, formatarTelefone, mascaraPrecCp } from '../../../../shared/utils/formatadores'
+import type { BeneficiarioBusca, DependenteMedico } from '../types'
 
 /**
  * Secao "Beneficiario" da Nova pre-guia do medico: busca pelo Prec CP com mascara e exibe os dados
@@ -17,6 +17,21 @@ interface Props {
   onBuscar: () => void
 }
 
+/**
+ * Aviso abaixo do cartão quando o paciente é um dependente (T30-FE5): quem recebe a Guia, envia à OCS e assina.
+ * Um só responsável por menor (regra 13): o titular no menor sob sua guarda, o responsável legal externo no outro.
+ */
+export function avisoDoDependente(dependente: DependenteMedico): string {
+  if (!dependente.menor) {
+    return 'Dependente maior de idade. Quando a Guia for emitida, ela aparece para o próprio dependente, que a envia à OCS e assina as sessões.'
+  }
+  const quem = dependente.responsavel ?? dependente.titularNome
+  if (quem === dependente.titularNome) {
+    return `Paciente menor de idade. Quando a Guia for emitida, ela aparece para o titular, ${quem}, que a envia à OCS e assina as sessões.`
+  }
+  return `Paciente menor de idade. Quando a Guia for emitida, ela aparece para o responsável legal, ${quem}, que a envia à OCS e assina as sessões.`
+}
+
 export default function BeneficiarioSecao({
                                             precCp,
                                             status,
@@ -30,13 +45,21 @@ export default function BeneficiarioSecao({
   const linhas = beneficiario
     ? [
       { rotulo: 'Nome', valor: beneficiario.nome },
-      { rotulo: 'Grupo', valor: beneficiario.grupo },
       {
         rotulo: 'Faixa etária',
         valor: `${beneficiario.faixaEtaria} (${beneficiario.idade} anos)`,
       },
       { rotulo: 'CPF', valor: formatarCpf(beneficiario.cpf) },
       { rotulo: 'Telefone', valor: formatarTelefone(beneficiario.telefone) },
+      ...(beneficiario.dependente
+        ? [
+          { rotulo: 'Paciente', valor: `Dependente${beneficiario.dependente.vinculo ? ` (${beneficiario.dependente.vinculo})` : ''}` },
+          {
+            rotulo: 'Titular',
+            valor: `${beneficiario.dependente.titularNome} · Prec CP ${formatarPrecCp(beneficiario.dependente.titularPrecCp)}`,
+          },
+        ]
+        : []),
     ]
     : []
 
@@ -93,6 +116,12 @@ export default function BeneficiarioSecao({
             </div>
           ))}
         </dl>
+      )}
+
+      {status === 'encontrado' && beneficiario?.dependente && (
+        <p className="npg-aviso" role="note">
+          {avisoDoDependente(beneficiario.dependente)}
+        </p>
       )}
     </section>
   )

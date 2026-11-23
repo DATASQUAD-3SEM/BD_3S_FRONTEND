@@ -1,11 +1,13 @@
 import type { Beneficiario } from '../../../../shared/types/domain'
+import { formatarTelefone } from '../../../../shared/utils/formatadores'
 
 import {
   calcularIdade,
 } from '../../../beneficiario/calculosBeneficiario'
 
 /**
- * Bloco somente leitura com os dados do beneficiario logado na Nova pre-guia (Sprint 1).
+ * Bloco somente leitura "Dados do paciente" da Nova pre-guia: os dados do paciente escolhido no passo 1 (o titular,
+ * o dependente maior logado ou o menor), vindos de GET /pre-guias/pacientes (T30-FE1).
  */
 
 interface Props {
@@ -73,8 +75,7 @@ export default function DadosBeneficiario({ value }: Props) {
   const idade = calcularIdade(value.dataNascimento)
 
   const linhas: Array<{ rotulo: string; valor: string }> = [
-    { rotulo: 'Beneficiário', valor: value.nome },
-    { rotulo: 'Grupo', valor: value.grupo ?? '' },
+    { rotulo: 'Nome', valor: value.nome },
     {
       rotulo: 'Data de nascimento',
       valor: formatarDataNascimento(value.dataNascimento),
@@ -97,17 +98,17 @@ export default function DadosBeneficiario({ value }: Props) {
     },
     {
       rotulo: 'Telefone',
-      valor: value.telefone ?? '',
+      valor: value.telefone ? formatarTelefone(value.telefone) : '',
     },
   ]
 
   return (
     <section className="painel painel-dados">
       <h2 className="painel-titulo">
-        Dados do beneficiário
+        Dados do paciente
       </h2>
 
-      <div className="dados-lista">
+      <div className="dados-lista dados-lista--grade">
         {linhas.map((linha, i) => (
           <div
             className="dados-linha"

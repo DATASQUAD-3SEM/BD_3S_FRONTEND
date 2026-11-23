@@ -1,0 +1,144 @@
+.ee-pagina h1 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  color: #1f3d2b;
+}
+
+.ee-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  color: #5b6b62;
+}
+
+.ee-barra-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ee-confirmacao {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+
+.ee-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ee-cartao {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  overflow-wrap: anywhere;
+}
+
+.ee-cartao-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.ee-selecao {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f3d2b;
+}
+
+.ee-selecao input {
+  width: 18px;
+  height: 18px;
+}
+
+.ee-paciente {
+  margin: 6px 0 12px;
+  color: #5b6b62;
+  font-size: 13px;
+}
+
+.ee-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ee-tabela th,
+.ee-tabela td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid #edf1ee;
+}
+
+.ee-tabela th {
+  color: #5b6b62;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ee-edicao {
+  margin-top: 12px;
+  border-top: 1px solid #dfe5e1;
+  padding-top: 12px;
+}
+
+.ee-edicao ul {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ee-edicao li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.ee-edicao input {
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  min-height: 40px;
+  width: 160px;
+}
+
+.ee-acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.ee-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #dfe5e1;
+  color: #1f3d2b;
+  font-size: 13px;
+}
+
+.ee-rodape strong {
+  font-size: 18px;
+}

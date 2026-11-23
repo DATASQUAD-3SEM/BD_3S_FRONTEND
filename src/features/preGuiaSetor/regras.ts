@@ -20,14 +20,34 @@ export function situacaoDecisao(detalhe: DetalhePreGuia): SituacaoDecisao {
   return 'indisponivel';
 }
 
-/** Concluir só vale com PDF já gravado para o número que está no campo. */
-export function podeConcluirGuia(detalhe: DetalhePreGuia, numeroDigitado: string): boolean {
-  const numero = numeroDigitado.trim();
-  return detalhe.guiaRascunho !== null && numero !== '' && numero === detalhe.guiaRascunho.numero;
+export const TAMANHO_MAXIMO_PDF_BYTES = 10 * 1024 * 1024; // 10 MB
+
+export interface SituacaoGuia {
+  numero: string;
+  /** PDF escolhido nesta sessao e ainda nao enviado. */
+  arquivoNovo: boolean;
+  rascunho: DetalhePreGuia['guiaRascunho'];
 }
 
-export function ehPdf(arquivo: File): boolean {
-  return arquivo.type === 'application/pdf' || arquivo.name.toLowerCase().endsWith('.pdf');
+/**
+ * Concluir exige numero preenchido e um PDF para enviar agora ou um rascunho salvo com o mesmo numero.
+ */
+export function podeConcluirGuia({ numero, arquivoNovo, rascunho }: SituacaoGuia): boolean {
+  const numeroPreenchido = numero.trim() !== '';
+  return numeroPreenchido && (arquivoNovo || (rascunho !== null && numero.trim() === rascunho.numero));
+}
+
+/** Extensao .pdf e conteudo comecando com %PDF. */
+export async function ehPdf(arquivo: File): Promise<boolean> {
+  if (!arquivo.name.toLowerCase().endsWith('.pdf')) return false;
+  return (await arquivo.slice(0, 4).text()) === '%PDF';
+}
+
+/** Devolve a mensagem de erro do PDF da Guia, ou null se ele pode ser lido. */
+export async function validarPdfGuia(arquivo: File): Promise<string | null> {
+  if (!(await ehPdf(arquivo))) return 'Arquivo inválido. Envie um PDF.';
+  if (arquivo.size > TAMANHO_MAXIMO_PDF_BYTES) return 'O PDF passa de 10 MB. Envie um arquivo menor.';
+  return null;
 }
 
 export function ehNaoEncontrada(erro: unknown): boolean {

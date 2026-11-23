@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 import BeneficiariosPage from './BeneficiariosPage'
+import { textoDependentes } from './ListaBeneficiarios'
 import type { BeneficiarioDetalhe, BeneficiariosApi, ListaBeneficiarios } from './tipos'
 
 /**
@@ -43,6 +44,26 @@ function criarApi(sobrescrever: Partial<BeneficiariosApi> = {}): BeneficiariosAp
 }
 
 const linhaDe = (nome: string) => screen.getByText(nome).closest('tr') as HTMLElement
+
+describe('T31-FE1 · coluna Dependentes', () => {
+  it('conta só os dependentes vigentes: "3 vigentes", "1 vigente" ou "Nenhum"', () => {
+    expect(textoDependentes(3)).toBe('3 vigentes')
+    expect(textoDependentes(1)).toBe('1 vigente')
+    expect(textoDependentes(0)).toBe('Nenhum')
+  })
+
+  it('mostra a frase dos titulares e o botão "Dependentes" abre o titular certo', async () => {
+    const onDependentes = vi.fn()
+    render(<BeneficiariosPage api={criarApi()} onDependentes={onDependentes} />)
+
+    expect(
+      screen.getByText('Aqui aparecem só os titulares. Os dependentes ficam dentro do titular ao qual pertencem.'),
+    ).toBeInTheDocument()
+    const botoes = await screen.findAllByRole('button', { name: 'Dependentes' })
+    fireEvent.click(botoes[0])
+    expect(onDependentes).toHaveBeenCalledWith(lista.itens[0].id)
+  })
+})
 
 describe('T7-FE · Tela Beneficiários', () => {
   it('mostra carregamento e lista apenas ativos por padrão', async () => {

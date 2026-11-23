@@ -1,0 +1,237 @@
+.gr-pagina h1 {
+  margin: 0 0 4px;
+}
+
+.gr-subtitulo {
+  margin: 0 0 16px;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+.gr-skeleton {
+  height: 48px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #e9edf2;
+}
+
+.gr-vazio {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+.gr-busca {
+  display: grid;
+  gap: 6px;
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+.gr-busca input {
+  padding: 8px 10px;
+  border: 1px solid #c7ced8;
+  border-radius: 6px;
+  font: inherit;
+}
+
+/* A tabela rola dentro da propria area, sem rolagem horizontal da pagina (telas pequenas). */
+.gr-tabela-area {
+  overflow-x: auto;
+}
+
+.gr-tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gr-tabela th,
+.gr-tabela td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e3e7ed;
+  text-align: left;
+  vertical-align: top;
+}
+
+.gr-tabela th {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave, #5b6470);
+  font-weight: 600;
+}
+
+/* Detalhe da guia (T19-FE-2) */
+.gr-voltar {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.gr-cartao {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #e3e7ed;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.gr-cartao h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.gr-dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.gr-dados dt {
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+.gr-dados dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.gr-codigo {
+  font-weight: 400;
+  color: var(--cor-texto-suave, #5b6470);
+}
+
+/* Grade de sessoes: as cores seguem a regra 7.2 (verde assinada, amarela solicitada, branca disponivel, cinza riscada expirada). */
+.gr-grade__procedimento {
+  margin-bottom: 16px;
+}
+
+.gr-grade__procedimento h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.gr-grade__sessoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gr-sessao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #aab3bf;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1f2933;
+}
+
+.gr-sessao--disponivel {
+  background: #ffffff;
+}
+
+.gr-sessao--solicitada {
+  background: #fde68a;
+  border-color: #d9a404;
+}
+
+.gr-sessao--assinada {
+  background: #bbf7d0;
+  border-color: #15803d;
+}
+
+.gr-sessao--expirada {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+.gr-sessao--ausente {
+  border-style: dashed;
+  color: #6b7280;
+}
+
+.gr-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.gr-legenda .gr-sessao {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Requerer assinatura (T19-FE-3) */
+.gr-sessao--selecionavel {
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.gr-sessao--selecionavel:hover {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 1px;
+}
+
+.gr-sessao--selecionada {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+  font-weight: 700;
+}
+
+.gr-banner-vencida {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.gr-requerer {
+  margin-top: 16px;
+}
+
+.gr-mensagem-ok,
+.gr-mensagem-erro {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.gr-mensagem-ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.gr-mensagem-erro {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Ver guia (PDF) (T19-FE-4): titulo e botao lado a lado */
+.gr-cabecalho-cartao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.gr-cabecalho-cartao h2 {
+  margin: 0;
+}

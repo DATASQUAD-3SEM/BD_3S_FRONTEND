@@ -14,7 +14,6 @@ export interface Beneficiario {
   precCp: string
   telefone: string | null
   dataNascimento?: string | null
-  grupo?: string | null
   assinaturaCadastrada?: boolean
 }
 

@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import LayoutPerfil from './LayoutPerfil'
+import LayoutPerfil, { iniciais } from './LayoutPerfil'
 import { MENUS, type Perfil } from './perfis'
 
 /**
@@ -29,11 +29,16 @@ function itensDoMenu() {
 describe('LayoutPerfil (T0-FE)', () => {
   it('mostra só os itens do perfil logado, na ordem de cada perfil', () => {
     const esperado: Record<Perfil, string[]> = {
-      BENEFICIARIO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas informações'],
+      OCS: ['Guias recebidas', 'Guias Finalizadas', 'Espelho', 'Glosas Recebidas'],
+      BENEFICIARIO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas guias', 'Minhas informações'],
       MEDICO: ['Início', 'Nova pré-guia', 'Corrigir pré-guias', 'Guias para assinar', 'Minhas informações'],
       CHEFE_FUSEX: ['Guias para assinar', 'Beneficiários', 'Médicos', 'Minhas informações'],
       SETOR_GUIAS: ['Fila de pré-guias'],
+      SETOR_FATURA: ['Espelhos recebidos', 'Faturas Auditadas'],
+      RASTREABILIDADE: ['Faturas Recebidas', 'Versos das Guias'],
+      AUDITORIA: ['Faturas Recebidas', 'Faturas Analisadas'],
       RECEPCAO: ['Guias para impressão'],
+      RESPONSAVEL_EXTERNO: ['Início', 'Nova pré-guia', 'Minhas pré-guias', 'Minhas guias', 'Minhas informações'],
     }
     for (const perfil of Object.keys(esperado) as Perfil[]) {
       const { unmount } = renderizar(perfil, MENUS[perfil][0].to)
@@ -56,6 +61,11 @@ describe('LayoutPerfil (T0-FE)', () => {
 
     renderizar('MEDICO', '/medico/inicio', 'Cap Méd Ribeiro')
     expect(screen.getByText('Cap Méd Ribeiro · Médico FUSEX')).toBeInTheDocument()
+  })
+
+  it('responsável legal mostra "{nome} · Responsável legal" (T30-FE3)', () => {
+    renderizar('RESPONSAVEL_EXTERNO', '/beneficiario/inicio', 'Helena Costa')
+    expect(screen.getByText('Helena Costa · Responsável legal')).toBeInTheDocument()
   })
 
   it('chefe, setor de Guias e recepção mostram só o nome do perfil', () => {
@@ -113,5 +123,28 @@ describe('LayoutPerfil (T0-FE)', () => {
     // escolher um item fecha a gaveta
     await user.click(screen.getByRole('link', { name: 'Guias para impressão' }))
     expect(container.querySelector('.app-body')).not.toHaveClass('menu-aberto')
+  })
+})
+
+describe('T36-FE1 · barra superior', () => {
+  it('iniciais do avatar: primeira letra do primeiro e do último nome', () => {
+    expect(iniciais('Antonio Carlos Ferreira')).toBe('AF')
+    expect(iniciais('  Helena  ')).toBe('H')
+    expect(iniciais('Capitao Carlos Eduardo Lima')).toBe('CL')
+    expect(iniciais('')).toBe('')
+  })
+
+  it('mostra o símbolo da marca e o avatar com as iniciais, sem mudar o texto "{nome} · {perfil}"', () => {
+    const { container } = renderizar('BENEFICIARIO', '/pre-guias', 'Antonio Carlos Ferreira')
+
+    expect(screen.getByText('Antonio Carlos Ferreira · Beneficiário')).toBeInTheDocument()
+    expect(container.querySelector('.app-avatar')).toHaveTextContent('AF')
+    expect(container.querySelector('.brand-simbolo')).toHaveTextContent('N')
+  })
+
+  it('chefe e setores: avatar com as iniciais do perfil', () => {
+    const { container } = renderizar('SETOR_GUIAS', '/setor-guias/fila', 'Nome que não aparece')
+
+    expect(container.querySelector('.app-avatar')).toHaveTextContent('SG')
   })
 })

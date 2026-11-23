@@ -9,8 +9,21 @@ import NovaPreGuiaPage from './features/novaPreGuia/NovaPreGuiaPage'
 import MinhasInformacoesPage from './features/beneficiario/BeneficiarioMyInfoPage'
 import MinhasPreGuiasRota from './features/minhasPreGuias/MinhasPreGuiasRota'
 import CorrecaoPreGuiaRota from './features/minhasPreGuias/correcao/CorrecaoPreGuiaRota'
+import MinhasGuiasPage from './features/minhasGuias/MinhasGuiasPage'
 import FilaPreGuiasRota from './features/filaPreGuias/FilaPreGuiasRota'
 import SetorGuiasLayout from './features/filaPreGuias/SetorGuiasLayout'
+import SetorFaturasLayout from './features/setorFatura/SetorFaturasLayout'
+import GlosasRecebidasPage from './features/glosasOcs/GlosasRecebidasPage'
+import GlosaDetalhePage from './features/glosasOcs/GlosaDetalhePage'
+import RastreabilidadeLayout from './features/rastreabilidade/RastreabilidadeLayout'
+import FaturasRecebidasPage from './features/rastreabilidade/FaturasRecebidasPage'
+import LisuraFaturaPage from './features/rastreabilidade/LisuraFaturaPage'
+import AuditoriaLayout from './features/auditoria/AuditoriaLayout'
+import FaturasRecebidasAuditoriaPage from './features/auditoria/FaturasRecebidasAuditoriaPage'
+import AuditoriaFaturaPage from './features/auditoria/AuditoriaFaturaPage'
+import FaturasAnalisadasPage from './features/auditoria/FaturasAnalisadasPage'
+import EspelhosRecebidosPage from './features/setorFatura/EspelhosRecebidosPage'
+import AuditadasPage from './features/setorFatura/AuditadasPage'
 import PreGuiaSetorRota from './features/preGuiaSetor/PreGuiaSetorRota'
 import MedicoLayout from './features/medicoFusex/MedicoLayout'
 import MedicoMinhasInformacoesPage from './features/medicoFusex/MedicoMyInfoPage'
@@ -18,13 +31,25 @@ import ChefeLayout from './features/chefeFusex/ChefeLayout'
 import ChefeMinhasInformacoesPage from './features/chefeFusex/ChefeMyInfoPage'
 import RecepcaoLayout from './features/guiasRecepcao/RecepcaoLayout'
 import GuiasParaImpressaoPage from './features/guiasRecepcao/GuiasParaImpressaoPage'
-import EmConstrucao from './shared/components/EmConstrucao'
+import InicioBeneficiarioPage from './features/inicio/InicioBeneficiarioPage'
+import InicioMedicoPage from './features/inicio/InicioMedicoPage'
 import { GuiasParaAssinarChefe, GuiasParaAssinarMedico } from './features/guiasParaAssinar/GuiasParaAssinarRotas'
-import BeneficiariosPage from './features/chefeBeneficiarios/BeneficiariosPage'
+import BeneficiariosRota from './features/chefeBeneficiarios/BeneficiariosRota'
+import DependentesTitularRota from './features/chefeDependentes/DependentesTitularRota'
+import DependenteFormRota from './features/chefeDependentes/DependenteFormRota'
+import VersosFaturasPage from './features/versosGuias/VersosFaturasPage'
+import VersosGuiasFaturaPage from './features/versosGuias/VersosGuiasFaturaPage'
 import NovaPreGuiaMedicoPage from './features/medicoFusex/NovaPreGuiaMedico'
 import MedicosPage from './features/chefeMedicos/MedicosPage'
 import CorrigirPreGuiasPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiasPage'
 import CorrigirPreGuiaPage from './features/medicoFusex/CorrigirPreGuias/CorrigirPreGuiaPage'
+import OcsLayout from './features/espelhoOcs/OcsLayout'
+import EspelhoPage from './features/espelhoOcs/EspelhoPage'
+import GuiasFinalizadasPage from './features/espelhoOcs/GuiasFinalizadasPage'
+import EspelhoEmConstrucaoPage from './features/espelhoOcs/EspelhoEmConstrucaoPage'
+import GuiasRecebidasPage from './features/guiasRecebidasOcs/GuiasRecebidasPage'
+import DetalheGuiaRecebidaPage from './features/guiasRecebidasOcs/DetalheGuiaRecebidaPage'
+import EspelhoEnviadoDetalhePage from './features/espelhoOcs/EspelhoEnviadoDetalhePage'
 
 /**
  * Tabela de rotas da aplicacao. Cada perfil tem um layout proprio (menu lateral e barra superior)
@@ -48,17 +73,18 @@ export default function App() {
       {/* Teste de conexao com o backend: aberto, sem login */}
       <Route path="/diagnostico/conexao" element={<main className="app-main"><ConexaoPage /></main>} />
 
-      <Route element={<RotaProtegida perfil="BENEFICIARIO"><AppLayout /></RotaProtegida>}>
-        <Route path="/beneficiario/inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
+      <Route element={<RotaProtegida perfil={["BENEFICIARIO", "RESPONSAVEL_EXTERNO"]}><AppLayout /></RotaProtegida>}>
+        <Route path="/beneficiario/inicio" element={<InicioBeneficiarioPage />} />
         <Route path="/pre-guias" element={<MinhasPreGuiasRota />} />
         <Route path="/pre-guias/:id/corrigir" element={<CorrecaoPreGuiaRota />} />
         <Route path="/pre-guias/nova" element={<NovaPreGuiaPage />} />
+        <Route path="/guias" element={<MinhasGuiasPage />} />
         <Route path="/beneficiario/minhas-informacoes" element={<MinhasInformacoesPage />} />
       </Route>
 
       <Route path="/medico" element={<RotaProtegida perfil="MEDICO"><MedicoLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="inicio" replace />} />
-        <Route path="inicio" element={<EmConstrucao nome="Início" task="Tela não desenhada (espaço reservado)" />} />
+        <Route path="inicio" element={<InicioMedicoPage />} />
         <Route path="nova-pre-guia" element={<NovaPreGuiaMedicoPage />} />
         <Route path="corrigir-pre-guias" element={<CorrigirPreGuiasPage />} />
         <Route path="corrigir-pre-guias/:id" element={<CorrigirPreGuiaPage />} />
@@ -69,7 +95,10 @@ export default function App() {
       <Route path="/chefe" element={<RotaProtegida perfil="CHEFE_FUSEX"><ChefeLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-assinar" replace />} />
         <Route path="guias-para-assinar" element={<GuiasParaAssinarChefe />} />
-        <Route path="beneficiarios" element={<BeneficiariosPage />} />
+        <Route path="beneficiarios" element={<BeneficiariosRota />} />
+        <Route path="beneficiarios/:id/dependentes" element={<DependentesTitularRota />} />
+        <Route path="beneficiarios/:id/dependentes/novo" element={<DependenteFormRota />} />
+        <Route path="beneficiarios/:id/dependentes/:dependenteId/editar" element={<DependenteFormRota />} />
         <Route path="medicos" element={<MedicosPage />} />
         <Route path="minhas-informacoes" element={<ChefeMinhasInformacoesPage />} />
       </Route>
@@ -82,9 +111,45 @@ export default function App() {
       {/* rota antiga da fila */}
       <Route path="/fila-pre-guias" element={<Navigate to="/setor-guias/fila" replace />} />
 
+      <Route path="/setor-fatura" element={<RotaProtegida perfil="SETOR_FATURA"><SetorFaturasLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="espelhos-recebidos" replace />} />
+        <Route path="espelhos-recebidos" element={<EspelhosRecebidosPage />} />
+        {/* T24-FE4 (Faturas Auditadas): tela a implementar na SCRUM-217 */}
+        <Route path="faturas-auditadas" element={<AuditadasPage />} />
+      </Route>
+
+      <Route path="/rastreabilidade" element={<RotaProtegida perfil="RASTREABILIDADE"><RastreabilidadeLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="faturas-recebidas" replace />} />
+        {/* T25-FE-1 (Faturas Recebidas, SCRUM-225) e T25-FE2 (lisura da fatura, SCRUM-226): telas a implementar */}
+        <Route path="faturas-recebidas" element={<FaturasRecebidasPage />} />
+        <Route path="faturas/:id" element={<LisuraFaturaPage />} />
+        <Route path="versos" element={<VersosFaturasPage />} />
+        <Route path="versos/:id" element={<VersosGuiasFaturaPage />} />
+      </Route>
+
+      <Route path="/auditoria" element={<RotaProtegida perfil="AUDITORIA"><AuditoriaLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="faturas-recebidas" replace />} />
+        {/* T26-FE1 (Faturas Recebidas) e T26-FE4 (Faturas Analisadas): telas a implementar */}
+        <Route path="faturas-recebidas" element={<FaturasRecebidasAuditoriaPage />} />
+        <Route path="faturas/:id" element={<AuditoriaFaturaPage />} />
+        <Route path="faturas-analisadas" element={<FaturasAnalisadasPage />} />
+      </Route>
+
       <Route path="/recepcao" element={<RotaProtegida perfil="RECEPCAO"><RecepcaoLayout /></RotaProtegida>}>
         <Route index element={<Navigate to="guias-para-impressao" replace />} />
         <Route path="guias-para-impressao" element={<GuiasParaImpressaoPage />} />
+      </Route>
+
+      <Route path="/ocs" element={<RotaProtegida perfil="OCS"><OcsLayout /></RotaProtegida>}>
+        <Route index element={<Navigate to="espelho" replace />} />
+        <Route path="guias-recebidas" element={<GuiasRecebidasPage />} />
+        <Route path="guias-recebidas/:id" element={<DetalheGuiaRecebidaPage />} />
+        <Route path="guias-finalizadas" element={<GuiasFinalizadasPage />} />
+        <Route path="espelho" element={<EspelhoPage />} />
+        <Route path="glosas" element={<GlosasRecebidasPage />} />
+        <Route path="glosas/:id" element={<GlosaDetalhePage />} />
+        <Route path="espelho/atual" element={<EspelhoEmConstrucaoPage />} />
+        <Route path="espelho/historico/:id" element={<EspelhoEnviadoDetalhePage />} />
       </Route>
 
       <Route path="*" element={<main className="app-main"><p>Página não encontrada.</p></main>} />

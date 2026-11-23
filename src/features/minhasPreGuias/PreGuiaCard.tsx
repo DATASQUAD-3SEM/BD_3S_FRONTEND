@@ -36,6 +36,8 @@ function imprimirBlob(blob: Blob) {
   document.body.appendChild(iframe);
 }
 
+import { textoPaciente } from './paciente';
+
 interface Props {
   preGuia: PreGuiaDoBeneficiario;
   api: MinhasPreGuiasApi;
@@ -87,6 +89,8 @@ export default function PreGuiaCard({ preGuia, api, onVisualizarECorrigir }: Pro
         </h2>
         <StatusBadge status={status} />
       </header>
+
+      {preGuia.paciente && <p className="pre-guia-card__meta">Paciente: {textoPaciente(preGuia.paciente)}</p>}
 
       {status === 'PENDENTE' && (
         <>

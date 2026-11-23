@@ -1,5 +1,6 @@
 import { get, getBlob, post } from '../../shared/api/http'
 import type {
+  AssinaturaLoteResultado,
   AssinaturaRegistrada,
   GuiaParaAssinar,
   GuiasParaAssinarApi,
@@ -24,5 +25,10 @@ export const guiasParaAssinarApi: GuiasParaAssinarApi = {
   assinar(guiaId: number): Promise<AssinaturaRegistrada> {
     // Sem corpo: o papel vem do perfil do token no backend.
     return post<AssinaturaRegistrada>(`/guias/${guiaId}/assinaturas`, undefined)
+  },
+
+  assinarLote(guiaIds: number[]): Promise<AssinaturaLoteResultado> {
+    // 200 sem falhas e 207 com falhas: o cliente HTTP devolve o corpo nos dois casos
+    return post<AssinaturaLoteResultado>('/guias/assinar-lote', { guiaIds })
   },
 }

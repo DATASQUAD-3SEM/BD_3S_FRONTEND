@@ -1,0 +1,341 @@
+.mg-pagina h1 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  color: #1f3d2b;
+}
+
+/* Filtro "Mostrar" acima da lista */
+.mg-filtro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #5b6b62;
+  font-size: 14px;
+}
+.mg-filtro select {
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  min-height: 40px;
+}
+
+/* Lista de cartões */
+.mg-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Cartão de uma guia */
+.mg-card {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  overflow-wrap: anywhere;
+}
+.mg-card__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mg-card__topo h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #1f3d2b;
+}
+.mg-card__meta {
+  color: #5b6b62;
+  font-size: 14px;
+  margin: 8px 0 4px;
+}
+.mg-card__procedimentos {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+  font-size: 14px;
+  color: #303d35;
+}
+.mg-card__procedimentos li + li {
+  margin-top: 2px;
+}
+.mg-card__texto {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #1f2a24;
+}
+.mg-card__contadores {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #1f2a24;
+}
+
+/* Cores dos badges da situação (base ".badge" vem de styles/global.css) */
+.badge-nao-enviada  { background: #fff3c4; color: #7a5b00; } /* amarelo */
+.badge-enviada      { background: #d9e8ff; color: #1b4a94; } /* azul */
+.badge-em-execucao  { background: #e7defa; color: #4b2d92; } /* roxo */
+.badge-realizada    { background: #d5f0dc; color: #1c6b34; } /* verde */
+.badge-encerrada    { background: #e5e7eb; color: #374151; } /* cinza */
+.badge-vencida      { background: #fadcdc; color: #8a1c12; } /* vermelho */
+
+/* Estados da página */
+.mg-skeleton {
+  height: 120px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  background: linear-gradient(90deg, #e8ede9 25%, #f4f7f5 50%, #e8ede9 75%);
+  background-size: 200% 100%;
+  animation: mg-brilho 1.2s infinite;
+}
+@keyframes mg-brilho {
+  to { background-position: -200% 0; }
+}
+
+.mg-estado-vazio,
+.mg-estado-erro {
+  background: #fff;
+  border: 1px dashed #b9c4bd;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  color: #5b6b62;
+}
+.mg-estado-erro button {
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .mg-card__topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Botão "Enviar para a OCS" (só em Não enviada) */
+.mg-card__acao-primaria {
+  margin-top: 12px;
+  font: inherit;
+  font-weight: 600;
+  background: #1f3d2b;
+  color: #fff;
+  border: 1px solid #1f3d2b;
+  border-radius: 8px;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+}
+
+.mg-card__acao-primaria:hover:not(:disabled) {
+  background: #2a523a;
+  border-color: #2a523a;
+}
+
+.mg-card__acao-primaria:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Painel de confirmação, dentro do cartão */
+.mg-confirmacao {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #eef5f0;
+  border: 1px solid #b9c4bd;
+  border-radius: 10px;
+}
+
+.mg-confirmacao__titulo {
+  margin: 0 0 10px;
+  color: #1f3d2b;
+  font-size: 15px;
+}
+
+.mg-confirmacao__dados {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.mg-confirmacao__dados > div {
+  display: contents;
+}
+
+.mg-confirmacao__dados dt {
+  color: #5b6b62;
+  font-size: 13px;
+}
+
+.mg-confirmacao__dados dd {
+  margin: 0;
+  color: #1f2a24;
+  overflow-wrap: anywhere;
+}
+
+.mg-confirmacao__erro {
+  margin: 0 0 12px;
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.mg-confirmacao__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botões do painel de confirmação */
+.mg-botao {
+  font: inherit;
+  font-weight: 600;
+  background: #fff;
+  color: #1f3d2b;
+  border: 1px solid #b9c4bd;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.mg-botao:hover:not(:disabled) {
+  background: #f1f5f2;
+}
+
+.mg-botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mg-botao--primario {
+  background: #1f3d2b;
+  color: #fff;
+  border-color: #1f3d2b;
+}
+
+.mg-botao--primario:hover:not(:disabled) {
+  background: #2a523a;
+  border-color: #2a523a;
+}
+
+/* Mensagem de sucesso, depois do envio */
+.mg-sucesso {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: #eaf5ee;
+  border: 1px solid #b9dcc6;
+  border-radius: 8px;
+  color: #1d3d30;
+  font-size: 14px;
+}
+
+/* Painel "Assinar sessões", abaixo do botão primário do cartão */
+.mg-assinar {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #eef5f0;
+  border: 1px solid #b9c4bd;
+  border-radius: 10px;
+}
+
+/* Cabeçalho: título + botão Fechar */
+.mg-assinar__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.mg-assinar__titulo {
+  margin: 0;
+  color: #1f3d2b;
+  font-size: 15px;
+}
+
+/* Lista de sessões SOLICITADAS */
+.mg-assinar__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mg-assinar__sessao {
+  background: #fff;
+  border: 1px solid #dfe5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.mg-assinar__sessao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: #1f2a24;
+}
+
+/* Confirmação inline de uma sessão (uma por vez) */
+.mg-assinar__confirmacao {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f6faf7;
+  border: 1px dashed #b9c4bd;
+  border-radius: 8px;
+}
+
+.mg-assinar__confirmacao-titulo {
+  margin: 0 0 8px;
+  color: #1f3d2b;
+  font-size: 14px;
+}
+
+.mg-assinar__erro {
+  margin: 0 0 8px;
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.mg-assinar__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Estado vazio (raro: painel aberto e todas já assinadas em outra aba) */
+.mg-assinar__vazio {
+  margin: 0 0 10px;
+  color: #5b6b62;
+  font-size: 14px;
+}
+
+/* "Já assinadas: sessão N em dd/mm/aaaa" (uma linha por sessão) */
+.mg-assinar__ja-assinadas {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid #dfe5e1;
+  font-size: 14px;
+  color: #1f5e37;
+}
+
+.mg-assinar__ja-assinadas li + li {
+  margin-top: 4px;
+}
+
+/* Empilha o cabeçalho da sessão no celular */
+@media (max-width: 600px) {
+  .mg-assinar__sessao-cabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

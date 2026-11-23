@@ -35,7 +35,12 @@ const LOGINS: Record<Perfil, string> = {
   MEDICO: '11144477735',
   CHEFE_FUSEX: 'chefe.fusex',
   SETOR_GUIAS: 'setor.guias',
+  SETOR_FATURA: 'setor.fatura',
+  RASTREABILIDADE: 'rastreabilidade',
+  AUDITORIA: 'auditoria',
+  RESPONSAVEL_EXTERNO: '',
   RECEPCAO: 'recepcao',
+  OCS: 'ocs.laboratorio',
 }
 
 function entrarComo(perfil: Perfil) {

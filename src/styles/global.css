@@ -68,10 +68,11 @@ code { background: #ecefec; padding: 0.1em 0.35em; border-radius: 4px; font-size
 .app-header a.ativo { color: #fff; font-weight: 700; border-bottom: 2px solid #fff; }
 
 .app-main {
-  padding: 2rem 1.5rem;
-  max-width: 960px;
+  padding: 2rem 2.5rem 3rem;
+  max-width: 1240px;
   width: 100%;
-  margin: 0 auto;   /* <- adicionar */
+  margin: 0;
+  min-width: 0;
 }
 
 .app-overlay {
@@ -180,7 +181,8 @@ button:focus-visible { outline: 3px solid #7fb08c; outline-offset: 2px; }
 }
 .botao-primario:hover:not(:disabled),
 .botao-atencao:hover:not(:disabled) { background: var(--verde); }
-input, select { font-size: 1rem; min-height: 44px; }
+/* T36-FE1: so os campos de texto e as listas tem altura minima; caixa de selecao e radio ficam do tamanho padrao */
+:where(input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']), select) { font-size: 1rem; min-height: 44px; }
 
 /* ===== Card de dados do beneficiario (estilo "readonly rows") ===== */
 .painel-dados {
@@ -594,10 +596,51 @@ input, select { font-size: 1rem; min-height: 44px; }
   margin: 0 0 0.6rem;
 }
 
+.info-assinatura-rotulo {
+  margin: 0 0 0.3rem;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* T37-FE1: pre-visualizacao e quadro de desenho usam a mesma area de proporcao 3:1 (a da imagem guardada). */
+.info-previa-assinatura {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 3 / 1;
+
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  background: #fff;
+
+  box-sizing: border-box;
+  margin-bottom: 0.9rem;
+  overflow: hidden;
+}
+
+.info-previa-assinatura img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.info-previa-assinatura-aviso {
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  padding: 0 0.75rem;
+  text-align: center;
+}
+
 .info-quadro-assinatura {
   position: relative;
   width: 100%;
-  height: 152px;
+  max-width: 900px;
+  aspect-ratio: 3 / 1;
 
   border: 2px dashed #c4d2c8;
   border-radius: 8px;
@@ -607,6 +650,30 @@ input, select { font-size: 1rem; min-height: 44px; }
   margin-bottom: 0.65rem;
   overflow: hidden;
   touch-action: none;
+}
+
+/* Linha-guia e dica ficam fora do canvas: nao entram na imagem enviada. */
+.info-quadro-linha-guia {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 72%;
+
+  border-top: 1px solid #9fb3a5;
+  pointer-events: none;
+}
+
+.info-quadro-dica {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(72% + 0.25rem);
+
+  color: #6b7f72;
+  font-size: 0.75rem;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
 }
 
 .info-quadro-assinatura canvas {
@@ -731,4 +798,190 @@ input, select { font-size: 1rem; min-height: 44px; }
 }
 .app-sair:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+/* ======================================================================
+   T36-FE1: base visual do Nexus
+   Tokens, campos, botoes, tabelas, cartoes, selos, avisos e o layout comum.
+   Classes utilitarias para as telas: .cartao, .selo, .aviso, .tabela, .botao-limpo.
+   ====================================================================== */
+:root {
+  --verde-medio: #24573a;
+  --verde-tinta: #1f5f3f;
+  --cinza-borda: #dfe5e1;
+  --cinza-campo: #b9c4bd;
+  --sombra-1: 0 1px 2px rgba(26, 61, 46, 0.06), 0 2px 8px rgba(26, 61, 46, 0.05);
+  --sombra-2: 0 10px 30px rgba(26, 61, 46, 0.12);
+  --raio: 10px;
+  --raio-grande: 14px;
+  --foco: 0 0 0 3px rgba(31, 77, 43, 0.2);
+  --aviso-borda: #f0d28a;
+  --aviso-fundo: #fff8e6;
+  --aviso-texto: #6b4a00;
+  --info-borda: #bcd5f0;
+  --info-fundo: #eef5fc;
+  --info-texto: #1c4b8a;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--fundo); }
+h2 { color: var(--verde-escuro); }
+a { color: var(--verde-tinta); }
+::selection { background: #cfe5d6; }
+
+/* ----- Campos ----- */
+:where(input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']), select, textarea) {
+  font: inherit;
+  color: var(--texto);
+  background: #fff;
+  border: 1px solid var(--cinza-campo);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+:where(input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']), select, textarea):focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: var(--foco);
+}
+:where(input, select, textarea):disabled { background: #f1f4f2; color: #6b7a71; cursor: not-allowed; }
+:where(input, textarea)[aria-invalid='true'] { border-color: var(--erro); }
+:where(input[type='checkbox'], input[type='radio']) {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--verde);
+  cursor: pointer;
+  vertical-align: middle;
+}
+::placeholder { color: #8a978f; }
+
+/* ----- Botoes ----- */
+:where(button) {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+:where(button):hover:not(:disabled) { filter: brightness(1.06); }
+:where(button):active:not(:disabled) { transform: translateY(1px); }
+/* Botao que nao e acao (item de lista de busca, cartao clicavel): sem o estilo verde global. */
+.botao-limpo {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-weight: inherit;
+  text-align: left;
+  filter: none;
+}
+
+/* ----- Cartoes, selos e avisos ----- */
+.cartao {
+  background: #fff;
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--raio-grande);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--sombra-1);
+}
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--verde-claro);
+  color: var(--verde-escuro);
+  border: 1px solid #c9e0cf;
+  white-space: nowrap;
+}
+.aviso {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--raio);
+  border: 1px solid var(--aviso-borda);
+  border-left-width: 4px;
+  background: var(--aviso-fundo);
+  color: var(--aviso-texto);
+}
+.aviso--info { border-color: var(--info-borda); background: var(--info-fundo); color: var(--info-texto); }
+.aviso--ok { border-color: #b6dcc4; background: var(--ok-fundo); color: var(--ok); }
+.aviso--erro { border-color: #f2c4c4; background: var(--erro-fundo); color: var(--erro); }
+
+/* ----- Tabelas ----- */
+.tabela { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: #fff; }
+.tabela thead th {
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  background: #f4f7f5;
+  border-bottom: 1px solid var(--cinza-borda);
+}
+.tabela tbody td,
+.tabela tbody th { padding: 0.65rem 0.85rem; border-bottom: 1px solid #eef2ef; vertical-align: middle; }
+.tabela tbody tr:hover { background: #f8fbf9; }
+
+/* ----- Layout: barra superior, menu lateral e area de conteudo ----- */
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: 60px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+.app-topbar .brand { color: #fff; text-decoration: none; }
+.brand-simbolo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--verde-escuro);
+  font-family: var(--fonte-serif);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+.app-topbar-direita { display: flex; align-items: center; gap: 0.75rem; }
+.app-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2f6b48;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+.app-usuario { font-size: 0.95rem; color: #e3f1e7; }
+.app-sair {
+  min-height: 36px;
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+.app-sair:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); filter: none; }
+.app-sidebar { padding: 1.25rem 0.75rem; }
+.app-sidebar nav a { font-weight: 500; }
+.app-sidebar nav a.ativo { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.app-body { align-items: stretch; }
+.app-main > h1:first-child { margin-top: 0; }
+
+@media (max-width: 720px) {
+  .app-usuario { display: none; }
+  .app-main { padding: 1rem 0.85rem 2rem; }
 }
