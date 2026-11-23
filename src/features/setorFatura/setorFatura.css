@@ -1,5 +1,5 @@
 /* Setor de Faturas — Espelhos Recebidos (T24-FE1). Paleta alinhada ao resto do app (verde #1f3d2b, cartões #fff). */
-.sf { display: flex; flex-direction: column; gap: 16px; color: #1f2a24; max-width: 960px; }
+.sf { display: flex; flex-direction: column; gap: 16px; color: #1f2a24; max-width: 1180px; }
 .sf-cabecalho h1 {
   margin: 0 0 6px;
   font-family: Georgia, 'Times New Roman', serif;
