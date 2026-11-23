@@ -87,3 +87,23 @@
   position: fixed; inset: 0; z-index: 1000; box-sizing: border-box; padding: 16px; background: #fff;
 }
 .pgs-viewer--tela-cheia .pgs-viewer__area { flex: 1 1 auto; height: auto; min-height: 0; }
+
+/* T36-FE3: tabela "Exames na Guia" dentro do cartao (antes as celulas com campos passavam da borda). */
+.pgs__exames-tabela { display: flex; flex-direction: column; gap: 8px; }
+.pgs__exames-tabela table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0 6px; }
+.pgs__exames-tabela th { text-align: left; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--texto-suave); padding: 0 4px; }
+.pgs__exames-tabela th:nth-child(1) { width: 28%; }
+.pgs__exames-tabela th:nth-child(2) { width: 42%; }
+.pgs__exames-tabela th:nth-child(3) { width: 14%; }
+.pgs__exames-tabela th:nth-child(4) { width: 16%; }
+.pgs__exames-tabela td { padding: 0 4px; vertical-align: top; }
+.pgs__exames-tabela td input { width: 100%; min-width: 0; min-height: 40px; }
+.pgs__exames-tabela td .botao { width: 100%; min-height: 40px; padding: 6px 8px; font-size: 13px; }
+.pgs__exames-tabela td .pgs__erro-campo { margin: 4px 0 0; font-size: 12px; }
+.pgs__exames-tabela > .botao { align-self: flex-start; }
+@media (max-width: 720px) {
+  .pgs__exames-tabela th:nth-child(1) { width: 30%; }
+  .pgs__exames-tabela th:nth-child(2) { width: 34%; }
+  .pgs__exames-tabela th:nth-child(3) { width: 16%; }
+  .pgs__exames-tabela th:nth-child(4) { width: 20%; }
+}
